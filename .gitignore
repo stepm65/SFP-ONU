@@ -1,0 +1,20 @@
+# Factory inputs and build outputs stay out of git. Published images live in firmware/.
+/base/
+/upload/
+/release-*/
+*.tar
+!/firmware/*.tar
+!/firmware/original/*.tar
+*.zip
+*.gz
+# Personal data: real profiles, the private reference, local fixtures.
+*PRIVATE*
+Huawei-working-reference-RU.md
+/odi-panel/work17/
+# Tooling and generated test artefacts.
+/tools/dom/node_modules/
+/odi-panel/*-test-report.json
+/odi-panel/rendered-tests.json
+/odi-panel/base
+__pycache__/
+*.pyc

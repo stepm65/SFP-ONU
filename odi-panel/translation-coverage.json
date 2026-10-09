@@ -1,0 +1,78 @@
+{
+  "result": "passed",
+  "scope": "18 primary native templates, panel UI, and identified literal native alerts; not every unused Realtek SDK template or unknown runtime string",
+  "pages": {
+    "status.asp": {
+      "referenced_ids": 24,
+      "missing_ids": []
+    },
+    "status_pon.asp": {
+      "referenced_ids": 13,
+      "missing_ids": []
+    },
+    "tcpiplan.asp": {
+      "referenced_ids": 18,
+      "missing_ids": []
+    },
+    "multi_wan_generic.asp": {
+      "referenced_ids": 54,
+      "missing_ids": []
+    },
+    "gpon.asp": {
+      "referenced_ids": 31,
+      "missing_ids": []
+    },
+    "epon.asp": {
+      "referenced_ids": 23,
+      "missing_ids": []
+    },
+    "vlan.asp": {
+      "referenced_ids": 13,
+      "missing_ids": []
+    },
+    "omci_info.asp": {
+      "referenced_ids": 15,
+      "missing_ids": []
+    },
+    "arptable.asp": {
+      "referenced_ids": 6,
+      "missing_ids": []
+    },
+    "ping.asp": {
+      "referenced_ids": 4,
+      "missing_ids": []
+    },
+    "saveconf.asp": {
+      "referenced_ids": 14,
+      "missing_ids": []
+    },
+    "password.asp": {
+      "referenced_ids": 13,
+      "missing_ids": []
+    },
+    "rebootTime.asp": {
+      "referenced_ids": 5,
+      "missing_ids": []
+    },
+    "reboot.asp": {
+      "referenced_ids": 4,
+      "missing_ids": []
+    },
+    "upgrade.asp": {
+      "referenced_ids": 7,
+      "missing_ids": []
+    },
+    "stats.asp": {
+      "referenced_ids": 20,
+      "missing_ids": []
+    },
+    "admin/pon-stats.asp": {
+      "referenced_ids": 16,
+      "missing_ids": []
+    },
+    "wanmode.asp": {
+      "referenced_ids": 4,
+      "missing_ids": []
+    }
+  }
+}

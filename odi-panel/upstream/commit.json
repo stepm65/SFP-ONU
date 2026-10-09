@@ -1,0 +1,106 @@
+{
+  "sha": "ad2fde9df058e3fa70b8b079ae5bcd308d41e394",
+  "node_id": "C_kwDOFD7g1doAKGFkMmZkZTlkZjA1OGUzZmE3MGI4YjA3OWFlNWJjZDMwOGQ0MWUzOTQ",
+  "commit": {
+    "author": {
+      "name": "Hitoha",
+      "email": "ilham92_sakura@yahoo.com",
+      "date": "2026-06-18T08:33:06Z"
+    },
+    "committer": {
+      "name": "GitHub",
+      "email": "noreply@github.com",
+      "date": "2026-06-18T08:33:06Z"
+    },
+    "message": "Merge pull request #480 from neo2043/docs/add-excitel-genexis-mikrotik-guide\n\nAdd Excitel Genexis MikroTik GPON SFP guide",
+    "tree": {
+      "sha": "df038da97acb9b091e5dab5addf5c6656d31ffb1",
+      "url": "https://api.github.com/repos/Anime4000/RTL960x/git/trees/df038da97acb9b091e5dab5addf5c6656d31ffb1"
+    },
+    "url": "https://api.github.com/repos/Anime4000/RTL960x/git/commits/ad2fde9df058e3fa70b8b079ae5bcd308d41e394",
+    "comment_count": 0,
+    "verification": {
+      "verified": true,
+      "reason": "valid",
+      "signature": "-----BEGIN PGP SIGNATURE-----\n\nwsFcBAABCAAQBQJqM61CCRC1aQ7uu5UhlAAAcpcQAIssqCuwx0qrXyptqqE5wKVQ\nmEx92t0gMdgYPBZxqf6m4rAV7qfTwfIzS8FdRaRBJFaUJIf46b5dk9l5dka8xonq\nVpdltVdF5aG3wKlzNzrPgHVqaOc6+jHHfpYPVNwUACS/XWNstseS7ZGNEbgBMedN\nW8xE9cT3DrXHsBcQ1Nt1ayrxe3PXWrhr+7JisvEJCqSFdxfWobSL6ObF58/OKSHG\nkVsn1cSMFH7vVZDDkP0pgOTN1ZXXFA4V8DNJTCyZlJsCPzsuXQBDbHqDoWTe/2tA\nBpZZhKnGCUw0WWFu3SJju2LOcYr9OZtg1Z4P8Jq/jKoAiay4UBrYkibuSsUQaRFq\nCqvttgaS4yC+/RP2Dna/53SDoRPkjS171NzjAxk0goVBBVVwLVXQJFAFHb/IMZVP\nTAeFUZIvmmz3Cuc34ggD1aZ2cVytec7Kt8FHR61AsUTckc1eL5a1Qu5UCug1ojp6\nU9HeFxlP4fa1kAUaXOFreI1IJvin/TQTpeMkTcQFIDtp7iqEwLJpWeYu8/BCcRA2\nVU8eamkKfWE7E3+/LcFCVGZkmlDqSOgluYabSJyctsE4j01OPRGlvhbeIXcWpcig\nTiR0yEyxBjhNrUbPU9o25kAlgyrUpucEjuIILoN0m+Xal4NcZ7cs+CoCX/5bWBVi\n8c2khK9q92S+t5BWy48g\n=2tHE\n-----END PGP SIGNATURE-----\n",
+      "payload": "tree df038da97acb9b091e5dab5addf5c6656d31ffb1\nparent c73115c07fbb2ab892a2d63076a1756292f63218\nparent 1fabac89bd70a9d3452dc86cc604d684f021a564\nauthor Hitoha <ilham92_sakura@yahoo.com> 1781771586 +0800\ncommitter GitHub <noreply@github.com> 1781771586 +0800\n\nMerge pull request #480 from neo2043/docs/add-excitel-genexis-mikrotik-guide\n\nAdd Excitel Genexis MikroTik GPON SFP guide",
+      "verified_at": "2026-06-18T08:33:07Z"
+    }
+  },
+  "url": "https://api.github.com/repos/Anime4000/RTL960x/commits/ad2fde9df058e3fa70b8b079ae5bcd308d41e394",
+  "html_url": "https://github.com/Anime4000/RTL960x/commit/ad2fde9df058e3fa70b8b079ae5bcd308d41e394",
+  "comments_url": "https://api.github.com/repos/Anime4000/RTL960x/commits/ad2fde9df058e3fa70b8b079ae5bcd308d41e394/comments",
+  "author": {
+    "login": "Anime4000",
+    "id": 1908715,
+    "node_id": "MDQ6VXNlcjE5MDg3MTU=",
+    "avatar_url": "https://avatars.githubusercontent.com/u/1908715?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/Anime4000",
+    "html_url": "https://github.com/Anime4000",
+    "followers_url": "https://api.github.com/users/Anime4000/followers",
+    "following_url": "https://api.github.com/users/Anime4000/following{/other_user}",
+    "gists_url": "https://api.github.com/users/Anime4000/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/Anime4000/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/Anime4000/subscriptions",
+    "organizations_url": "https://api.github.com/users/Anime4000/orgs",
+    "repos_url": "https://api.github.com/users/Anime4000/repos",
+    "events_url": "https://api.github.com/users/Anime4000/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/Anime4000/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "committer": {
+    "login": "web-flow",
+    "id": 19864447,
+    "node_id": "MDQ6VXNlcjE5ODY0NDQ3",
+    "avatar_url": "https://avatars.githubusercontent.com/u/19864447?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/web-flow",
+    "html_url": "https://github.com/web-flow",
+    "followers_url": "https://api.github.com/users/web-flow/followers",
+    "following_url": "https://api.github.com/users/web-flow/following{/other_user}",
+    "gists_url": "https://api.github.com/users/web-flow/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/web-flow/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/web-flow/subscriptions",
+    "organizations_url": "https://api.github.com/users/web-flow/orgs",
+    "repos_url": "https://api.github.com/users/web-flow/repos",
+    "events_url": "https://api.github.com/users/web-flow/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/web-flow/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "parents": [
+    {
+      "sha": "c73115c07fbb2ab892a2d63076a1756292f63218",
+      "url": "https://api.github.com/repos/Anime4000/RTL960x/commits/c73115c07fbb2ab892a2d63076a1756292f63218",
+      "html_url": "https://github.com/Anime4000/RTL960x/commit/c73115c07fbb2ab892a2d63076a1756292f63218"
+    },
+    {
+      "sha": "1fabac89bd70a9d3452dc86cc604d684f021a564",
+      "url": "https://api.github.com/repos/Anime4000/RTL960x/commits/1fabac89bd70a9d3452dc86cc604d684f021a564",
+      "html_url": "https://github.com/Anime4000/RTL960x/commit/1fabac89bd70a9d3452dc86cc604d684f021a564"
+    }
+  ],
+  "stats": {
+    "total": 447,
+    "additions": 447,
+    "deletions": 0
+  },
+  "files": [
+    {
+      "sha": "e5ba9fc113b5f62d63286c4df003f18af22cc45d",
+      "filename": "Docs/genexis-hsgq-gpon-sfp-mikrotik-guide.md",
+      "status": "added",
+      "additions": 447,
+      "deletions": 0,
+      "changes": 447,
+      "blob_url": "https://github.com/Anime4000/RTL960x/blob/ad2fde9df058e3fa70b8b079ae5bcd308d41e394/Docs%2Fgenexis-hsgq-gpon-sfp-mikrotik-guide.md",
+      "raw_url": "https://github.com/Anime4000/RTL960x/raw/ad2fde9df058e3fa70b8b079ae5bcd308d41e394/Docs%2Fgenexis-hsgq-gpon-sfp-mikrotik-guide.md",
+      "contents_url": "https://api.github.com/repos/Anime4000/RTL960x/contents/Docs%2Fgenexis-hsgq-gpon-sfp-mikrotik-guide.md?ref=ad2fde9df058e3fa70b8b079ae5bcd308d41e394",
+      "patch": "@@ -0,0 +1,447 @@\n+# Replacing Excitel Genexis ONT with HSGQ GPON SFP Stick on MikroTik hEX S\n+\n+Reference: https://github.com/Anime4000/RTL960x/issues/478\n+\n+This guide documents the full process used to replace a Genexis GPON ONT with an HSGQ/DFP-style GPON SFP stick on a MikroTik RB760iGS / hEX S.\n+\n+The important outcome from the original troubleshooting thread is that the stock ONT configuration showed Internet VLAN `100`, while live OMCI provisioning showed VLAN `331` in `ME 171`. In this setup, both VLAN `100` and VLAN `331` were observed to work, depending on how VLAN handling was configured between the SFP stick and the router.\n+\n+## Hardware\n+\n+* Stock ONT: Genexis T2122A (T21 Pro)\n+* Replacement ONT: HSGQ GPON SFP stick\n+* Router: MikroTik RB760iGS / hEX S\n+* RouterOS: 7.23.1\n+* SFP management IP: `192.168.1.80`\n+* Router LAN IP: `192.168.88.1/24`\n+* Router SFP management IP: `192.168.1.1/24`\n+\n+The SFP stick reported this CPU information:\n+\n+```text\n+system type : RTL8672\n+processor   : 0\n+cpu model   : 56322\n+BogoMIPS    : 299.00\n+```\n+\n+## Safety\n+\n+GPON networks are shared infrastructure. Incorrect ONU identity, bad OMCI behavior, or unstable optical levels can affect other subscribers on the same PON segment.\n+\n+Do not blindly copy values from another user's ONT. Clone only your own stock ONT values, and stop if the device repeatedly fails registration or behaves unpredictably.\n+\n+## Values to Extract From the Stock ONT\n+\n+From the Genexis ONT web UI and/or its configuration dump, I collected these values:\n+\n+```text\n+Manufacturer\n+ProductClass\n+SerialNumber / GPON SN / XPON SN\n+Hardware version\n+Software version\n+ONU MAC\n+WAN MAC\n+OUI\n+PLOAM password, if used\n+LOID and LOID password, if used\n+PPPoE username and password\n+Internet WAN VLAN\n+```\n+\n+In the original case, the stock ONT exposed values similar to:\n+\n+```text\n+Manufacturer: GENEXIS\n+ProductClass: 3f1e00\n+SerialNumber: GNXS93901379\n+HWVer: C40-210\n+SWVer: T21PRO-V1.14EU\n+ONU MAC: 20:0C:86:3F:1E:02\n+GPON MAC: 20:0C:86:3F:1E:00\n+OUI: 200c86\n+xponsn: GNXS93901379\n+```\n+\n+## Stock ONT romfile.cfg Context\n+\n+The stock Genexis ONT configuration dump contained useful OMCI and WAN information. Relevant fields included:\n+\n+```xml\n+<ONU Version=\"RP0201\"\n+     VendorId=\"4899\"\n+     SerialNumber=\"<stock GPON serial>\"\n+     Password=\"<stock password>\"\n+     EquipmentId=\"GENEXIS\"\n+     OMCCVersion=\"A0\" />\n+```\n+\n+The Internet WAN service in the stock configuration showed VLAN `100`:\n+\n+```xml\n+<PVC0 VLANID=\"100\" VLANMode=\"TAG\" GPONEnable=\"Yes\">\n+<Entry0 ServiceList=\"INTERNET\"\n+        WanMode=\"Bridge\"\n+        BridgeMode=\"IP_Bridged\"\n+        VLANMode=\"TAG\"\n+        VLANID=\"100\" />\n+```\n+\n+This is important, but it is not the whole picture. `romfile.cfg` is the local saved configuration of the stock ONT/router. The OLT can still push live VLAN rules through OMCI that do not look identical to the locally saved WAN VLAN.\n+\n+## Configure the SFP Stick Identity\n+\n+Clone the stock ONT identity into the SFP stick. Exact variable names depend on firmware, but the values usually map to these fields:\n+\n+```sh\n+flash set GPON_SN <stock GPON serial>\n+flash set PON_VENDOR_ID <stock vendor id>\n+flash set HW_CWMP_MANUFACTURER GENEXIS\n+flash set HW_HWVER <stock hardware version>\n+flash set GPON_ONU_MODEL <stock model or product class>\n+flash set ELAN_MAC_ADDR <stock ONU or WAN MAC, depending on firmware expectation>\n+flash set MAC_KEY <generated MAC_KEY>\n+```\n+\n+Generate `MAC_KEY` using the keygen linked from the RTL960x README:\n+\n+```text\n+https://gist.github.com/rajkosto/29c513b96ea6262d2fb1f965a52ce16f\n+```\n+\n+Without the correct `MAC_KEY`, the stick may stay at `O0`/`O3`, fail to reach a usable `O5`, or show invalid authentication state.\n+\n+In the issue thread, the maintainer's first question was whether the correct `MAC_KEY` had been entered. After generating and applying the correct key, the stick reached a state where OMCI data could be inspected and PPPoE/VLAN handling became the remaining problem.\n+\n+## PON State Progression\n+\n+During troubleshooting, the stick showed states like:\n+\n+```text\n+ONU State: O0\n+ONU ID: 255\n+LOID Status: WRONG\n+```\n+\n+Then later:\n+\n+```text\n+ONU State: O3\n+ONU ID: 255\n+LOID Status: WRONG\n+```\n+\n+At one point it briefly showed:\n+\n+```text\n+ONU State: O5\n+ONU ID: 127\n+LOID Status: WRONG\n+```\n+\n+The final useful target is:\n+\n+```text\n+ONU State: O5\n+```\n+\n+`LOID Status: WRONG` may not be fatal if the ISP does not actually use LOID authentication for Internet service, but this depends on the OLT and ISP.\n+\n+## Inspect OMCI MIBs\n+\n+After the stick reaches `O5`, telnet or SSH into the SFP stick and inspect these OMCI managed entities:\n+\n+```sh\n+omcicli mib get 11\n+omcicli mib get 84\n+omcicli mib get 131\n+omcicli mib get 171\n+omcicli mib get 329\n+```\n+\n+In the original case:\n+\n+* `ME 11` showed Ethernet UNI information.\n+* `ME 84` was empty.\n+* `ME 131` showed OLT information.\n+* `ME 171` showed extended VLAN operation data.\n+* `ME 329` showed VEIP information.\n+\n+The relevant `ME 171` output was:\n+\n+```text\n+ExtVlanTagOperCfgData\n+=================================\n+EntityId: 0x101\n+AssociationType: 2\n+InputTPID: 0x8100\n+OutputTPID: 0x8100\n+DsMode: 0\n+ReceivedFrameVlanTaggingOperTable\n+INDEX 0\n+Filter Outer      : PRI 15,VID 4096, TPID 0\n+Filter Inner      : PRI 15,VID 4096, TPID 0, EthType 0x00\n+Treatment Outer   : PRI 15,VID 4096, TPID 0, RemoveTags 0\n+Treatment Inner   : PRI 0,VID 331, TPID 4\n+AssociatedMePoint : 0x101\n+```\n+\n+The line below is the key clue:\n+\n+```text\n+Treatment Inner   : PRI 0,VID 331, TPID 4\n+```\n+\n+`ME 171` means OMCI Managed Entity 171, Extended VLAN Tagging Operation Configuration Data. It tells the ONT/SFP how the OLT wants frames filtered, tagged, untagged, or translated on the Ethernet side.\n+\n+## Why romfile.cfg Showed VLAN 100 But ME 171 Showed VLAN 331\n+\n+The stock ONT `romfile.cfg` showed Internet VLAN `100` because that was the WAN service configuration inside the Genexis ONT.\n+\n+The live OMCI MIB showed VLAN `331` because the OLT provisioned an extended VLAN tagging operation involving VLAN `331`.\n+\n+These can differ for several reasons:\n+\n+* The stock ONT may translate VLANs internally.\n+* The stock ONT may expose a service VLAN like `100` in the web UI while handling another OMCI-provisioned VLAN internally.\n+* The SFP stick may bridge OMCI-provisioned VLANs differently from the original ONT box.\n+* `romfile.cfg` is static local configuration, while `ME 171` is live OLT provisioning.\n+\n+In this specific setup, both VLAN `100` and VLAN `331` were tested and worked. That means neither value should be treated as universally correct without checking the selected SFP VLAN mode and the router-side VLAN configuration.\n+\n+## SFP Web UI VLAN Modes\n+\n+The SFP web UI appears to have at least two practical VLAN handling modes.\n+\n+## Manual\n+\n+### Transparent\n+\n+In this mode, the SFP stick mostly forwards Ethernet frames to the router. VLAN tagging or untagging is done on the router.\n+\n+This is the preferred mode for this setup because the router has more CPU, RAM, tooling, and visibility than the SFP stick. It also makes packet captures and PPPoE debugging easier.\n+\n+Use this if you want the MikroTik to handle the WAN VLAN using an `/interface vlan` on `sfp1`.\n+\n+### PVID Mode\n+\n+In this mode, the SFP stick performs VLAN untagging internally. The router may then receive untagged traffic from the SFP stick.\n+\n+This can work, but it moves VLAN handling into the SFP stick, which is a much smaller device with fewer debugging tools.\n+\n+If using PVID mode, the router configuration may need PPPoE directly on `sfp1` instead of on a VLAN subinterface.\n+\n+## Recommended Design\n+\n+Use transparent/manual forwarding on the SFP stick and do VLAN handling on the MikroTik.\n+\n+This keeps the paths separate:\n+\n+```text\n+sfp1                 = physical SFP interface and SFP management access\n+wan-vlan331 on sfp1  = PPPoE WAN over VLAN 331\n+pppoe-out1           = Internet PPPoE client\n+bridge               = LAN bridge\n+```\n+\n+The SFP management IP stays reachable on the physical interface:\n+\n+```text\n+Router SFP management IP: 192.168.1.1/24\n+SFP management IP:        192.168.1.80/24\n+```\n+\n+The LAN stays separate:\n+\n+```text\n+Router LAN IP: 192.168.88.1/24\n+LAN DHCP pool: 192.168.88.2-192.168.88.254\n+```\n+\n+## Known Working MikroTik Configuration\n+\n+This is a sanitized version of the working MikroTik configuration. Replace placeholders with your own values.\n+\n+Set the SFP interface MAC address if your ISP expects the stock ONT/router-facing MAC:\n+\n+```routeros\n+/interface ethernet\n+set [ find default-name=sfp1 ] mac-address=<stock WAN MAC>\n+```\n+\n+Create the VLAN interface on `sfp1`:\n+\n+```routeros\n+/interface vlan\n+add comment=wan-vlan331 interface=sfp1 name=wan-vlan331 vlan-id=331\n+```\n+\n+Create the PPPoE client on the VLAN interface:\n+\n+```routeros\n+/interface pppoe-client\n+add add-default-route=yes dial-on-demand=yes disabled=no interface=wan-vlan331 name=pppoe-out1 use-peer-dns=yes user=<pppoe username> password=<pppoe password>\n+```\n+\n+Add interface lists:\n+\n+```routeros\n+/interface list\n+add comment=defconf name=WAN\n+add comment=defconf name=LAN\n+\n+/interface list member\n+add comment=defconf interface=bridge list=LAN\n+add interface=pppoe-out1 list=WAN\n+```\n+\n+Keep SFP management on the physical `sfp1` interface:\n+\n+```routeros\n+/ip address\n+add address=192.168.1.1/24 comment=\"SFP management\" interface=sfp1 network=192.168.1.0\n+```\n+\n+Keep the normal LAN on the bridge:\n+\n+```routeros\n+/ip address\n+add address=192.168.88.1/24 comment=defconf interface=bridge network=192.168.88.0\n+\n+/ip pool\n+add name=dhcp ranges=192.168.88.2-192.168.88.254\n+\n+/ip dhcp-server\n+add address-pool=dhcp interface=bridge name=defconf\n+\n+/ip dhcp-server network\n+add address=192.168.88.0/24 comment=defconf dns-server=192.168.88.1 gateway=192.168.88.1\n+```\n+\n+Add NAT for Internet:\n+\n+```routeros\n+/ip firewall nat\n+add action=masquerade chain=srcnat comment=\"defconf: masquerade\" ipsec-policy=out,none out-interface-list=WAN\n+```\n+\n+Add NAT for reaching the SFP management IP from the LAN:\n+\n+```routeros\n+/ip firewall nat\n+add action=masquerade chain=srcnat comment=\"NAT for SFP management\" dst-address=192.168.1.80 out-interface=sfp1\n+```\n+\n+Do not actively bridge `sfp1` into the LAN bridge while it is used as WAN and SFP management. If RouterOS default configuration added it as a bridge port, disable or remove that bridge port:\n+\n+```routeros\n+/interface bridge port\n+set [ find interface=sfp1 ] disabled=yes\n+```\n+\n+Alternatively, remove it completely:\n+\n+```routeros\n+/interface bridge port\n+remove [ find interface=sfp1 ]\n+```\n+\n+## Working Configuration Shape\n+\n+The working configuration used this structure:\n+\n+```text\n+/interface ethernet\n+sfp1 MAC overridden to stock WAN MAC\n+\n+/interface vlan\n+wan-vlan331 on sfp1, vlan-id 331\n+\n+/interface pppoe-client\n+pppoe-out1 on wan-vlan331\n+\n+/ip address\n+192.168.88.1/24 on bridge\n+192.168.1.1/24 on sfp1 for SFP management\n+\n+/ip firewall nat\n+masquerade out WAN\n+masquerade to 192.168.1.80 out sfp1 for SFP management\n+```\n+\n+My exact working export had:\n+\n+```routeros\n+/interface vlan\n+add comment=wan-vlan331 interface=sfp1 name=wan-vlan331 vlan-id=331\n+\n+/interface pppoe-client\n+add add-default-route=yes dial-on-demand=yes disabled=no interface=wan-vlan331 name=pppoe-out1 use-peer-dns=yes user=<redacted>\n+\n+/ip address\n+add address=192.168.88.1/24 comment=defconf interface=bridge network=192.168.88.0\n+add address=192.168.1.1/24 comment=\"SFP management\" interface=sfp1 network=192.168.1.0\n+\n+/ip firewall nat\n+add action=masquerade chain=srcnat comment=\"defconf: masquerade\" ipsec-policy=out,none out-interface-list=WAN\n+add action=masquerade chain=srcnat comment=\"NAT for SFP management\" dst-address=192.168.1.80 out-interface=sfp1\n+```\n+\n+## VLAN 100 Alternative\n+\n+Because the stock ONT showed VLAN `100`, this VLAN may also work depending on SFP VLAN mode.\n+\n+To test VLAN `100` instead of `331`, create a VLAN 100 interface and move PPPoE to it:\n+\n+```routeros\n+/interface vlan\n+add comment=wan-vlan100 interface=sfp1 name=wan-vlan100 vlan-id=100\n+\n+/interface pppoe-client\n+set pppoe-out1 interface=wan-vlan100\n+```\n+\n+Do not keep multiple enabled PPPoE clients trying the same credentials unless you are intentionally testing and know what your ISP permits.\n+\n+## Troubleshooting\n+\n+If the SFP reaches `O5` but there is no Internet:\n+\n+* Confirm the PPPoE username and password.\n+* Confirm the selected VLAN mode in the SFP web UI.\n+* Try PPPoE on VLAN `100` and VLAN `331`, one at a time.\n+* Check `omcicli mib get 171` for live OLT VLAN rules.\n+* Capture packets on the MikroTik to see whether PPPoE discovery frames are tagged or untagged.\n+* Keep SFP management on physical `sfp1`, not on the PPPoE VLAN interface.\n+\n+If the SFP management IP becomes unreachable after changing VLAN settings:\n+\n+* Verify that `192.168.1.1/24` is assigned to physical `sfp1`.\n+* Verify that the SFP IP is still `192.168.1.80`.\n+* Verify `sfp1` is not actively bridged into the LAN bridge.\n+* Verify the management NAT rule exists if accessing from LAN.\n+* Revert the SFP VLAN mode if PVID caused management traffic to be hidden behind tagging behavior.\n+\n+If the stick stays at `O3`:\n+\n+* Recheck GPON serial number.\n+* Recheck PLOAM password, if used.\n+* Recheck `MAC_KEY`.\n+* Recheck vendor ID, manufacturer, model, hardware version, and OMCI-related identity fields.\n+* Check optical RX power and connector cleanliness.\n+\n+## Final Notes\n+\n+The main lesson from this setup is not simply \"use VLAN 331\" or \"use VLAN 100\".\n+\n+The actual lesson is:\n+\n+```text\n+romfile.cfg VLAN: 100\n+OMCI ME 171 VLAN treatment: 331\n+Observed working VLANs: 100 and 331\n+Preferred setup: transparent/manual SFP VLAN mode, router-side VLAN handling\n+```\n+\n+For this MikroTik setup, router-side VLAN handling was preferred because it keeps the SFP stick simple and moves VLAN processing to a device with more resources and better diagnostics."
+    }
+  ]
+}

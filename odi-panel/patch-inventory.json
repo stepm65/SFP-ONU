@@ -1,0 +1,45 @@
+{
+  "base_sha256": "79c5ce4e62f4cb334b4335ad405d14f8c905b8b61d56ca636486d1ef91632623",
+  "anime_commit": "ad2fde9df058e3fa70b8b079ae5bcd308d41e394",
+  "items": [
+    {
+      "name": "fix_sw_ver.sh",
+      "status": "adapted opt-in",
+      "upstream_sha256": "3cc2184a81747d625aa860e9cbbb5ecde38511e26c372237117d662b247b9d0f",
+      "adapted_sha256": "428b08eae4552aacb04a30c4c6675a25fa0e0b41c1425868def1a086824f7f90"
+    },
+    {
+      "name": "fix_speed.sh",
+      "status": "adapted opt-in",
+      "upstream_sha256": "c412cf9dab2d8f810500b52c7320d47c14490458dbfcdb58fdeae097764a8965",
+      "adapted_sha256": "1fd7460cbfbfe161b88c3aae39e6bb0dd270f8f66a8979a5510dca9ac1820ee9"
+    },
+    {
+      "name": "fix_vlan_fwdop.sh",
+      "status": "adapted opt-in",
+      "upstream_sha256": "a7f1143b4e1e2e4317219417557e3b6d420a3d825bde0acebbfdc1505998eea7",
+      "adapted_sha256": "1f064a7776b98adf577cbdd0e34523c958a3c69791f7df52037dacceda3d549d"
+    },
+    {
+      "name": "fix_vlan_tag.sh",
+      "status": "adapted opt-in",
+      "upstream_sha256": "ee34bfa2d44d04372051fd61579ebb3f68a86989d2f9a6c6b58acb1275f17545",
+      "adapted_sha256": "1e598004ac903215c450f384ddeed6068f575d9602012d5b334acdc0d1f9d8d2"
+    }
+  ],
+  "hack_gpon": "Documentation reference; no separately identified binary patch set imported",
+  "kernel_and_vendor_binaries": "Kernel and vendor binaries preserved except bin/boa: exact-path CGI dispatcher and native administrator-session bridge in 1.6.2",
+  "excluded": [
+    "OMCI_OLT_MODE=21 workaround",
+    "unidentified binary patches",
+    "wholesale upstream rootfs replacement"
+  ],
+  "boa_fix": {
+    "version": "1.6.2",
+    "paths": [
+      "/panel/api.cgi",
+      "/panel/upload.cgi"
+    ],
+    "authentication": "Native administrator session required; REMOTE_USER=boa-admin only for server-created /index.html session record"
+  }
+}

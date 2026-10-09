@@ -1,0 +1,8 @@
+{
+  "source": "https://odi-tools.dextercai.com/",
+  "bundle": "https://odi-tools.dextercai.com/assets/index-4fafcabd.js",
+  "sha256": "767d50b1e180b06206572a98edbb1efafef616dd3987572b6b32367f1b684547",
+  "algorithm": "lowercase hex MD5 of ASCII \"hsgq1.9a\" + uppercase MAC without separators",
+  "md5_implementation": "existing firmware admin/md5.js, Paul Johnston BSD header retained",
+  "comparison": "64 synthetic MACs matched isolated source hash function and Node crypto"
+}

@@ -1,0 +1,17 @@
+# Commands resolvable by /bin/sh on ODI SFU V1.1.8-240408 (X100SFP).
+# Source: `busybox --list` of the firmware's own /bin/busybox, plus the
+# non-BusyBox programs in its /bin. /sbin is a symlink to /bin; /usr/bin is empty.
+# NOT present on the stick: mv tr head tail od cut wc rmdir touch sort uniq
+# date tee xargs find seq basename dirname. Shell builtins (printf, test, [,
+# read, trap, umask, export, wait, kill) are provided by ash itself.
+# BusyBox applets:
+ash awk bash cat chmod cksum cmp cp df diff echo egrep expr fgrep fuser grep
+halt ifconfig init insmod kill killall klogd linuxrc ls lsmod md5sum mdev mkdir
+mknod mount nc ping ping6 poweroff ps reboot rm rmmod route sed sh sleep stty
+tar telnet telnetd top traceroute traceroute6 umount vconfig
+# Vendor programs (tests replace them with stubs by absolute path):
+ShowStatus arp boa brctl busybox checkomci configd consoleset dbg_tool diag
+dropbear ebtables eponoamd ethctl europacli flash_eraseall igmpcli igmpd inetd
+ip iptables iptables-batch led ledtest loadconfig login mib mpctl nv oamcli
+omci_app omcicli pondetect qc rtkbosa saveconfig sfpapp show startup tftp tftpd
+xmlconfig

@@ -1,0 +1,35 @@
+const fs=require('fs'),assert=require('assert');
+const {JSDOM}=require('../tools/dom/node_modules/jsdom');
+const source=fs.readFileSync(__dirname+'/src/login-template.asp','utf8');
+const version=fs.readFileSync(__dirname+'/VERSION','utf8').trim();
+assert(source.includes('<% passwd2xmit(); %>'));
+for(const lang of ['ru','en']){
+ const html=source.replace('<% passwd2xmit(); %>','window.challengeCalls=(window.challengeCalls||0)+1;').replace(/<script src="md5.js"[^>]*><\/script>/,'');
+ const dom=new JSDOM(html,{runScripts:'dangerously',url:'http://192.168.1.1/admin/login.asp',beforeParse(w){w.localStorage.setItem('odi-panel-language',lang);}});
+ const w=dom.window,d=w.document,f=d.forms.namedItem('cmlogin');
+ assert(d.querySelector('footer').textContent.includes('ODI Panel '+version));
+ assert.equal(d.querySelector('meta[name=odi-panel-version]').content,version);
+ assert.equal(f.getAttribute('action'),'/boaform/admin/formLogin');
+ assert.equal(f.method,'post');
+ for(const name of ['username','password','challenge','save','submit-url'])assert(f.elements.namedItem(name));
+ assert.equal(d.documentElement.lang,lang);
+ f.elements.namedItem('password').value='test-password';
+ d.getElementById('reveal').click();
+ assert.equal(f.elements.namedItem('password').type,'text');
+ assert.equal(w.challengeCalls,undefined);
+ d.getElementById('language').value=lang==='ru'?'en':'ru';
+ d.getElementById('language').dispatchEvent(new w.Event('change'));
+ assert.equal(f.elements.namedItem('password').value,'test-password');
+ f.dispatchEvent(new w.Event('submit',{cancelable:true}));
+ assert.equal(w.challengeCalls,1);
+ dom.window.close();
+ const preview=new JSDOM(fs.readFileSync(__dirname+'/login-preview.html','utf8'),{runScripts:'dangerously',url:'http://onu/login-preview.html',beforeParse(w){w.localStorage.setItem('odi-panel-language',lang);}});
+ const pd=preview.window.document;
+ assert(pd.querySelector('footer').textContent.includes('ODI Panel '+version));
+ assert.equal(pd.querySelector('meta[name=odi-panel-version]').content,version);
+ assert.equal(pd.documentElement.lang,lang);
+ assert(pd.getElementById('submit').disabled);
+ assert.equal(pd.forms.namedItem('cmlogin').getAttribute('onsubmit'),'return false');
+ preview.window.close();
+}
+console.log('Login: current version on real/preview pages, native fields, challenge, RU/EN and visibility passed');

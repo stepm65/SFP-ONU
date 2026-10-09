@@ -1,0 +1,17 @@
+{
+  "firmware_base": "V1.1.8-240408",
+  "boa_sha256": "7b36c74a388e1ed47767e297d510dfcdf3f1cf1ea8eb5cd01e79a33da87949ad",
+  "shared_mib_ids": {
+    "LOID": "0x100",
+    "LOID_PASSWD": "0x101"
+  },
+  "readers": {
+    "fmgpon_checkWrite": "0x42648c",
+    "fmepon_checkWrite": "0x427420"
+  },
+  "writers": {
+    "formgponConf": "0x426a84",
+    "formeponConf": "0x4277bc"
+  },
+  "evidence": "Both readers call the same mib_get entry with IDs 0x100 and 0x101; both writers use the same setter GOT entry with those IDs. Static MIPS inspection of the supplied binary."
+}

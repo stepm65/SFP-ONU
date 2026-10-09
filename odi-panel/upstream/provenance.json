@@ -1,0 +1,11 @@
+{
+  "repository": "https://github.com/Anime4000/RTL960x",
+  "commit": "ad2fde9df058e3fa70b8b079ae5bcd308d41e394",
+  "path": "Firmware_Mod/DFP-34X-2C2/etc/scripts",
+  "original_sha256": {
+    "fix_sw_ver.sh": "3cc2184a81747d625aa860e9cbbb5ecde38511e26c372237117d662b247b9d0f",
+    "fix_speed.sh": "c412cf9dab2d8f810500b52c7320d47c14490458dbfcdb58fdeae097764a8965",
+    "fix_vlan_fwdop.sh": "a7f1143b4e1e2e4317219417557e3b6d420a3d825bde0acebbfdc1505998eea7",
+    "fix_vlan_tag.sh": "ee34bfa2d44d04372051fd61579ebb3f68a86989d2f9a6c6b58acb1275f17545"
+  }
+}

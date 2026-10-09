@@ -1,0 +1,44 @@
+{
+  "base_sha256": "7b36c74a388e1ed47767e297d510dfcdf3f1cf1ea8eb5cd01e79a33da87949ad",
+  "base_profile": "ODI SFU 240408",
+  "gp": "0x487a70",
+  "patched_sha256": "7d89489776ed29f23544245d08a14e99f30c48949aefac1f6ee14eec2d243a73",
+  "entries": [
+    {
+      "entry": "0x4110ec",
+      "stub": "0x500000",
+      "original": "3c1c0007279c6984",
+      "replacement": "0814000000000000"
+    },
+    {
+      "entry": "0x410fd0",
+      "stub": "0x500150",
+      "original": "3c1c0007279c6aa0",
+      "replacement": "0814005400000000"
+    }
+  ],
+  "new_segment_offset": 462848,
+  "new_segment_vaddr": 5242880,
+  "new_segment_size": 717,
+  "allowed_paths": [
+    "/panel/api.cgi",
+    "/panel/upload.cgi"
+  ],
+  "authentication": "Existing auth_authorize remains before dispatch. Native search_login_list must return an administrator record (/index.html) before exporting REMOTE_USER=boa-admin; other sessions retain empty REMOTE_USER and CGI denies access.",
+  "device_tested": false,
+  "unicorn_mips_tests": {
+    "result": "passed",
+    "dispatcher_cases": 1022,
+    "native_environment_cases": 28,
+    "scope": "actual dispatcher, native session lookup and native complete_env with libc/helper calls mocked",
+    "session_cases": [
+      "administrator",
+      "restricted user",
+      "no session",
+      "different source IP",
+      "null role",
+      "unknown role",
+      "role prefix spoof"
+    ]
+  }
+}

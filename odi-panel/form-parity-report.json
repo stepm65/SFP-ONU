@@ -1,0 +1,6 @@
+{
+  "result": "passed",
+  "original_pages": 180,
+  "forms_actions_names_values_and_ASP_directives": "byte-for-byte preserved after stripping injected assets and two GPON guards",
+  "note": "saveconf.asp redesigned in 1.4 and extended in 1.5; original backup/reset submission contracts covered by layout-test-report.json and Fiber Reset by integration-test-report.json. Other ASP sources preserve parity, including two GPON guards."
+}

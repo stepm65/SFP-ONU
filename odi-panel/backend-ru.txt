@@ -1,0 +1,34 @@
+Требуется авторизация. Войдите под учётной записью администратора.|Authentication required. Open the panel with the administrator account.
+Требуется GET или POST|GET or POST required
+Не удалось создать рабочий каталог|Cannot initialize runtime directory
+Случайный токен недоступен|Random token unavailable
+Инициализация. Повторите запрос.|Initialization in progress. Retry.
+Неизвестный запрос|Unknown query
+Недопустимая длина запроса|Invalid request length
+Запрос превышает 4096 байт|Request exceeds 4096 bytes
+Требуется text/plain|text/plain required
+Неизвестное действие|Unknown action
+Недопустимый CSRF-токен. Обновите страницу.|Invalid CSRF token. Reload the page.
+Выполняется другая операция|Another operation is running
+Слишком много полей|Too many fields
+Неизвестное поле|Unknown field
+Повторное поле|Duplicate field
+Недопустимый запрос выбора банка|Invalid bank request
+Недопустимый банк|Invalid bank
+Лишний параметр перезагрузки|Unexpected reboot parameter
+Нет изменений|No changes
+Для PLOAM требуется формат HEX|PLOAM requires HEX format
+При изменении MAC требуется соответствующий MAC_KEY|Changing MAC requires its matching MAC_KEY
+Для тега требуется VLAN 1–4094 и PCP 0–7|Tagging requires VLAN 1..4094 and PCP 0..7
+Необходимо указать банк|Bank is required
+Неизвестное состояние банков|Unknown current bank state
+Целевые разделы не найдены|Target partitions not found
+Не удалось выбрать банк. Обновите данные для проверки.|Bank selection failed. Reload to verify.
+Сохранено и проверено. Перезагрузите отдельно для применения.|Saved and read back. Reboot separately to apply.
+Выбран банк следующей загрузки. Текущий банк не изменён.|Next boot bank selected. Current bank is unchanged.
+Перезагрузка запрошена. Соединение будет закрыто.|Reboot requested. The connection will close.
+Необходимо передать все параметры модов|All mod fields are required
+Укажите VLAN ID или Entity ID|Select VLAN IDs or entities
+Укажите пары Entity ID и FwdOp|Specify entity and FwdOp pairs
+Не удалось сохранить конфигурацию модов|Cannot save mod configuration
+Для PLOAM необходимо явно указать формат отображения|PLOAM requires an explicit display format

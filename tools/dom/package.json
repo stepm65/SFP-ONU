@@ -1,0 +1,8 @@
+{
+  "name": "odi-panel-test-dom",
+  "private": true,
+  "description": "jsdom for the ODI Panel UI tests (odi-panel/test_*.cjs load ../tools/dom/node_modules/jsdom)",
+  "dependencies": {
+    "jsdom": "24.1.3"
+  }
+}
