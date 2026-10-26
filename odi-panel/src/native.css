@@ -6,3 +6,32 @@
 
 .embedded .maintenance-heading h1{display:none}.embedded.maintenance-page{padding:0;background:transparent}.embedded .maintenance-heading{margin-top:0}
 .embedded > blockquote > h2:first-child,.embedded > .odi-native-content > blockquote > h2:first-child{display:none}
+
+/* Factory pages use quirks mode: a table otherwise resets the body font to
+   the browser's medium size. Explicit inheritance also covers dynamic rows. */
+table,td,th{font:inherit}
+.native-table{width:100%;max-width:none!important;margin:0 0 20px;border:0;text-align:left;font-size:12px;line-height:1.5}
+.native-table td,.native-table th{padding:12px 14px;overflow-wrap:anywhere}
+.native-properties{table-layout:fixed}
+.native-properties tr:not(.native-section)>:first-child{width:40%;color:#647584;font-weight:500}
+.native-properties tr:not(.native-section)>:last-child{color:#172737}
+.native-properties .native-section>*{padding:18px 14px 10px;background:#f1f6f8;border-bottom:1px solid #d7e1e6;font-weight:700;color:#172737}
+.native-properties .native-section:first-child>*{padding-top:12px}
+.native-note{margin:0 0 16px;color:#647584;font-size:12px;line-height:1.6}
+.native-note td{padding:0;border:0}
+.native-note hr,.native-note br{display:none}
+.native-grid th,.native-grid tr:first-child td{background:#f1f6f8;font-weight:650}
+.native-grid tbody tr:nth-child(even){background:#f8fbfc}
+.native-table-scroll{overflow-x:auto;max-width:100%;margin-bottom:20px}
+.native-table-scroll .native-table{margin-bottom:0}
+body.embedded{padding:20px 24px;font-size:14px;line-height:1.5}
+.embedded blockquote{margin:0;padding:0}
+.embedded blockquote>br,.embedded form>br{display:none}
+.embedded form{margin-bottom:0}
+.embedded h2{font-size:15px;line-height:1.4;margin:20px 0 12px}
+.embedded .native-table b{font-weight:inherit}
+.embedded .native-table input:not([type=checkbox]):not([type=radio]):not([type=hidden]),.embedded .native-table select,.embedded .native-table textarea{width:100%;min-width:0}
+.embedded input,.embedded select,.embedded textarea{font-size:14px}
+.embedded button{font-size:12px;font-weight:650;padding:9px 15px}
+.embedded .maintenance-card{margin-bottom:16px}
+@media(max-width:650px){body.embedded{padding:16px;font-size:14px}.native-table td,.native-table th{padding:10px 8px}.native-properties tr:not(.native-section)>:first-child{width:44%}}

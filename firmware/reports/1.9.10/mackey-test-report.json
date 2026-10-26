@@ -1,0 +1,13 @@
+{
+  "result": "passed",
+  "source_algorithm_vectors": 64,
+  "accepted_formats": [
+    "bare",
+    "colon",
+    "hyphen",
+    "dotted"
+  ],
+  "invalid_inputs_rejected": 7,
+  "ui": "local fill, no fetch, no save; normalized MAC and derived key retained through RU/EN switch",
+  "navigation": "single WAN entry; no separate EPON or WAN Mode entries"
+}

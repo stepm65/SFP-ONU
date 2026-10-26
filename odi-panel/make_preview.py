@@ -1,6 +1,6 @@
 """Generate a standalone preview; native forms are inert snapshots, not an ASP emulator."""
 from pathlib import Path
-import json,re
+import json,re,subprocess
 from bs4 import BeautifulSoup
 p=Path(__file__).resolve().parent
 from release import VERSION, sync_sources
@@ -24,7 +24,8 @@ for name in files:
    node.name='button';node.string=node.get('value','');node['type']='button'
  style=soup.new_tag('style');style.string=css
  if soup.head:soup.head.append(style)
- pages['/'+name]=str(soup)
+ pages['/'+name]='<!doctype html>\n'+str(soup)
+pages=json.loads(subprocess.run(['node',str(p/'normalize_preview.cjs')],input=json.dumps(pages),capture_output=True,text=True,encoding='utf-8',check=True).stdout)
 pages['/boaform/formWanRedirect?redirect-url=/multi_wan_generic.asp&if=pon']=pages['/multi_wan_generic.asp']
 s=(p/'src/index.html').read_text().replace('?v='+VERSION,'').replace('<link rel="stylesheet" href="panel.css">','<style>'+(p/'src/panel.css').read_text()+'</style>')
 s=s.replace('<script defer src="translations.js"></script>','<script>window.ODINativePreview='+json.dumps(pages,ensure_ascii=False).replace('</','<\\/')+';</script><script defer src="translations.js"></script>')

@@ -5,7 +5,7 @@ export PATH
 LC_ALL=C
 export LC_ALL
 umask 077
-PANEL_VERSION=1.9.9
+PANEL_VERSION=1.9.10
 STATE=/tmp/odi-panel
 FLASH=/etc/scripts/flash
 NV=/bin/nv

@@ -571,3 +571,5 @@ UNI, мосты, GEM и T-CONT|UNI, bridges, GEM and T-CONT
 Язык|Language
 Версия страницы отличается от версии работающей прошивки. |The page version differs from the running firmware. 
 Загрузить актуальный интерфейс|Load current interface
+Загрузка процессора|CPU Usage
+Использование памяти|Memory Usage

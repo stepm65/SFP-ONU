@@ -1,4 +1,4 @@
-<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Обслуживание устройства</title><link rel="stylesheet" href="/panel/native.css"><script src="/panel/translations.js"></script><script src="/panel/i18n.js"></script><script src="/panel/native.js"></script>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Обслуживание устройства</title><link rel="stylesheet" href="/panel/native.css?v=1.9.10"><script src="/panel/translations.js?v=1.9.10"></script><script src="/panel/i18n.js?v=1.9.10"></script><script src="/panel/native.js?v=1.9.10"></script>
 <script>
 function uploadClick(){if(!document.saveConfig.binary.value){alert('Выберите файл резервной копии.');return false;}return confirm('Восстановить настройки из выбранного файла? Текущая конфигурация будет заменена.');}
 function resetClick(all){return confirm(all?'Сбросить все параметры? Настройки подключения к оператору будут удалены.':'Сбросить настройки с сохранением критических параметров? Состав сохраняемых параметров определяет штатная прошивка.');}

@@ -19,6 +19,7 @@ def sync_sources(check=False):
             (r'(?<=name="odi-panel-version" content=")\d+\.\d+\.\d+', VERSION, 1),
         ],
         'api.cgi': [(r'(?m)^PANEL_VERSION=\d+\.\d+\.\d+$', 'PANEL_VERSION=' + VERSION, 1)],
+        'saveconf.asp': [(r'(?<=\?v=)\d+\.\d+\.\d+', VERSION, 4)],
     }
     for name, replacements in rules.items():
         path = PROJECT / 'src' / name

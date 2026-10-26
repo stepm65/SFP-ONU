@@ -78,7 +78,7 @@ for name,item in before.items():
  if name.startswith('home/httpd/web/') and name.endswith('.asp') and 'data' in item:
   original=item['data']
   if re.search(br'<head\b[^>]*>',original,re.I) and name.rsplit('/',1)[-1] not in ['code.asp','code_user.asp','title.asp','logobelow.asp']:
-   patched=re.sub(br'(<head\b[^>]*>)',lambda m:m[0]+native_injection,original,count=1,flags=re.I)
+   patched=re.sub(br'</head\s*>',lambda m:native_injection+m[0],original,count=1,flags=re.I)
    # Factory GPON page refers to two commented-out controls. Guard those lookups.
    if name=='home/httpd/web/gpon.asp':
     patched=patched.replace(b'if (document.formOmciInfo.oui.value=="")',b'if (document.formOmciInfo.oui && document.formOmciInfo.oui.value=="")')
@@ -97,6 +97,9 @@ mods['home/httpd/web/saveconf.asp']=(PROJECT/'src/saveconf.asp').read_bytes()
 for route in json.loads((PROJECT/'native-pages.json').read_text()):
  source='home/httpd/web/'+route
  content=mods[source]
+ # Standards mode prevents the browser's legacy table typography and sizing.
+ content=re.sub(br'<!doctype\b[^>]*>\s*',b'',content,flags=re.I)
+ content=b'<!doctype html>\n'+content
  target='odi-native-'+route.replace('/','_')
  marker=(f'<base href="/"><meta name="odi-native-page" content="/{route}">').encode()
  content=re.sub(br'(<head\b[^>]*>)',lambda m:m[0]+marker,content,count=1,flags=re.I)
