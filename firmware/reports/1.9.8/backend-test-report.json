@@ -1,9 +1,0 @@
-[
-  {
-    "shell": "host POSIX shell",
-    "path": "device command set only (device-commands.txt)",
-    "cgi_requests": 50,
-    "boot_hook_cases": 2,
-    "result": "passed"
-  }
-]
