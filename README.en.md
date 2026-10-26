@@ -4,7 +4,7 @@
 
 A new management panel for GPON SFP sticks built on the **Realtek RTL9601D** with factory firmware **ODI SFU V1.1.8-240408**. Targets the **ODI DFP-34X-2IY2** (XPON ONU Stick, hardware tag X100SFP). The panel replaces the factory web interface but keeps all of its handlers: the whole device is configured from one place, in English or Russian, without SSH or a console.
 
-**Version 1.9.8** · [Download firmware](firmware/) · [Releases](https://github.com/stepm65/sfp-onu/releases) · [Release description (in Russian)](odi-panel/README-1.9.8.md) · [Install and recovery (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md)
+**Version 1.9.9** · [Download firmware](firmware/) · [Releases](https://github.com/stepm65/sfp-onu/releases) · [Release description (in Russian)](odi-panel/README-1.9.9.md) · [Install and recovery (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md)
 
 ![Device status](docs/screenshots/en/01-overview.png)
 
@@ -16,9 +16,9 @@ A new management panel for GPON SFP sticks built on the **Realtek RTL9601D** wit
 
 | File | SHA256 |
 |---|---|
-| [`firmware/ODI-Panel-1.9.8-RU-EN-SFU-240408.tar`](firmware/ODI-Panel-1.9.8-RU-EN-SFU-240408.tar) | `f41e50e8b79803863c3ee176d886ba13ee9c698bf677167dc22a8cee884db8bb` |
+| [`firmware/ODI-Panel-1.9.9-RU-EN-SFU-240408.tar`](firmware/ODI-Panel-1.9.9-RU-EN-SFU-240408.tar) | `64f48debe8d40f573450fab64d77cb2e8032e9c04c74304978ff9fb13cd84e75` |
 
-Version **1.9.8** has software validation only; physical ONU and Eltex OLT tests have not been performed. The TAR preserves the factory 240408 kernel and installer. See the [build and validation reports](firmware/reports/1.9.8/).
+Version **1.9.9** has software validation only; physical ONU and Eltex OLT tests have not been performed. The TAR preserves the factory 240408 kernel and installer. See the [build and validation reports](firmware/reports/1.9.9/).
 
 ### Compatibility
 
@@ -121,7 +121,7 @@ Fixes from the [Anime4000/RTL960x](https://github.com/Anime4000/RTL960x) project
 1. Back up the configuration in the factory interface.
 2. **Stick on factory firmware 240408:** upload the TAR on the factory "Firmware Upgrade" page. The factory handler picks the target bank itself.
    **Stick with the panel installed:** Firmware → select the running bank for the next boot → upload the TAR to the other bank → wait for verification → select the new bank and reboot.
-3. Open `http://<stick address>/panel/index.html` and press Ctrl+F5. Check panel version **1.9.8**, base **V1.1.8-240408**, SFP port mode, PON registration and optics.
+3. Open `http://<stick address>/panel/index.html` and press Ctrl+F5. Check panel version **1.9.9**, base **V1.1.8-240408**, SFP port mode, PON registration and optics.
 
 Upload the TAR, not a ZIP. Do not cut power while writing. Rollback and what to do if the connection drops are described in [docs/03 (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md).
 
@@ -150,7 +150,7 @@ python3 test_backend.py && python3 test_mods.py && python3 test_diagnostics.py &
 Build from the factory image [`firmware/original/M110_sfp_ODI_SFU_240408.tar`](firmware/original/) (SHA256 `79c5ce4e…`). Requires Python 3 and squashfs-tools with LZMA and pseudo files (4.6.1+; this release was built with 4.7.5). The output directory must not exist. Compressor versions may change the final SHA256. Preview generation also requires `beautifulsoup4`.
 
 ```sh
-python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin release-1.9.8-sfu
+python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin release-1.9.9-sfu
 ```
 
 ## Provenance

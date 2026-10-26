@@ -24,7 +24,7 @@ with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
  for f in sorted((p/'upstream').rglob('*')):
   if f.is_file() and not (f.parent.name=='odi-tools' and f.suffix!='.json'):z.write(f,'source/upstream/'+f.relative_to(p/'upstream').as_posix())
  for f in sorted(p.iterdir()):
-  if f.is_file() and f.name!='patch_build.py' and (f.suffix in ['.py','.cjs','.txt'] or f.name=='VERSION' or f.name in ['native-en.json','native-cn.json','native-preview.json']):z.write(f,'source/'+f.name)
+  if f.is_file() and f.name!='patch_build.py' and (f.suffix in ['.py','.cjs','.txt'] or f.name=='VERSION' or f.name in ['native-en.json','native-cn.json','native-preview.json','native-pages.json']):z.write(f,'source/'+f.name)
  for n in ['patch_boa.py','test_patch.py','test_unicorn.py']:z.write(p/'hotfix'/n,'source/hotfix/'+n)
  # Only evidence collected for this release; do not reuse historical test claims.
  for f in sorted(reports.glob('*.json')):z.write(f,'reports/'+f.name)

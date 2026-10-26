@@ -92,6 +92,18 @@ for route in ['admin/login.asp','login.asp']:
  mods['home/httpd/web/'+route]=login.replace('<!-- CAPTCHA -->',captcha).encode()
 
 mods['home/httpd/web/saveconf.asp']=(PROJECT/'src/saveconf.asp').read_bytes()
+# Dedicated form documents avoid legacy landing-page routing in embedded views.
+# Keep factory POST handlers and ASP directives; resolve relative assets at /.
+for route in json.loads((PROJECT/'native-pages.json').read_text()):
+ source='home/httpd/web/'+route
+ content=mods[source]
+ target='odi-native-'+route.replace('/','_')
+ marker=(f'<base href="/"><meta name="odi-native-page" content="/{route}">').encode()
+ content=re.sub(br'(<head\b[^>]*>)',lambda m:m[0]+marker,content,count=1,flags=re.I)
+ content=re.sub(br'(<meta\b[^>]*http-equiv\s*=\s*[\x22\x27]?refresh[^>]*>)',lambda m:re.sub(br'URL\s*=\s*[^\x22\x27>]+',('URL=/panel/'+target+'?v='+VERSION).encode(),m[0],flags=re.I),content,flags=re.I)
+ mods['home/httpd/web/panel/'+target]=content
+landing=mods['home/httpd/web/index.html'].decode().replace('/panel/index.html','/panel/index.html?v='+VERSION)
+mods['home/httpd/web/index.html']=landing.encode()
 # A CRLF shebang breaks scripts on the ONU, even if host text readers hide it.
 for name,content in mods.items():
  if name.endswith(('.cgi','.sh')):assert b'\r' not in content,f'Non-LF script: {name}'

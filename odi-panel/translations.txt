@@ -563,3 +563,11 @@ Uptime в начале / конце, секунд|Uptime at start / end, seconds
 Достигнут лимит времени сбора. Часть таблиц не прочитана; это не означает отсутствия объектов.|Collection time limit reached. Some tables were not read; this does not mean objects are absent.
 Открыть штатную настройку таймера|Open factory timer settings
 UNI, мосты, GEM и T-CONT|UNI, bridges, GEM and T-CONT
+Вместо формы устройство вернуло страницу входа или оболочку. Войдите снова и обновите раздел.|The device returned a sign-in page or shell instead of the form. Sign in again and refresh this section.
+Язык интерфейса|Interface language
+Один язык для панели и встроенных страниц.|One language for the panel and embedded pages.
+Язык панели|Panel language
+Выбор сохраняется в этом браузере и синхронизируется с переключателем сверху.|The selection is saved in this browser and synchronised with the top selector.
+Язык|Language
+Версия страницы отличается от версии работающей прошивки. |The page version differs from the running firmware. 
+Загрузить актуальный интерфейс|Load current interface

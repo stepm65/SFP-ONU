@@ -5,3 +5,4 @@
 @media(max-width:700px){.maintenance-page{padding:16px}.maintenance-card{grid-template-columns:1fr;gap:20px;padding:20px}.maintenance-controls{justify-content:flex-start}.maintenance-controls button{width:100%}.restore-controls button{justify-self:stretch}.maintenance-heading h1{font-size:22px}}
 
 .embedded .maintenance-heading h1{display:none}.embedded.maintenance-page{padding:0;background:transparent}.embedded .maintenance-heading{margin-top:0}
+.embedded > blockquote > h2:first-child,.embedded > .odi-native-content > blockquote > h2:first-child{display:none}

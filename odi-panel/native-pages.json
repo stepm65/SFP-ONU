@@ -1,0 +1,6 @@
+[
+"status.asp", "status_pon.asp", "tcpiplan.asp", "wanmode.asp",
+"multi_wan_generic.asp", "gpon.asp", "epon.asp", "vlan.asp", "omci_info.asp",
+"arptable.asp", "ping.asp", "saveconf.asp", "password.asp", "rebootTime.asp",
+"reboot.asp", "upgrade.asp", "stats.asp", "admin/pon-stats.asp"
+]

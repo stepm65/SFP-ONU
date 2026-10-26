@@ -11,5 +11,8 @@ document.addEventListener('DOMContentLoaded',()=>{
  else {const label=document.createElement('label');label.className='language-control';label.textContent='Language / Язык ';const select=document.createElement('select');select.id='language';select.innerHTML='<option value="ru">Русский</option><option value="en">English</option>';select.value=ODILang.get();select.onchange=()=>ODILang.set(select.value);label.append(select);document.body.prepend(label);}
  document.addEventListener('input',()=>{window.nativeDirty=true;});document.addEventListener('change',()=>{window.nativeDirty=true;});
  document.addEventListener('submit',()=>{window.nativeDirty=false;});
+ if(parent!==window){try{
+  for(const input of document.querySelectorAll('input[name="submit-url"]'))if(input.value)input.value=parent.nativeFrameURL(input.value);
+ }catch(_){} }
  window.addEventListener('beforeunload',e=>{if(window.nativeDirty){e.preventDefault();e.returnValue='';}});
 });

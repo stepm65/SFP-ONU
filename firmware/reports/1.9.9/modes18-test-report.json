@@ -1,0 +1,19 @@
+{
+  "result": "passed",
+  "environment": "jsdom; no pixel layout or hardware test",
+  "checks": [
+    "eight stable primary sections with network subtabs",
+    "mode toggle preserves form nodes, dirty flag, password and PLOAM format",
+    "selected file and native iframe state retained",
+    "imported profile retained in memory",
+    "mode preference reload, unknown value and denied storage",
+    "cross-window layout change preserves drafts",
+    "RU/EN controls and workspace text",
+    "preview switch sends no requests",
+    "diagnostic mode reads telemetry on identity without writes or config reload",
+    "busy operation postpones telemetry",
+    "writes wait for current read to release the lock",
+    "stale and failed reads cannot show green online status",
+    "PON history and optical readings update independently of forms"
+  ]
+}

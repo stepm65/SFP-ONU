@@ -1,5 +1,6 @@
 'use strict';
 const nativePages=[
+ ['language','Язык интерфейса','/multi_lang.asp','Обслуживание'],
  ['status','Состояние устройства','/status.asp','Состояние'],['pon','Состояние PON','/status_pon.asp','Состояние'],
  ['lan','Настройки LAN / IP','/tcpiplan.asp','Сеть'],['wanmode','Режим WAN','/wanmode.asp','Сеть'],['wan','Подключение PON WAN','/boaform/formWanRedirect?redirect-url=/multi_wan_generic.asp&if=pon','Сеть'],
  ['gpon','Настройки GPON','/gpon.asp','Сеть'],['epon','Настройки EPON','/epon.asp','Сеть'],['olt-vlan','Штатный VLAN и таблица OLT','/vlan.asp','Сеть'],['omci','Информация OMCI','/omci_info.asp','Сеть'],
@@ -16,10 +17,10 @@ function nativeNavigation(){
  const nav=document.getElementById('native-nav');
  nav.innerHTML=rootSections.map(([id,label,path])=>'<a href="#'+id+'" '+(id.startsWith('native-')?'data-native="'+id.slice(7)+'"':'data-tab="'+id+'"')+'><svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+path+'"/></svg><span>'+esc(label)+'</span></a>').join('');ODILang.apply(nav);if(typeof tab!=='undefined')paintSectionNav();
 }
-function nativePage(){if(location.hash==='#native-recovery')return header('Восстановление доступа','Запасной вход в управление устройством.')+card('Резервный интерфейс','Открывает сохранённый интерфейс прошивки в новой вкладке. Используйте, если основная панель недоступна.',(preview?'<button type="button" class="button secondary" disabled>Открыть резервный интерфейс</button><p class="muted">Доступно только на устройстве.</p>':'<a class="button secondary" href="/legacy.html" target="_blank" rel="noopener">Открыть резервный интерфейс</a>')+'<p class="muted">Прямой адрес: <code>/legacy.html</code></p>');const entry=nativePages.find(p=>p[0]===location.hash.slice(8));if(!entry)return header('Штатные разделы','');const [,label,url]=entry;
+function nativePage(){if(location.hash==='#native-recovery')return header('Восстановление доступа','Запасной вход в управление устройством.')+card('Резервный интерфейс','Открывает сохранённый интерфейс прошивки в новой вкладке. Используйте, если основная панель недоступна.',(preview?'<button type="button" class="button secondary" disabled>Открыть резервный интерфейс</button><p class="muted">Доступно только на устройстве.</p>':'<a class="button secondary" href="/legacy.html" target="_blank" rel="noopener">Открыть резервный интерфейс</a>')+'<p class="muted">Прямой адрес: <code>/legacy.html</code></p>');const entry=nativePages.find(p=>p[0]===location.hash.slice(8));if(!entry)return header('Штатные разделы','');const [,label,url]=entry;if(url.replace(/^\/admin\//,'/')==='/multi_lang.asp')return panelLanguagePage();
  return header(esc(label),'Формы используют штатные обработчики прошивки. Некоторые действия применяются немедленно.')+
  (['gpon','omci'].includes(entry[0])?'<div class="banner">Штатные версии OMCI могут переопределяться при загрузке. Пользовательские версии задаются в разделе ONU / OMCI.</div>':'')+
- (preview?(window.ODINativePreview?.[url]?`<iframe sandbox="allow-same-origin" class="native-frame" title="${esc(label)}" srcdoc="${esc(window.ODINativePreview[url])}"></iframe>`:'<div class="card empty"><p>Штатная страница доступна только на устройстве.</p></div>'):`<p class="native-external"><a href="${esc(url)}" target="_blank" rel="noopener">Открыть отдельно ↗</a></p><iframe class="native-frame" name="view" title="${esc(label)}" src="${esc(url)}"></iframe>`);
+ (preview?(window.ODINativePreview?.[url]?`<iframe sandbox="allow-same-origin" class="native-frame" title="${esc(label)}" srcdoc="${esc(window.ODINativePreview[url])}"></iframe>`:'<div class="card empty"><p>Штатная страница доступна только на устройстве.</p></div>'):`<p class="native-external"><a href="${esc(url)}" target="_blank" rel="noopener">Открыть отдельно ↗</a></p><iframe class="native-frame" name="view" title="${esc(label)}" src="${esc(nativeFrameURL(url))}"></iframe>`);
 }
 async function discoverNativeMenu(){if(preview)return;try{
  const res=await fetch('/code.asp',{credentials:'same-origin',cache:'no-store'});if(!res.ok)return;
@@ -37,13 +38,24 @@ async function discoverNativeMenu(){if(preview)return;try{
 
 function nativeEmbed(url,label){
  if(preview)return window.ODINativePreview?.[url]?`<iframe sandbox="allow-same-origin" class="native-frame" title="${esc(label)}" srcdoc="${esc(window.ODINativePreview[url])}"></iframe>`:'<p>Штатная страница доступна только на устройстве.</p>';
- return `<iframe class="native-frame" title="${esc(label)}" src="${esc(url)}"></iframe>`;
+ return `<iframe class="native-frame" title="${esc(label)}" src="${esc(nativeFrameURL(url))}"></iframe>`;
 }
 function wan(){if(!nativeWan.pon&&!nativeWan.mode)return vlan();return header('WAN','Штатные разделы WAN, доступные в меню этой прошивки.')+
  (nativeWan.pon?card('Подключение через PON','Форма присутствует в штатном меню устройства. Таблица WAN задаётся отдельно от ручного PVID; изменения могут влиять на передачу трафика.',nativeEmbed(nativeWan.pon,'Подключение через PON')):'')+
  (nativeWan.mode?card('Расширенные настройки','Выбор типа WAN-интерфейса общего SDK. Это не переключатель GPON/EPON.',`<details><summary>Выбор WAN-интерфейса</summary><p class="muted">Шаблон содержит ATM, Ethernet, PTM и Wireless. Их наличие не означает поддержку стиком; менять этот параметр для обычной настройки GPON не требуется.</p>${nativeEmbed(nativeWan.mode,'Выбор WAN-интерфейса')}</details>`):'');}
 
 const nativeFrameBindings=new Map();
+const dedicatedNativePages=new Set(['status.asp','status_pon.asp','tcpiplan.asp','wanmode.asp','multi_wan_generic.asp','gpon.asp','epon.asp','vlan.asp','omci_info.asp','arptable.asp','ping.asp','saveconf.asp','password.asp','rebootTime.asp','reboot.asp','upgrade.asp','stats.asp','admin/pon-stats.asp']);
+function nativeFrameURL(raw){
+ const url=new URL(raw,location.origin+'/');
+ if(url.origin!==location.origin)return raw;
+ let path=url.pathname.slice(1);
+ if(!dedicatedNativePages.has(path)&&path.startsWith('admin/'))path=path.slice(6);
+ if(!dedicatedNativePages.has(path))return raw;
+ url.pathname='/panel/odi-native-'+path.replaceAll('/','_');
+ url.searchParams.set('v',document.querySelector('meta[name="odi-panel-version"]')?.content||'unknown');
+ return url.pathname+url.search;
+}
 function sizeNativeFrames(){
  for(const [frame,binding] of nativeFrameBindings)if(!frame.isConnected){binding.dispose();nativeFrameBindings.delete(frame);}
  document.querySelectorAll('.native-frame').forEach(frame=>{
@@ -70,6 +82,13 @@ function sizeNativeFrames(){
    const next=frame.contentDocument;if(!next?.body||next.readyState==='loading'||!next.body.childNodes.length)return;
    if(next===doc&&content?.parentElement===doc.body){schedule();return;}
    stopDocument();doc=next;if(preview)ODILang.apply(doc);
+   // A session/legacy redirect must never display another complete panel here.
+   if(doc.querySelector('.sidebar,#native-nav,frameset,form[name="cmlogin"]')){
+    frame.hidden=true;let error=frame.nextElementSibling;
+    if(!error?.classList.contains('native-load-error')){error=document.createElement('div');error.className='banner warn native-load-error';error.textContent=bi('Вместо формы устройство вернуло страницу входа или оболочку. Войдите снова и обновите раздел.','The device returned a sign-in page or shell instead of the form. Sign in again and refresh this section.');frame.after(error);}
+    if(typeof showAuth==='function')showAuth();return;
+   }
+   frame.hidden=false;if(frame.nextElementSibling?.classList.contains('native-load-error'))frame.nextElementSibling.remove();
    content=doc.createElement('div');content.className='odi-native-content';content.style.display='flow-root';
    // Move existing nodes: native form handlers, tokens, drafts and selected files survive.
    while(doc.body.firstChild)content.append(doc.body.firstChild);doc.body.append(content);
@@ -81,3 +100,5 @@ function sizeNativeFrames(){
   frame.addEventListener('load',fit);frame.addEventListener('odi-native-ready',fit);window.addEventListener('resize',schedule);fit();
  });
 }
+
+function panelLanguagePage(){return header(bi('Язык интерфейса','Interface language'),bi('Один язык для панели и встроенных страниц.','One language for the panel and embedded pages.'))+card(bi('Язык панели','Panel language'),bi('Выбор сохраняется в этом браузере и синхронизируется с переключателем сверху.','The selection is saved in this browser and synchronised with the top selector.'),'<label for="panel-language">'+bi('Язык','Language')+'</label><select id="panel-language" data-no-translate><option value="ru">Русский</option><option value="en">English</option></select>');}

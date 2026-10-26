@@ -30,7 +30,7 @@ async function app(hash='wan'){
  w.ODILang.set('en');await pause();assert(d.querySelector('#main').textContent.includes('Factory WAN sections'));assert(!/[а-яё]/i.test(d.querySelector('#main').textContent));
  // WAN Mode is enabled independently; it must not resurrect PON WAN.
  await menu(stock+'<a target="view" href="/admin/wanmode.asp">WAN Mode</a>');vm.runInContext('render()',c);
- assert.equal(vm.runInContext('nativeWan.pon',c),null);assert.equal(d.querySelectorAll('iframe').length,1);assert.equal(d.querySelector('iframe').getAttribute('src'),'/admin/wanmode.asp');
+ assert.equal(vm.runInContext('nativeWan.pon',c),null);assert.equal(d.querySelectorAll('iframe').length,1);assert.equal(d.querySelector('iframe').getAttribute('src'),'/panel/odi-native-wanmode.asp?v='+fs.readFileSync(__dirname+'/VERSION','utf8').trim());
  await menu(stock+'<a target="view" href="/boaform/admin/formWanRedirect?redirect-url=/multi_wan_generic.asp&amp;if=pon">PON WAN</a>');
  assert(vm.runInContext('nativeWan.pon.endsWith("&if=pon")',c));
  // Foreign URLs and unrelated WAN media cannot enable PON forms.
