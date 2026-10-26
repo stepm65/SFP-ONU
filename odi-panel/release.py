@@ -29,7 +29,7 @@ def sync_sources(check=False):
         if check:
             assert updated == original, f'Stale version in {name}; run python release.py'
         elif updated != original:
-            path.write_text(updated)
+            path.write_text(updated, encoding='utf-8', newline='\n')
 
 
 if __name__ == '__main__':

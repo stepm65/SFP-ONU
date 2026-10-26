@@ -2,9 +2,9 @@
 
 [Русский](README.md) · **English**
 
-A new management panel for GPON SFP sticks built on the **Realtek RTL9601D** with factory firmware **ODI SFU V1.1.8-240408**. Tested on the **ODI DFP-34X-2IY2** (XPON ONU Stick, hardware tag X100SFP). The panel replaces the factory web interface but keeps all of its handlers: the whole device is configured from one place, in English or Russian, without SSH or a console.
+A new management panel for GPON SFP sticks built on the **Realtek RTL9601D** with factory firmware **ODI SFU V1.1.8-240408**. Targets the **ODI DFP-34X-2IY2** (XPON ONU Stick, hardware tag X100SFP). The panel replaces the factory web interface but keeps all of its handlers: the whole device is configured from one place, in English or Russian, without SSH or a console.
 
-**Version 1.9.7** · [Download firmware](firmware/) · [Releases](https://github.com/stepm65/sfp-onu/releases) · [Release description (in Russian)](odi-panel/README-1.9.7.md) · [Install and recovery (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md)
+**Version 1.9.8** · [Download firmware](firmware/) · [Releases](https://github.com/stepm65/sfp-onu/releases) · [Release description (in Russian)](odi-panel/README-1.9.8.md) · [Install and recovery (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md)
 
 ![Device status](docs/screenshots/en/01-overview.png)
 
@@ -16,9 +16,9 @@ A new management panel for GPON SFP sticks built on the **Realtek RTL9601D** wit
 
 | File | SHA256 |
 |---|---|
-| [`firmware/ODI-Panel-1.9.7-RU-EN-SFU-240408.tar`](firmware/ODI-Panel-1.9.7-RU-EN-SFU-240408.tar) | `4adb90b7c11c822d0d7a8094974aa268d69d9fc06c49ccc1d1c73225a3818e6c` |
+| [`firmware/ODI-Panel-1.9.8-RU-EN-SFU-240408.tar`](firmware/ODI-Panel-1.9.8-RU-EN-SFU-240408.tar) | `f41e50e8b79803863c3ee176d886ba13ee9c698bf677167dc22a8cee884db8bb` |
 
-Tested and running on an **ODI DFP-34X-2IY2** stick (XPON ONU Stick, hardware version V08 with DDM support, 1.25/2.5G, 1310 nm, 20 km). The TAR contains the unmodified factory 240408 kernel and installer plus a rootfs with the panel: 2.22 MB against a 2.57 MB partition limit.
+Version **1.9.8** has software validation only; physical ONU and Eltex OLT tests have not been performed. The TAR preserves the factory 240408 kernel and installer. See the [build and validation reports](firmware/reports/1.9.8/).
 
 ### Compatibility
 
@@ -81,6 +81,8 @@ Fixes from the [Anime4000/RTL960x](https://github.com/Anime4000/RTL960x) project
 
 ### Profiles and backups
 
+- **Eltex NTU-1 rev.C / bridge:** a starting preset using existing OMCI mode 0, with a diff and selectable fields. [Configuration and O5 diagnostics (Russian)](odi-panel/docs/05-ELTEX-NTU1-RU.md). Not yet tested on an Eltex OLT.
+
 - **Transfer settings from a working ONU:** import GZ, JSON, XML or UCI `gpon`. The profile is compared with the current configuration and only the fields you tick are written.
 - **Panel profile export** — without SN, MAC and passwords by default.
 - **Factory configuration backup** and restore, fibre-reconnect reset (Fiber Reset), reset keeping critical parameters, and full reset with a separate confirmation.
@@ -119,7 +121,7 @@ Fixes from the [Anime4000/RTL960x](https://github.com/Anime4000/RTL960x) project
 1. Back up the configuration in the factory interface.
 2. **Stick on factory firmware 240408:** upload the TAR on the factory "Firmware Upgrade" page. The factory handler picks the target bank itself.
    **Stick with the panel installed:** Firmware → select the running bank for the next boot → upload the TAR to the other bank → wait for verification → select the new bank and reboot.
-3. Open `http://<stick address>/panel/index.html` and press Ctrl+F5. Check panel version **1.9.7**, base **V1.1.8-240408**, SFP port mode, PON registration and optics.
+3. Open `http://<stick address>/panel/index.html` and press Ctrl+F5. Check panel version **1.9.8**, base **V1.1.8-240408**, SFP port mode, PON registration and optics.
 
 Upload the TAR, not a ZIP. Do not cut power while writing. Rollback and what to do if the connection drops are described in [docs/03 (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md).
 
@@ -145,10 +147,10 @@ for t in test_*.cjs; do [ "$t" = test_ui.cjs ] || node "$t"; done
 python3 test_backend.py && python3 test_mods.py && python3 test_diagnostics.py && python3 test_version.py
 ```
 
-Build from the factory image [`firmware/original/M110_sfp_ODI_SFU_240408.tar`](firmware/original/) (SHA256 `79c5ce4e…`), included in the repository. Requires Python 3 and squashfs-tools 4.6.1 with LZMA; the output directory must not exist. The build is reproducible: it produces the same SHA256 `4adb90b7…` as the file in `firmware/`.
+Build from the factory image [`firmware/original/M110_sfp_ODI_SFU_240408.tar`](firmware/original/) (SHA256 `79c5ce4e…`). Requires Python 3 and squashfs-tools with LZMA and pseudo files (4.6.1+; this release was built with 4.7.5). The output directory must not exist. Compressor versions may change the final SHA256. Preview generation also requires `beautifulsoup4`.
 
 ```sh
-python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin release-1.9.7-sfu
+python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin release-1.9.8-sfu
 ```
 
 ## Provenance

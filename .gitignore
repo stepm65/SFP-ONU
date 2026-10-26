@@ -15,6 +15,7 @@ Huawei-working-reference-RU.md
 /tools/dom/node_modules/
 /odi-panel/*-test-report.json
 /odi-panel/rendered-tests.json
+/odi-panel/tmp*/
 /odi-panel/base
 __pycache__/
 *.pyc

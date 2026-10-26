@@ -6,6 +6,8 @@ on the device. Commands that could affect the host are replaced by failing stubs
 """
 from pathlib import Path
 import shutil
+import shlex
+import sys
 
 P = Path(__file__).resolve().parent
 NAMES = sorted({w for line in (P / 'device-commands.txt').read_text().splitlines()
@@ -15,6 +17,9 @@ REAL = {'awk', 'cat', 'chmod', 'cksum', 'cmp', 'cp', 'diff', 'echo', 'egrep', 'e
         'fgrep', 'grep', 'kill', 'ls', 'md5sum', 'mkdir', 'ps', 'rm', 'sed', 'sh',
         'ash', 'sleep', 'tar', 'df'}
 HOST_PATH = '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
+# MSYS process creation is much slower than Linux; this is a host-test budget,
+# never the firmware's command or collection timeout.
+HOST_TIMEOUT_SCALE = 6 if sys.platform == 'cygwin' else 1
 
 
 def make(root):
@@ -27,7 +32,13 @@ def make(root):
             continue
         host = shutil.which('dash' if name in ('sh', 'ash') else name, path=HOST_PATH) if name in REAL else None
         if host:
-            target.symlink_to(host)
+            if sys.platform == 'cygwin':
+                # MSYS may copy executables instead of making symlinks. Those
+                # copies lose adjacent DLLs under this deliberately limited PATH.
+                target.write_text('#!/bin/sh\nexec '+shlex.quote(host)+' "$@"\n')
+                target.chmod(0o755)
+            else:
+                target.symlink_to(host)
         else:
             target.write_text(f'#!/bin/sh\necho "{name}: not available in host test sandbox" >&2\nexit 126\n')
             target.chmod(0o755)

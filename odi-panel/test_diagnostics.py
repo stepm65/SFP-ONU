@@ -18,6 +18,7 @@ elif a[:3]==['mib','get','84']:
  else:print('EntityID: '+a[3]+'\\nFwdOp: 0x02\\nrule PRI 0 VID 109\\nPassword: DO-NOT-EXPORT')
 elif a[:2]==['mib','get']:
  if a[2]=='171':print('EntityID: 0x0001\\nFilter Inner : PRI 8,VID 4095, TPID 0\\nTreatment Outer : PRI 1,VID 109, TPID 4')
+ elif a[2]=='256':print('SerialNum: DO-NOT-EXPORT\\nVendorID: ELTX')
  else:print('No entries')
 elif a[:2]==['get','loidauth']:print('LOID auth status: 0')
 elif a[:2]==['get','sn']:print('Serial Number: DO-NOT-EXPORT')
@@ -37,10 +38,21 @@ else:print('value: -19.25 dBm')
   for line in body.splitlines():
    if '=' in line:
     key,h=line.split('=',1);result[key]=bytes.fromhex(h).decode()
-  return p.stdout,result
- raw,out=read('diagnostics');assert out['ok']=='1';assert out['panel_version']==VERSION;assert 'VID 109' in out['me_84'] and 'FwdOp' in out['me_84'];assert out['me_84'].count('EntityID:')==2
+  return p.stdout+(('\nstderr: '+p.stderr) if p.stderr else ''),result
+ raw,out=read('diagnostics');assert out.get('ok')=='1',(raw,out);assert out['panel_version']==VERSION;assert 'VID 109' in out['me_84'] and 'FwdOp' in out['me_84'];assert out['me_84'].count('EntityID:')==2
  assert 'DO-NOT-EXPORT' not in raw and '[redacted]' in out['me_84'];assert 'ONU State: 4' in out['pon_state'];assert 'VID 4095' in out['me_171']
  commands=[json.loads(s) for s in (r/'log').read_text().splitlines()];assert all('set' not in a and 'setenv' not in a for a in commands);assert ['mib','get','84','0x0202'] in commands
+ for me in [11,47,329,256,257,45,266,268,262,84,171,78,79,277,7]:assert ['mib','get',str(me)] in commands,me
+ assert commands.index(['dump','conn'])<commands.index(['mib','get','11'])
+ assert 'DO-NOT-EXPORT' not in out['me_256'] and 'VendorID: ELTX' in out['me_256']
+ assert out['pon_state_end']==out['pon_state'] and int(out['sampled_uptime_end'])>=int(out['sampled_uptime'])
+ assert out['collection_incomplete']=='0'
+ for key in ['DEVICE_TYPE','DUAL_MGMT_MODE','OMCI_DBGLVL','OMCI_LOGFILE']:assert out[key]=='0'
+ # Exercise the exhausted budget without waiting 45 seconds or running a command.
+ before=(r/'log').read_text();(r/'deadline').mkdir()
+ p=subprocess.run(['/bin/sh','-c','. "$1"; diag_now() { printf 100; }; diag_started=0; diag_incomplete=0; DWORK=$2; diag_run "$3" get sn; printf "%s\\n" "$diag_incomplete"; cat "$DWORK/out"','test',str(r/'diagnostics.sh'),str(r/'deadline'),str(r/'omcicli')],capture_output=True,text=True,env={**os.environ,'PATH':devbin},timeout=15)
+ assert p.returncode==0 and p.stdout=='1\nREAD_ERROR collection deadline\n',(p.stdout,p.stderr)
+ assert (r/'log').read_text()==before
  raw,out=read('operation');assert out['ok']=='1'
  raw,out=read('diagnostics','');assert '403' in raw
  (r/'runtime/write.lock').mkdir();raw,out=read('telemetry');assert '503' in raw
@@ -51,5 +63,5 @@ else:print('value: -19.25 dBm')
  # A failed command has a bounded wait and an explicit error marker.
  (r/'diag').write_text('#!/bin/sh\nsleep 10\n');(r/'diag').chmod(0o755)
  raw,out=read('telemetry');assert out['panel_version']==VERSION;assert 'READ_ERROR' in out.get('pon_state',''),(raw,out)
- report={'result':'passed','scope':'host shell; fixed command fixtures; no device writes','checks':['ME enumeration and per-entity attributes','VLAN 109 and special VID preserved','serial/password redaction','no settings writes','authentication guard','write-lock guard','unknown queries rejected','bounded failed reads','operation status endpoint']}
+ report={'result':'passed','scope':'host shell; fixed command fixtures; no device writes','checks':['ME enumeration and per-entity attributes','VLAN 109 and special VID preserved','serial/password and ONU-G SerialNum redaction','expanded UNI/bridge/VEIP/ONU-G topology','connections captured before MIB','start/end PON and uptime','read-only device type and OMCI log settings','collection deadline flag without command execution','no settings writes','authentication guard','write-lock guard','unknown queries rejected','bounded failed reads','operation status endpoint']}
  (P/'diagnostics-test-report.json').write_text(json.dumps(report,indent=2));print('Diagnostics read and redaction checks passed')

@@ -1,0 +1,20 @@
+{
+  "result": "passed",
+  "environment": "jsdom with incremental XHR/upload byte fixtures; no real Boa, network or hardware",
+  "version": "1.9.8",
+  "checks": [
+    "inactive bank choice and preview guards",
+    "CSRF and target bank upload envelope",
+    "measured upload percentage",
+    "split stream lines update before completion; flash has no invented percentage",
+    "RU/EN switch during update preserves current stage",
+    "read-back stage and inert decoded log",
+    "verified result and completed stages remain visible after state reload",
+    "read-back failure is explicit and does not show successful verification",
+    "lost connection retains last actual stage and requires checking bank state",
+    "missing final ok cannot confirm success",
+    "CSRF error is preserved instead of being misreported as sign-in failure",
+    "plain response from earlier CGI remains compatible",
+    "pending boot and invalid-bank controls; reinstall remains available"
+  ]
+}

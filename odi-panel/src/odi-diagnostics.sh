@@ -4,12 +4,12 @@ diag_now() { IFS=' ' read -r tick rest </proc/uptime; printf '%s' "${tick%%.*}";
 diag_redact() {
  awk '{
   line=tolower($0)
-  if(line ~ /(password|passwd|pwd|ploam|loid[ :=]|mac_key|csrf|challenge|serialnumber|serial number|(^|[ :])sn[ :=])/) print "[redacted]"
+  if(line ~ /(password|passwd|pwd|ploam|loid[ :=]|mac_key|csrf|challenge|serial|(^|[ :])sn[ :=])/) print "[redacted]"
   else print
  }'
 }
 diag_run() {
- if [ $(($(diag_now) - diag_started)) -ge 50 ]; then printf 'READ_ERROR collection deadline\n' >"$DWORK/out"; return; fi
+ if [ $(($(diag_now) - diag_started)) -ge 45 ]; then printf 'READ_ERROR collection deadline\n' >"$DWORK/out"; diag_incomplete=1; return; fi
  "$@" >"$DWORK/out" 2>&1 & read_pid=$!
  (sleep 2; kill -TERM "$read_pid" 2>/dev/null; sleep 1; kill -KILL "$read_pid" 2>/dev/null) & timer_pid=$!
  wait "$read_pid"; rc=$?
@@ -47,6 +47,7 @@ diag_collect() {
  mkdir "$STATE/read.lock" 2>/dev/null || return 1
  DWORK=$STATE/read.lock
  diag_started=$(diag_now)
+ diag_incomplete=0
  trap 'rm -r "$DWORK"' 0
  trap 'exit 1' 1 2 15
  headers
@@ -58,7 +59,7 @@ diag_collect() {
  emit firmware_phase "$(cat "$STATE/firmware-phase" 2>/dev/null)"
  emit firmware_error "$(cat "$STATE/firmware-error" 2>/dev/null)"
  emit link_actual "$(cat /proc/lan_sds/lan_sds_cfg 2>/dev/null)"
- for key in PON_MODE VLAN_CFG_TYPE VLAN_MANU_MODE; do emit "$key" "$(get_flash "$key")"; done
+ for key in PON_MODE DEVICE_TYPE DUAL_MGMT_MODE OMCI_DBGLVL OMCI_LOGFILE VLAN_CFG_TYPE VLAN_MANU_MODE; do emit "$key" "$(get_flash "$key")"; done
  diag_read pon_state /bin/diag gpon get onu-state
  for metric in rx-power tx-power temperature voltage bias-current; do
   diag_read "optic_$metric" /bin/diag pon get transceiver "$metric"
@@ -69,12 +70,21 @@ diag_collect() {
  emit mods_status "$(cat "$STATE/mods-status" 2>/dev/null)"
  emit mods_log "$(cat "$STATE/mods.log" 2>/dev/null | diag_redact)"
  if [ "$QUERY_STRING" = diagnostics ]; then
-  for class in 84 171 78 79 268 262 277 7 257; do diag_mib "$class"; done
+  # Capture connections first, then the UNI/bridge topology omitted in 1.9.7.
   diag_read connections /bin/omcicli dump conn
+  for class in 11 47 329 256 257 45 266 268 262 84 171 78 79 277 7; do diag_mib "$class"; done
   for class in 84 171; do emit "baseline_$class" "$(cat "$STATE/baseline-$class" 2>/dev/null | diag_redact)"; done
   emit baseline_uptime "$(cat "$STATE/baseline-uptime" 2>/dev/null)"
   emit firmware_log "$(cat "$STATE/firmware-update.log" 2>/dev/null | diag_redact | awk 'NR<=100{print}')"
  fi
+ # A collection is not atomic: preserve both ends of the sampling interval.
+ # Reserve a bounded read for the final state even if the MIB budget expired.
+ diag_saved_start=$diag_started
+ diag_started=$(diag_now)
+ diag_read pon_state_end /bin/diag gpon get onu-state
+ emit sampled_uptime_end "$(diag_now)"
+ diag_started=$diag_saved_start
+ emit collection_incomplete "$diag_incomplete"
  emit collection_seconds "$(($(diag_now) - diag_started))"
  emit ok 1
  rm -r "$DWORK"; trap - 0 1 2 15

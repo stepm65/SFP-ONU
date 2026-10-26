@@ -47,7 +47,7 @@ def exercise(shell,label):
    body='' if action is None else 'action='+action+'\ncsrf='+csrf+'\n'+''.join(k+'='+ (v if action=='bank' else v.encode().hex())+'\n' for k,v in (fields or {}).items())
    if raw is not None:body=raw
    env=dict(os.environ,REMOTE_USER=user,REQUEST_METHOD='POST' if action else 'GET',QUERY_STRING='state',CONTENT_TYPE='text/plain',CONTENT_LENGTH=str(len(body)))
-   p=subprocess.run(shell+[str(script)],input=body,text=True,capture_output=True,env=env,timeout=20)
+   p=subprocess.run(shell+[str(script)],input=body,text=True,capture_output=True,env=env,timeout=20*devpath.HOST_TIMEOUT_SCALE)
    total+=1
    return p.stdout,p.stderr
   def store():return json.loads((r/'storage.json').read_text())

@@ -1,0 +1,20 @@
+{
+  "result": "passed",
+  "scope": "host shell; fixed command fixtures; no device writes",
+  "checks": [
+    "ME enumeration and per-entity attributes",
+    "VLAN 109 and special VID preserved",
+    "serial/password and ONU-G SerialNum redaction",
+    "expanded UNI/bridge/VEIP/ONU-G topology",
+    "connections captured before MIB",
+    "start/end PON and uptime",
+    "read-only device type and OMCI log settings",
+    "collection deadline flag without command execution",
+    "no settings writes",
+    "authentication guard",
+    "write-lock guard",
+    "unknown queries rejected",
+    "bounded failed reads",
+    "operation status endpoint"
+  ]
+}

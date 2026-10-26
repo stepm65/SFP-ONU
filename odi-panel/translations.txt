@@ -543,3 +543,23 @@ PVID / обработка тегов|PVID / tag processing
 Формат переключён. Введите 20 hex-цифр пароля.|Format changed. Enter 20 hexadecimal password digits.
 Штатные разделы WAN, доступные в меню этой прошивки.|Factory WAN sections available in this firmware’s menu.
 Форма присутствует в штатном меню устройства. Таблица WAN задаётся отдельно от ручного PVID; изменения могут влиять на передачу трафика.|This form is present in the device’s factory menu. The WAN table is configured separately from manual PVID; changes may affect traffic forwarding.
+
+Eltex NTU-1 rev.C · начальный профиль|Eltex NTU-1 rev.C · starting profile
+Для замены мостового ONT на этой SFU-сборке. Требует проверки на вашей линии.|For replacing a bridge ONT with this SFU build. Requires validation on your line.
+Использует существующий режим OMCI 0, правила VLAN от OLT и отключает Fake OK, мод версий и VLAN-моды. Это не отдельный OMCI-драйвер Eltex.|Uses existing OMCI mode 0, OLT VLAN rules, and disables Fake OK, the version mod and VLAN mods. This is not a separate Eltex OMCI driver.
+Серийник, PLOAM, LOID, MAC, идентичность OMCI и скорость порта остаются вашими. Сверьте данные регистрации со штатным терминалом.|Your serial, PLOAM, LOID, MAC, OMCI identity and port speed are preserved. Verify registration data against the original terminal.
+Сравнить профиль Eltex с текущими настройками|Compare Eltex profile with current settings
+Температура|Temperature
+Напряжение|Voltage
+Uptime уменьшился: устройство перезапущено|Uptime decreased: device restarted
+Не удалось прочитать; проверьте штатную страницу таймера|Unavailable; check the factory timer page
+Выключен|Disabled
+минут от загрузки|minutes from boot
+Интервал сбора и перезагрузка|Collection interval and reboot
+Снимок не атомарный: состояния до и после сбора могут различаться.|The snapshot is not atomic: states before and after collection may differ.
+PON в начале / конце|PON at start / end
+Uptime в начале / конце, секунд|Uptime at start / end, seconds
+Таймер перезагрузки|Reboot timer
+Достигнут лимит времени сбора. Часть таблиц не прочитана; это не означает отсутствия объектов.|Collection time limit reached. Some tables were not read; this does not mean objects are absent.
+Открыть штатную настройку таймера|Open factory timer settings
+UNI, мосты, GEM и T-CONT|UNI, bridges, GEM and T-CONT

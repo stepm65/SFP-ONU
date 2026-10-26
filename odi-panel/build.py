@@ -92,6 +92,9 @@ for route in ['admin/login.asp','login.asp']:
  mods['home/httpd/web/'+route]=login.replace('<!-- CAPTCHA -->',captcha).encode()
 
 mods['home/httpd/web/saveconf.asp']=(PROJECT/'src/saveconf.asp').read_bytes()
+# A CRLF shebang breaks scripts on the ONU, even if host text readers hide it.
+for name,content in mods.items():
+ if name.endswith(('.cgi','.sh')):assert b'\r' not in content,f'Non-LF script: {name}'
 # Remove only replaced file definitions; original byte offsets stay valid.
 header='\n'.join(item['line'] for name,item in before.items() if name not in mods)+'\n'
 (out/'patched.pseudo').write_bytes(header.encode()+MARK+blob)
