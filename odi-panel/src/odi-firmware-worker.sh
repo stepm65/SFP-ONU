@@ -60,9 +60,16 @@ for file in fwu.sh rootfs uImage fwu_ver hw_ver;do
  [ "$(member_md5 "$file")" = "$expected" ] || fw_error CHECKSUM
 done
 [ "$(getnv sw_active)" = "$active" ] && [ "$(getnv sw_commit)" = "$active" ] || fw_error BOOT_STATE
+# The reviewed factory fwu.sh unlinks its input TAR after writing. Retain the
+# open inode for readback without storing another complete archive in RAM.
+exec 9<"$image" || fw_error ARCHIVE_HANDLE
+retained_image=/proc/$$/fd/9
+tar -tf "$retained_image" >"$WORK/retained-list" 2>/dev/null || fw_error ARCHIVE_HANDLE
+cmp "$WORK/list" "$WORK/retained-list" >/dev/null 2>&1 || fw_error ARCHIVE_HANDLE
 printf 'Update not verified\n' >"$CONFIG/odi-invalid-bank$bank" || fw_error MARKER
 started=1;printf 'WRITING bank=%s\n' "$bank" >"$STATE/firmware-status";fw_phase writing
 sh "$STARTER" "$bank" "$image" >"$STATE/firmware-update.log" 2>&1 || fw_error WRITE
+image=$retained_image
 fw_phase readback
 stream uImage | sh "$COMPARE" "$WORK" - "$kerneldev" || fw_error READBACK
 stream_ok || fw_error READBACK

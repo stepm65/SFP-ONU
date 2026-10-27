@@ -1,0 +1,24 @@
+{
+  "version": "1.9.15",
+  "firmware_sha256": "6892345c9009ffeb6f8999eaafc0c132e77a4e798dc604bd537dba97b48a1cdf",
+  "release_channel": "stable",
+  "physical_onu_test_this_version": false,
+  "user_report": "On 1.9.14 the factory installer reported successful writing followed by READBACK and a missing TAR in the worker log.",
+  "checks": [
+    "26 host cases of the real upload CGI and worker, including the exact release TAR and both bank directions",
+    "reviewed factory updater scripts on regular-file MTD fixtures with host-only path and output-format substitutions; successful installer removes the TAR",
+    "previous worker reproduces READBACK after factory TAR deletion; fixed worker verifies both banks without a second full archive copy",
+    "invalid image and partition checks, write failure, readback mismatch, invalid-bank marker and interrupted HTTP monitoring",
+    "firmware UI/protocol tests and built version consistency",
+    "all non-web files except the worker are unchanged from 1.9.14; upload CGI and API logic unchanged; base kernel, installer, archive integrity and partition sizes verified"
+  ],
+  "not_run": [
+    "physical 1.9.15 ONU flash update or OLT session",
+    "raw MTD comparison of the affected user bank"
+  ],
+  "known_limits": [
+    "1.9.13\u20131.9.14 can report READBACK after a successful factory write because the installer unlinks its TAR",
+    "an existing invalid-bank marker is cleared only after a successful verification",
+    "TCP full-debug logs can contain credentials and are not encrypted"
+  ]
+}

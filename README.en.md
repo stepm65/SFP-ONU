@@ -4,7 +4,7 @@
 
 A new management panel for GPON SFP sticks built on the **Realtek RTL9601D** with factory firmware **ODI SFU V1.1.8-240408**. Targets the **ODI DFP-34X-2IY2** (XPON ONU Stick, hardware tag X100SFP). The panel replaces the factory web interface but keeps all of its handlers: the whole device is configured from one place, in English or Russian, without SSH or a console.
 
-**Version 1.9.14** · [Download firmware](firmware/) · [Releases](https://github.com/stepm65/sfp-onu/releases) · [Release description (in Russian)](odi-panel/README-1.9.14.md) · [Install and recovery (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md)
+**Version 1.9.15** · [Download firmware](firmware/) · [Releases](https://github.com/stepm65/sfp-onu/releases) · [Release description (in Russian)](odi-panel/README-1.9.15.md) · [Install and recovery (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md)
 
 ![Device status](docs/screenshots/en/01-overview.png)
 
@@ -16,11 +16,11 @@ A new management panel for GPON SFP sticks built on the **Realtek RTL9601D** wit
 
 | File | SHA256 |
 |---|---|
-| [`firmware/ODI-Panel-1.9.14-RU-EN-SFU-240408.tar`](firmware/ODI-Panel-1.9.14-RU-EN-SFU-240408.tar) | `166e9827a05a0b1885b293274e429899a1d5c1ae18e91a414843a0bd43e6fe2a` |
+| [`firmware/ODI-Panel-1.9.15-RU-EN-SFU-240408.tar`](firmware/ODI-Panel-1.9.15-RU-EN-SFU-240408.tar) | `6892345c9009ffeb6f8999eaafc0c132e77a4e798dc604bd537dba97b48a1cdf` |
 
-Presentation changes in **1.9.14** have software validation. The user confirmed the previous 1.9.13 works on hardware; a separate physical 1.9.14 test is not claimed. The TAR preserves the factory 240408 kernel and installer. See the [build and validation reports](firmware/reports/1.9.14/).
+The **1.9.15** fix has software validation; physical flash testing remains pending. The TAR preserves the factory 240408 kernel and installer. See the [build and validation reports](firmware/reports/1.9.15/).
 
-Version 1.9.14 unifies panel, factory form and login styles and makes factory backup immediately visible. The user confirmed 1.9.13 works on hardware and requested a normal release without the prerelease flag. New presentation changes pass Chromium checks on built assets and the offline preview.
+Version 1.9.15 fixes READBACK after the factory updater deletes its input TAR. The failure on 1.9.14 was confirmed by a device log; the fix was tested with the factory updater on regular-file models of both banks. Physical testing of 1.9.15 remains pending.
 
 ### Compatibility
 
@@ -124,8 +124,9 @@ Fixes from the [Anime4000/RTL960x](https://github.com/Anime4000/RTL960x) project
 1. Back up the configuration in the factory interface.
 2. **Stick on factory firmware 240408:** upload the TAR on the factory "Firmware Upgrade" page. The factory handler picks the target bank itself.
    **From 1.9.12 or older:** use the factory page through `/legacy.html`.
-   **From 1.9.13 or later:** Firmware → select the running bank for the next boot → upload the TAR to the other bank → wait for verification → select the new bank and reboot.
-3. Open `http://<stick address>/` and press Ctrl+F5. Check panel version **1.9.14**, base **V1.1.8-240408**, SFP port mode, PON registration and optics.
+   **From 1.9.13–1.9.14:** use `/legacy.html`; verify the bank and any invalid-bank marker before switching.
+   **From 1.9.15 or later:** Firmware → select the running bank for the next boot → upload the TAR to the other bank → wait for verification → select the new bank and reboot.
+3. Open `http://<stick address>/` and press Ctrl+F5. Check panel version **1.9.15**, base **V1.1.8-240408**, SFP port mode, PON registration and optics.
 
 Upload the TAR, not a ZIP. Do not cut power while writing. Rollback and what to do if the connection drops are described in [docs/03 (in Russian)](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md).
 
@@ -154,7 +155,7 @@ python3 test_backend.py && python3 test_mods.py && python3 test_diagnostics.py &
 Build from the factory image [`firmware/original/M110_sfp_ODI_SFU_240408.tar`](firmware/original/) (SHA256 `79c5ce4e…`). Requires Python 3 and squashfs-tools with LZMA and pseudo files (4.6.1+; this release was built with 4.7.5). The output directory must not exist. Compressor versions may change the final SHA256. Preview generation also requires `beautifulsoup4`.
 
 ```sh
-python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin release-1.9.14-sfu
+python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin release-1.9.15-sfu
 ```
 
 ## Provenance

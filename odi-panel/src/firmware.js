@@ -7,6 +7,7 @@ const firmwareErrors={AUTH:'Требуется вход администрато
 Object.defineProperty(firmwareErrors,'DEBUG_ACTIVE',{get:()=>bi('Остановите полную отладку перед обновлением.','Stop full debug before updating.')});
 Object.defineProperty(firmwareErrors,'WORKER_STOPPED',{get:()=>bi('Обработчик обновления завершился без проверки записи. Проверьте состояние банка.','Update worker stopped before verification. Check the bank status.')});
 const firmwareUnknown='Не удалось получить результат. Обновите данные и проверьте состояние операции перед перезагрузкой.';
+Object.defineProperty(firmwareErrors,'ARCHIVE_HANDLE',{get:()=>bi('Не удалось подготовить архив для контрольного чтения. Запись не начиналась.','Could not retain the archive for read-back verification. Flash writing has not started.')});
 function sendFirmware(file,bank,onEvent,onTransfer){return new Promise((resolve,reject)=>{
  const request=new XMLHttpRequest(),rows={};let offset=0,pending='',invalid=false;
  request.open('POST','/panel/upload.cgi');request.setRequestHeader('Content-Type','application/octet-stream');

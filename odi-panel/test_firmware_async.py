@@ -1,9 +1,15 @@
 """Actual asynchronous upload/worker on regular-file MTD fixtures; no device access."""
 from pathlib import Path
-import hashlib,io,json,os,shlex,subprocess,sys,tarfile,tempfile,time
+import argparse,hashlib,io,json,os,shlex,subprocess,sys,tarfile,tempfile,time
 import devpath
 P=Path(__file__).resolve().parent
-with tarfile.open(P.parent/'firmware/original/M110_sfp_ODI_SFU_240408.tar') as t:base={n:t.extractfile(n).read() for n in t.getnames()}
+parser=argparse.ArgumentParser()
+parser.add_argument('release',nargs='?')
+parser.add_argument('--worker-source',type=Path,default=P/'src/odi-firmware-worker.sh')
+args=parser.parse_args()
+factory_tar=P.parent/'firmware/original/M110_sfp_ODI_SFU_240408.tar'
+assert hashlib.sha256(factory_tar.read_bytes()).hexdigest()=='79c5ce4e62f4cb334b4335ad405d14f8c905b8b61d56ca636486d1ef91632623'
+with tarfile.open(factory_tar) as t:base={n:t.extractfile(n).read() for n in t.getnames()}
 def archive(changes=None,extra=None):
  d={**base,**(changes or {})};d['md5.txt']=''.join(hashlib.md5(d[n]).hexdigest()+'  '+n+'\n' for n in ['fwu.sh','rootfs','uImage','fwu_ver','hw_ver']).encode();out=io.BytesIO()
  with tarfile.open(fileobj=out,mode='w',format=tarfile.USTAR_FORMAT) as t:
@@ -16,6 +22,37 @@ with tempfile.TemporaryDirectory(dir=P) as temp:
  layout='dev: size erasesize name\n'+''.join(f'mtd{i+4}: {size} 00001000 "{name}"\n' for i,(name,size) in enumerate([('k0','0014c000'),('r0','00274000'),('k1','0014c000'),('r1','00274000')]))
  (r/'mtd').write_text(layout)
  for i in range(4,8):(dev/f'mtd{i}').write_bytes(b'ORIGINAL'+bytes([i]))
+ # Execute the reviewed factory installer, changing only its host fixture paths.
+ # Its real input-TAR deletion is essential; a writer mock previously missed it.
+ factory_root=r/'factory-rootfs';factory_root.write_bytes(base['rootfs'])
+ factory_pseudo=r/'factory.pseudo'
+ subprocess.run(['unsquashfs','-no-progress','-pf',str(factory_pseudo),str(factory_root)],capture_output=True,check=True)
+ header,blob=factory_pseudo.read_bytes().split(b'#\n# START OF DATA - DO NOT MODIFY\n#\n',1)
+ factory_starter=None
+ for line in header.decode().splitlines():
+  fields=shlex.split(line,comments=True)
+  if len(fields)>7 and fields[0]=='etc/scripts/fwu_starter.sh':factory_starter=blob[int(fields[7]):int(fields[7])+int(fields[6])].decode()
+ assert factory_starter is not None
+ (r/'factory-starter.sh').write_text(factory_starter.replace('tmp_dir="/tmp/fwu"','tmp_dir="'+str(r/'fwu')+'"').replace('/bin/md5sum',str(bin/'md5sum')))
+ mapped=base['fwu.sh'].decode().replace('/proc/mtd',str(r/'mtd')).replace('"/dev/"','"'+str(dev)+'/"').replace('/var/config/topbar.gif',str(config/'topbar.gif')).replace('/bin/md5sum',str(bin/'md5sum'))
+ (r/'factory-fwu.sh').write_text(mapped)
+ (bin/'sh').write_text('#!/bin/sh\nif [ "$1" = fwu.sh ];then shift;exec /bin/sh '+shlex.quote(str(r/'factory-fwu.sh'))+' "$@";fi\nexec /bin/sh "$@"\n');(bin/'sh').chmod(0o755)
+ # MSYS GNU md5sum defaults to '*file'; target BusyBox uses two spaces and
+ # hashes binary bytes. Emulate that output without MSYS text-mode conversion.
+ (bin/'md5sum').write_text('''#!/usr/bin/python3
+import hashlib,sys
+from pathlib import Path
+for name in sys.argv[1:] or ['-']:
+ data=sys.stdin.buffer.read() if name=='-' else Path(name).read_bytes()
+ print(hashlib.md5(data).hexdigest()+'  '+name)
+''');(bin/'md5sum').chmod(0o755)
+ (bin/'flash_eraseall').write_text('''#!/usr/bin/python3
+import sys
+from pathlib import Path
+r=Path(__file__).parent.parent;p=Path(sys.argv[1]);assert p.parent.resolve()==(r/'dev').resolve()
+p.write_bytes(bytes([255])*4096)
+with (r/'erase-targets').open('a') as log:log.write(p.name+'\\n')
+''');(bin/'flash_eraseall').chmod(0o755)
  (bin/'nv').write_text('''#!/usr/bin/python3
 import json,sys
 from pathlib import Path
@@ -34,11 +71,16 @@ else:print('files differ')
 sys.exit(1)
 ''');(bin/'cmp').chmod(0o755)
  (r/'starter').write_text('''#!/usr/bin/python3
-import sys,json,tarfile,time
+import sys,json,tarfile,time,subprocess
 from pathlib import Path
 r=Path(__file__).parent;b=int(sys.argv[1]);mode=(r/'mode').read_text() if (r/'mode').exists() else ''
 assert not (r/'state/write.lock/rootfs').exists() and not (r/'state/write.lock/uImage').exists()
 print('Updating image',b,flush=True);(r/'writes').write_text(str(b))
+if mode=='factory':
+ rc=subprocess.call(['/bin/sh',str(r/'factory-starter.sh'),str(b),sys.argv[2]])
+ if rc==0:
+  assert not Path(sys.argv[2]).exists();(r/'factory-unlinked').write_text('yes')
+ sys.exit(rc)
 if mode=='fail':sys.exit(1)
 if mode=='pause':
  (r/'ready').touch();end=time.monotonic()+90
@@ -51,10 +93,11 @@ with tarfile.open(sys.argv[2]) as t:
   if mode=='corrupt' and name=='rootfs':payload=b'BROKEN'+payload[6:]
   (r/'dev'/('mtd'+str(index+2*b))).write_bytes(payload+b'\\xff'*64)
  p=r/'nv.json';d=json.loads(p.read_text());d['sw_version'+str(b)]=t.extractfile('fwu_ver').read().decode().strip();p.write_text(json.dumps(d))
+Path(sys.argv[2]).unlink()
 ''');(r/'starter').rename(r/'starter.py');(r/'starter').write_text('#!/bin/sh\nexec /usr/bin/python3 '+shlex.quote(str(r/'starter.py'))+' "$@"\n');(r/'starter').chmod(0o755)
  replacements={'PATH=/bin:/sbin:/usr/bin:/usr/sbin':'PATH='+path,'STATE=/tmp/odi-panel':'STATE='+str(state),'NV=/bin/nv':'NV='+str(bin/'nv'),'MTD=/proc/mtd':'MTD='+str(r/'mtd'),'DEV=/dev':'DEV='+str(dev),'CONFIG=/var/config':'CONFIG='+str(config),'/etc/scripts/odi-fw-lib.sh':str(r/'lib.sh'),'/etc/scripts/odi-firmware-worker.sh':str(r/'worker.sh'),'/etc/scripts/odi-fw-stream.sh':str(r/'stream.sh'),'/etc/scripts/odi-fw-compare.sh':str(r/'compare.sh'),'/etc/scripts/fwu_starter.sh':str(r/'starter'),'[ -c "$DEV/$dev" ]':'[ -f "$DEV/$dev" ]','/tmp/odi-debug/running':str(r/'private-running'),'/tmp/odi-debug/starting':str(r/'private-starting')}
  for name,out in [('odi-fw-lib.sh','lib.sh'),('odi-fw-stream.sh','stream.sh'),('odi-fw-compare.sh','compare.sh'),('odi-firmware-worker.sh','worker.sh'),('upload.cgi','upload.cgi')]:
-  text=(P/'src'/name).read_text()
+  text=(args.worker_source if name=='odi-firmware-worker.sh' else P/'src'/name).read_text()
   for a,b in replacements.items():text=text.replace(a,b)
   (r/out).write_text(text)
  def send(data=None,bank='1',token='abc-token',extra=None):
@@ -73,14 +116,15 @@ with tarfile.open(sys.argv[2]) as t:
   response=send(data);assert b'accepted=1' in response.stdout,(name,response.stdout,response.stderr)
   phase,actual=finish()
   if error:assert phase=='failed' and actual==error,(name,phase,actual,(state/'firmware-worker.log').read_text())
-  else:assert phase=='verified',(name,phase,actual,(state/'firmware-worker.log').read_text())
+  else:assert phase=='verified',(name,phase,actual,(state/'firmware-worker.log').read_text(),(state/'firmware-update.log').read_text())
   assert (dev/'mtd4').read_bytes()==before[0] and (dev/'mtd5').read_bytes()==before[1],name
   assert json.loads(store.read_text())['sw_active']==json.loads(store.read_text())['sw_commit']=='0'
   if error and mode not in ['corrupt','fail']:assert not (r/'writes').exists(),name
   checks.append(name)
- case('valid TAR verified in background without extracting kernel/rootfs')
- if len(sys.argv)>1:
-  release=Path(sys.argv[1]).resolve()
+ case('real factory updater deletes TAR; readback still verifies bank 1',mode='factory');assert (r/'factory-unlinked').exists()
+ case('valid TAR verified after mock factory TAR deletion without extracting kernel/rootfs')
+ if args.release:
+  release=Path(args.release).resolve()
   case('built release TAR verified in background',release.read_bytes())
  for name,kwargs in [('no authentication',{'extra':{'REMOTE_USER':''}}),('bad CSRF',{'token':'wrong'}),('active bank',{'bank':'0'}),('truncated body',{'extra':{'CONTENT_LENGTH':str(len(archive())+100)}})]:
   proc=send(**kwargs);assert b'accepted=1' not in proc.stdout and proc.returncode!=0,(name,proc.stdout);checks.append(name)
@@ -117,6 +161,11 @@ with tarfile.open(sys.argv[2]) as t:
  assert before==[(dev/f'mtd{i}').read_bytes() for i in [6,7]]
  assert json.loads(store.read_text())['sw_active']==json.loads(store.read_text())['sw_commit']=='1'
  checks.append('explicit bank 0 update preserves active bank 1 and boot selection')
-report={'result':'passed','scope':'real upload CGI/background shell worker with exact target cmp diagnostic fixture and regular-file MTD; no physical flash','checks':checks}
-if len(sys.argv)>1:report['release_sha256']=hashlib.sha256(Path(sys.argv[1]).read_bytes()).hexdigest()
+ (r/'mode').write_text('factory');(r/'factory-unlinked').unlink()
+ response=send(bank='0');assert b'accepted=1' in response.stdout;assert finish()[0]=='verified'
+ assert (r/'factory-unlinked').exists() and before==[(dev/f'mtd{i}').read_bytes() for i in [6,7]]
+ assert json.loads(store.read_text())['sw_active']==json.loads(store.read_text())['sw_commit']=='1'
+ checks.append('real factory updater deletes TAR; bank 0 readback succeeds and preserves active bank 1')
+report={'result':'passed','scope':'actual upload CGI/worker, reviewed factory installer with host-only path remapping and regular-file MTD, target cmp/md5 output fixtures; no physical flash','checks':checks}
+if args.release:report['release_sha256']=hashlib.sha256(Path(args.release).read_bytes()).hexdigest()
 (P/'firmware-test-report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

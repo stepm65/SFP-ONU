@@ -1,0 +1,33 @@
+{
+  "result": "passed",
+  "scope": "actual upload CGI/worker, reviewed factory installer with host-only path remapping and regular-file MTD, target cmp/md5 output fixtures; no physical flash",
+  "checks": [
+    "real factory updater deletes TAR; readback still verifies bank 1",
+    "valid TAR verified after mock factory TAR deletion without extracting kernel/rootfs",
+    "built release TAR verified in background",
+    "no authentication",
+    "bad CSRF",
+    "active bank",
+    "truncated body",
+    "active private capture blocks update",
+    "private capture preparation blocks update",
+    "modified pinned kernel rejected",
+    "unreviewed updater rejected",
+    "wrong hardware rejected",
+    "bad rootfs signature rejected",
+    "oversized rootfs rejected",
+    "duplicate TAR entry rejected",
+    "TAR traversal rejected",
+    "checksum error rejected before erase",
+    "unexpected MTD geometry rejected before job",
+    "missing target partition rejected before job",
+    "pending boot bank rejected",
+    "updater failure retains invalid-bank marker",
+    "readback mismatch retains marker",
+    "verified reinstall clears marker",
+    "update continues after upload CGI/HTTP client exits; final bank remains unchanged",
+    "explicit bank 0 update preserves active bank 1 and boot selection",
+    "real factory updater deletes TAR; bank 0 readback succeeds and preserves active bank 1"
+  ],
+  "release_sha256": "6892345c9009ffeb6f8999eaafc0c132e77a4e798dc604bd537dba97b48a1cdf"
+}
