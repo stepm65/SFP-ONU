@@ -26,8 +26,13 @@ def logging_fixture(root, state=None):
     root = Path(root)
     state = Path(state) if state is not None else root / 'runtime'
     target = root / 'loglib.sh'
+    debuglib = root / 'debuglib.sh'
+    debuglib.write_text((P / 'src/odi-debug-lib.sh').read_text()
+                        .replace('/var/config/odi-panel-debug.conf', str(root / 'debug.conf'))
+                        .replace('/tmp/odi-debug', str(root / 'debug')))
     target.write_text((P / 'src/odi-log-lib.sh').read_text()
                       .replace('/var/config/odi-panel-logging.conf', str(root / 'logging.conf'))
+                      .replace('/etc/scripts/odi-debug-lib.sh', str(debuglib))
                       .replace('/tmp/odi-panel', str(state)))
     return str(target)
 

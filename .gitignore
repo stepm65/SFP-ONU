@@ -2,6 +2,7 @@
 /base/
 /upload/
 /release-*/
+/release-*-build.log
 *.tar
 !/firmware/*.tar
 !/firmware/original/*.tar

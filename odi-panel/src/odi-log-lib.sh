@@ -3,6 +3,7 @@
 LOGCONF=/var/config/odi-panel-logging.conf
 LOGSTATE=/tmp/odi-panel
 LOGKEYS='LOG_LOCAL LOG_REMOTE LOG_HOST LOG_PORT LOG_TAG'
+. /etc/scripts/odi-debug-lib.sh
 log_default() {
  case "$1" in LOG_LOCAL) printf 1;; LOG_REMOTE) printf 0;; LOG_PORT) printf 514;; LOG_TAG) printf onu;; esac
 }

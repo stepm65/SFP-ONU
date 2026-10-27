@@ -12,7 +12,7 @@ const nativeAliases={'native-wanmode':'wan','native-wan':'wan','native-epon':'id
 // An SDK template on disk is not proof that the OEM exposes or supports it.
 // Only links returned by the stock menu enable the generic WAN forms.
 const nativeWan={pon:null,mode:null};
-const duplicatePaths=new Set(['/wanmode.asp','/multi_wan_generic.asp','/boaform/formWanRedirect','/epon.asp','/gpon.asp','/omci_info.asp','/vlan.asp','/linkmode.asp','/linkmode_eth.asp','/reboot.asp','/upgrade.asp','/saveconf.asp']);
+const duplicatePaths=new Set(['/logout.asp','/adminlogout.asp','/userlogout.asp','/multi_lang.asp','/wanmode.asp','/multi_wan_generic.asp','/boaform/formWanRedirect','/epon.asp','/gpon.asp','/omci_info.asp','/vlan.asp','/linkmode.asp','/linkmode_eth.asp','/reboot.asp','/upgrade.asp','/saveconf.asp']);
 function nativeNavigation(){
  const nav=document.getElementById('native-nav');
  nav.innerHTML=rootSections.map(([id,label,path])=>'<a href="#'+id+'" '+(id.startsWith('native-')?'data-native="'+id.slice(7)+'"':'data-tab="'+id+'"')+'><svg class="nav-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="'+path+'"/></svg><span>'+esc(label)+'</span></a>').join('');ODILang.apply(nav);if(typeof tab!=='undefined')paintSectionNav();

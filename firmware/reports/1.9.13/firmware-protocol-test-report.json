@@ -1,0 +1,10 @@
+{
+  "result": "passed",
+  "scope": "jsdom + mocked XHR/worker status",
+  "checks": [
+    "accepted upload is not treated as verified flash",
+    "background phases are polled to verified bank",
+    "dead worker cannot report success",
+    "reload exposes resume monitoring and blocks duplicate upload"
+  ]
+}

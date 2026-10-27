@@ -7,7 +7,7 @@ function paintSectionNav(){const root=sectionRoot(),nativeEntry=id=>nativePages.
  if(root==='overview')entries=[['overview','Сводка'],nativeTab('status'),nativeTab('pon')];
  if(root==='wan')entries=[nativeWan.pon||nativeWan.mode?['wan',nativeWan.pon?'PON WAN':'Режим WAN']:null,['vlan','VLAN'],['link','SFP-порт'],nativeTab('lan')];
  if(root==='diagnostics')entries=[['diagnostics','PON / OMCI'],nativeTab('arp'),nativeTab('ping'),nativeTab('stats'),nativeTab('pon-stats')];
- if(root==='native-password')entries=[nativeTab('password'),nativeTab('timer'),nativeTab('language'),['native-recovery','Восстановление доступа'],...nativePages.filter(p=>p[3]==='Штатные разделы').map(p=>['native-'+p[0],p[1]])];
+ if(root==='native-password')entries=[nativeTab('password'),nativeTab('timer'),['native-recovery','Восстановление доступа'],...nativePages.filter(p=>p[3]==='Штатные разделы').map(p=>['native-'+p[0],p[1]])];
  const nav=document.getElementById('section-nav');nav.innerHTML=entries.filter(Boolean).map(([id,label])=>'<a href="#'+esc(id)+'" '+(id.startsWith('native-')?'data-native="'+esc(id.slice(7))+'"':'data-tab="'+esc(id)+'"')+' aria-current="'+((location.hash||'#overview')==='#'+id?'page':'false')+'">'+esc(label)+'</a>').join('');nav.hidden=!nav.children.length;
  document.querySelectorAll('#native-nav a').forEach(a=>{const active=a.hash==='#'+root;a.classList.toggle('active',active);a.setAttribute('aria-current',active?'page':'false');});ODILang.apply(nav);
 }

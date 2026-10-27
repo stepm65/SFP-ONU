@@ -8,7 +8,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert'),{JSDOM}=require
  const checks=[],requests=[];
  class MockXHR{
   constructor(){this.upload={};this.responseText='';this.status=200;requests.push(this);}
-  open(method,url){assert.equal(method,'POST');assert.equal(url,'upload.cgi');}
+  open(method,url){assert.equal(method,'POST');assert.equal(url,'/panel/upload.cgi');}
   setRequestHeader(key,value){assert.equal(key,'Content-Type');assert.equal(value,'application/octet-stream');}
   send(body){this.body=body;}
   chunk(text){this.responseText+=text;this.onprogress();}

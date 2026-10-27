@@ -1,13 +1,15 @@
 'use strict';
 function firmwareUpload(){
- const active=state.sw_active,ready=['0','1'].includes(active)&&state.sw_commit===active;
- return card('Установка в выбранный банк','Поддерживаются подготовленные TAR-образы на основе ODI SFU 240408.',`<form id="upload"><div class="grid"><div class="field"><label for="upload-bank">Банк для записи</label><select id="upload-bank" name="bank" ${!ready||preview?'disabled':''}>${['0','1'].map(n=>`<option value="${n}" ${n===active?'disabled':'selected'}>${ODILang.t('Банк '+n)}${n===active?' · '+ODILang.t('Текущий'):''}</option>`).join('')}</select><small>Работающий банк защищён от перезаписи.</small></div><div class="field"><label for="firmware-file">Файл прошивки TAR</label><input id="firmware-file" type="file" name="binary" accept=".tar" required ${!ready||preview?'disabled':''}></div></div><p class="muted">После записи проверяются данные в памяти. Выбор следующей загрузки и перезагрузка выполняются отдельно.</p>${!ready?'<div class="banner warn">Перед установкой выберите текущий банк для следующей загрузки и обновите данные.</div>':''}<div class="actions" style="margin-top:18px"><button class="button" type="submit" ${!ready||preview?'disabled':''}>Проверить и записать</button></div><p id="upload-status" role="status" aria-live="polite"></p></form>${state.firmware_status?`<p class="muted">${esc(ODILang.t('Последняя операция'))}: <span>${esc(state.firmware_status)}</span></p>`:''}`);
+ const active=state.sw_active,jobActive=/^(RECEIVING|CHECKING|WRITING)/.test(state.firmware_status||''),ready=!jobActive&&['0','1'].includes(active)&&state.sw_commit===active;
+ return card('Установка в выбранный банк','Поддерживаются подготовленные TAR-образы на основе ODI SFU 240408.',`<form id="upload"><div class="grid"><div class="field"><label for="upload-bank">Банк для записи</label><select id="upload-bank" name="bank" ${!ready||preview?'disabled':''}>${['0','1'].map(n=>`<option value="${n}" ${n===active?'disabled':'selected'}>${ODILang.t('Банк '+n)}${n===active?' · '+ODILang.t('Текущий'):''}</option>`).join('')}</select><small>Работающий банк защищён от перезаписи.</small></div><div class="field"><label for="firmware-file">Файл прошивки TAR</label><input id="firmware-file" type="file" name="binary" accept=".tar" required ${!ready||preview?'disabled':''}></div></div><p class="muted">После записи проверяются данные в памяти. Выбор следующей загрузки и перезагрузка выполняются отдельно.</p>${!ready&&!jobActive?'<div class="banner warn">Перед установкой выберите текущий банк для следующей загрузки и обновите данные.</div>':''}<div class="actions" style="margin-top:18px"><button class="button" type="submit" ${!ready||preview?'disabled':''}>Проверить и записать</button></div><p id="upload-status" role="status" aria-live="polite"></p></form>${jobActive?'<div class="banner"><span>'+bi('Фоновое обновление продолжается.','Background update is continuing.')+'</span><button type="button" class="button secondary" id="resume-update">'+bi('Показать ход обновления','Show update progress')+'</button><pre id="resume-update-status"></pre></div>':''}${state.firmware_status?`<p class="muted">${esc(ODILang.t('Последняя операция'))}: <span>${esc(state.firmware_status)}</span></p>`:''}`);
 }
 const firmwareErrors={AUTH:'Требуется вход администратора.',CSRF:'Обновите страницу и повторите загрузку.',METHOD:'Недопустимый запрос.',TYPE:'Недопустимый запрос.',LENGTH:'Выберите TAR-файл размером не более 8 МиБ.',ENVELOPE:'Недопустимый запрос.',BANK:'Не выбран банк для записи.',BUSY:'Другая операция уже выполняется.',BOOT_STATE:'Перед установкой выберите текущий банк для следующей загрузки и обновите данные.',ACTIVE_BANK:'Работающий банк защищён от перезаписи.',PARTITIONS:'Разметка устройства не соответствует этой сборке.',RECEIVE:'Не удалось принять файл прошивки.',TRUNCATED:'Файл загружен не полностью.',ARCHIVE:'Неверная структура TAR-архива.',KERNEL:'Неподдерживаемое ядро. Разрешена только проверенная основа ODI SFU 240408.',UPDATER:'Скрипт обновления отличается от проверенного штатного варианта.',HARDWARE:'Образ предназначен для другой аппаратной платформы.',ROOTFS:'Неверный формат или размер rootfs.',VERSION:'Не удалось проверить версию образа.',CHECKSUM:'Контрольная сумма образа не совпадает.',MARKER:'Не удалось сохранить состояние проверки банка.',WRITE:'Запись не завершена. Не загружайтесь из целевого банка.',READBACK:'Записанные данные не прошли проверку. Не загружайтесь из целевого банка.',BOOT_CHANGED:'Во время записи изменилось состояние загрузки. Проверьте банки перед перезагрузкой.'};
+Object.defineProperty(firmwareErrors,'DEBUG_ACTIVE',{get:()=>bi('Остановите полную отладку перед обновлением.','Stop full debug before updating.')});
+Object.defineProperty(firmwareErrors,'WORKER_STOPPED',{get:()=>bi('Обработчик обновления завершился без проверки записи. Проверьте состояние банка.','Update worker stopped before verification. Check the bank status.')});
 const firmwareUnknown='Не удалось получить результат. Обновите данные и проверьте состояние операции перед перезагрузкой.';
 function sendFirmware(file,bank,onEvent,onTransfer){return new Promise((resolve,reject)=>{
  const request=new XMLHttpRequest(),rows={};let offset=0,pending='',invalid=false;
- request.open('POST','upload.cgi');request.setRequestHeader('Content-Type','application/octet-stream');
+ request.open('POST','/panel/upload.cgi');request.setRequestHeader('Content-Type','application/octet-stream');
  // Incremental responseText works without ReadableStream and includes upload byte events.
  function consume(final=false){
   const text=request.responseText||'';if(text.length>65536){invalid=true;return;}
@@ -23,13 +25,24 @@ function sendFirmware(file,bank,onEvent,onTransfer){return new Promise((resolve,
   consume(true);
   if((!rows.error&&(request.status===401||request.status===403))||(request.responseText||'').trimStart().startsWith('<')){reject(new Error(firmwareErrors.AUTH));return;}
   if(invalid||request.status<200||request.status>=300||rows.error||rows.ok!=='1'||rows.bank!==bank){reject(new Error(firmwareErrors[rows.error]||firmwareUnknown));return;}
+  if(rows.accepted==='1'){monitorFirmware(bank,onEvent).then(resolve,reject);return;}
   resolve(rows);
  };
  request.onerror=request.ontimeout=request.onabort=()=>reject(new Error('Связь со стиком прервана. Не отключайте питание. Обновите данные и проверьте состояние банка.'));
  // No client timeout or cancellation: flash writing may outlive the connection.
  request.send(new Blob(['csrf='+state.csrf+'\nbank='+bank+'\n',file]));
 });}
-function bindFirmware(){const form=document.getElementById('upload');if(!form)return;form.onsubmit=async e=>{
+async function monitorFirmware(bank,onEvent){
+ for(;;){
+  const result=await readApi('operation',20000),phase=result.firmware_phase;
+  if(phase)onEvent('phase',phase);if(result.firmware_log)onEvent('log',result.firmware_log);
+  if(result.firmware_worker_alive==='0'&&phase!=='verified'&&phase!=='failed')throw new Error(firmwareErrors.WORKER_STOPPED);
+  if(phase==='failed')throw new Error(firmwareErrors[result.firmware_error]||result.firmware_error||firmwareUnknown);
+  if(phase==='verified'&&result.firmware_status==='VERIFIED bank='+bank)return {ok:'1',bank};
+  await new Promise(resolve=>setTimeout(resolve,1200));
+ }
+}
+function bindFirmware(){const resume=document.getElementById('resume-update');if(resume)resume.onclick=async()=>{if(busy)return;busy=true;resume.disabled=true;try{const match=String(state.firmware_status).match(/bank=([01])/);if(!match)throw new Error(firmwareUnknown);await monitorFirmware(match[1],(key,value)=>{if(key==='phase')document.getElementById('resume-update-status').textContent=({receiving:bi('Получение файла','Receiving file'),checking:bi('Проверка архива','Checking archive'),writing:bi('Запись прошивки','Writing firmware'),readback:bi('Проверка записи','Verifying write'),verified:bi('Запись проверена','Write verified')})[value]||value;});busy=false;await load();toast(bi('Фоновое обновление завершено и проверено.','Background update completed and verified.'));}catch(e){toast(e.message,true);}finally{busy=false;resume.disabled=false;restartLive();}};const form=document.getElementById('upload');if(!form)return;form.onsubmit=async e=>{
  e.preventDefault();if(preview||busy)return;
  const file=form.elements.binary.files[0],bank=form.elements.bank.value;
  if(!file||!file.name.toLowerCase().endsWith('.tar')||file.size>8388500){toast('Выберите TAR-файл размером не более 8 МиБ.',true);return;}

@@ -5,7 +5,7 @@ export PATH
 LC_ALL=C
 export LC_ALL
 umask 077
-PANEL_VERSION=1.9.12
+PANEL_VERSION=1.9.13
 STATE=/tmp/odi-panel
 FLASH=/etc/scripts/flash
 NV=/bin/nv
@@ -54,7 +54,18 @@ get_value() {
  esac
 }
 if [ "$REQUEST_METHOD" = GET ]; then
- case "$QUERY_STRING" in logs)
+ case "$QUERY_STRING" in debug_status)
+  headers;for key in $DEBUGKEYS;do emit "$key" "$(debug_get "$key")";done
+  emit debug_status "$(cat "$DEBUGROOT/status" 2>/dev/null)"
+  emit debug_error "$(cat "$DEBUGROOT/reader-error" 2>/dev/null)"
+  for kind in raw parsed;do
+   total=0
+   for suffix in '' .1;do if [ -f "$DEBUGROOT/$kind$suffix" ];then bytes=$(cksum "$DEBUGROOT/$kind$suffix" | awk '{print $2}');total=$((total+bytes));fi;done
+   emit "debug_$kind""_bytes" "$total"
+  done
+  emit debug_syslog_status "$(cat "$DEBUGROOT/syslog-status" 2>/dev/null)"
+  emit ok 1;exit 0;;
+ logs)
   headers
   for key in $LOGKEYS;do emit "$key" "$(log_get "$key")";done
   emit logger_status "$(cat "$STATE/logger-status" 2>/dev/null)"
@@ -64,6 +75,8 @@ if [ "$REQUEST_METHOD" = GET ]; then
  operation)
   headers
   emit firmware_status "$(cat "$STATE/firmware-status" 2>/dev/null)"
+  worker_pid=$(cat "$STATE/firmware-worker.pid" 2>/dev/null)
+  case "$worker_pid" in ''|*[!0-9]*) ;; *) emit firmware_worker_alive "$(kill -0 "$worker_pid" 2>/dev/null && printf 1 || printf 0)";;esac
   emit firmware_phase "$(cat "$STATE/firmware-phase" 2>/dev/null)"
   emit firmware_error "$(cat "$STATE/firmware-error" 2>/dev/null)"
   emit firmware_log "$(awk 'NR<=100{print}' "$STATE/firmware-update.log" 2>/dev/null)"
@@ -75,6 +88,7 @@ if [ "$REQUEST_METHOD" = GET ]; then
  [ "$QUERY_STRING" = state ] || fail '400 Bad Request' 'Unknown query'
  headers; emit csrf "$token"
  for key in $LOGKEYS;do emit "$key" "$(log_get "$key")";done
+ for key in $DEBUGKEYS;do emit "$key" "$(debug_get "$key")";done
  emit panel_version "$PANEL_VERSION"
  emit uptime "$(cat /proc/uptime)"
  emit pending_keys "$(cat "$STATE/pending-keys" 2>/dev/null)"
@@ -110,7 +124,7 @@ case "$CONTENT_LENGTH" in ''|*[!0-9]*) fail '400 Bad Request' 'Invalid request l
 [ "${#CONTENT_LENGTH}" -le 4 ] && [ "$CONTENT_LENGTH" -le 4096 ] || fail '413 Payload Too Large' 'Request exceeds 4096 bytes'
 case "$CONTENT_TYPE" in 'text/plain'|'text/plain;charset=UTF-8'|'text/plain; charset=UTF-8') ;; *) fail '415 Unsupported Media Type' 'text/plain required';; esac
 IFS= read -r action
-case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check|action=logging|action=log_test|action=log_clear) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
+case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check|action=logging|action=log_test|action=log_clear|action=debug_config|action=debug_start|action=debug_stop|action=debug_export) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
 IFS= read -r supplied
 [ "$supplied" = "csrf=$token" ] || fail '403 Forbidden' 'Invalid CSRF token. Reload the page.'
 mkdir "$STATE/write.lock" 2>/dev/null || fail '409 Conflict' 'Another operation is running'
@@ -138,6 +152,37 @@ decode() {
   oct=$(printf '%03o' "$n"); ch=$(printf "\\$oct"); dec=$dec$ch
  done
 }
+if [ "$action" = debug_config ];then
+ count=0
+ while IFS='=' read -r key value;do
+  case " $DEBUGKEYS " in *" $key "*) [ -n "$key" ] || fail '400 Bad Request' 'Unknown debug field';; *) fail '400 Bad Request' 'Unknown debug field';; esac
+  [ ! -f "$WORK/$key" ] || fail '400 Bad Request' 'Duplicate debug field'
+  decode "$value" && debug_valid "$key" "$dec" || fail '400 Bad Request' "Invalid value: $key"
+  printf '%s' "$dec" >"$WORK/$key";count=$((count+1))
+ done
+ [ "$count" -gt 0 ] || fail '400 Bad Request' 'No debug fields'
+ for key in $DEBUGKEYS;do [ -f "$WORK/$key" ] || debug_get "$key" >"$WORK/$key";done
+ if [ "$(cat "$WORK/DEBUG_REMOTE")" = 1 ];then
+  log_valid LOG_HOST "$(log_get LOG_HOST)" && [ -n "$(log_get LOG_HOST)" ] || fail '400 Bad Request' 'Configure the syslog server before forwarding full debug'
+ fi
+ for key in $DEBUGKEYS;do printf '%s=%s\n' "$key" "$(cat "$WORK/$key")";done >"$WORK/debug.conf"
+ cp "$WORK/debug.conf" "$DEBUGCONF" && cmp "$WORK/debug.conf" "$DEBUGCONF" >/dev/null || fail '500 Internal Server Error' 'Debug configuration read-back failed'
+ headers;for key in $DEBUGKEYS;do emit "$key" "$(debug_get "$key")";done;emit ok 1;exit 0
+fi
+case "$action" in debug_start|debug_stop|debug_export)
+ while IFS= read -r extra;do [ -z "$extra" ] || fail '400 Bad Request' 'Debug action accepts no parameters';done
+ if [ "$action" = debug_export ];then
+  [ ! -d "$DEBUGROOT/running" ] && [ ! -d "$DEBUGROOT/starting" ] || fail '409 Conflict' 'Stop full debug before downloading'
+  [ -f "$DEBUGROOT/credentials.txt" ] || fail '409 Conflict' 'No private capture is available'
+  set -- status credentials.txt
+  for part in raw raw.1 parsed parsed.1 native-before.txt previous-omcilog previous-omcilog.par reader-error syslog-status;do [ ! -f "$DEBUGROOT/$part" ] || set -- "$@" "$part";done
+  printf 'Content-Type: application/x-tar\r\nContent-Disposition: attachment; filename="ODI-full-debug-PRIVATE.tar"\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\n\r\n'
+  tar -cf - -C "$DEBUGROOT" "$@";exit $?
+ fi
+ debug_job=stop;[ "$action" != debug_start ] || debug_job=start
+ /etc/scripts/odi-debug.sh "$debug_job" >/dev/null 2>&1;debug_rc=$?
+ [ "$debug_rc" != 75 ] || fail '409 Conflict' 'Full debug is already running'
+ headers;emit debug_rc "$debug_rc";emit debug_status "$(cat "$DEBUGROOT/status" 2>/dev/null)";emit ok 1;exit 0;;esac
 if [ "$action" = logging ]; then
  count=0
  while IFS='=' read -r key value;do

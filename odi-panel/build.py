@@ -3,7 +3,7 @@
 python3 build.py BASE.tar SQUASHFS_TOOLS OUTPUT
 Run from anywhere; src/ is resolved beside this file. Never flashes hardware.
 """
-import hashlib,io,json,re,shlex,struct,subprocess,sys,tarfile,zlib
+import hashlib,io,json,re,shlex,struct,subprocess,sys,tarfile,zlib,time,os
 from pathlib import Path
 PROJECT=Path(__file__).resolve().parent
 from release import VERSION, sync_sources
@@ -58,19 +58,24 @@ mods={'bin/boa':boa_binary}
 (out/'boa-patch-report.json').write_text(json.dumps(boa_patch_report,indent=2)+'\n')
 for n in ['index.html','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','uplink.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js']:
  mods['home/httpd/web/panel/'+n]=(PROJECT/'src'/n).read_bytes()
-for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh','odi-log-lib.sh','odi-log-run.sh']:
+for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh','odi-log-lib.sh','odi-log-run.sh','odi-debug-lib.sh','odi-debug.sh','odi-debug-ring.awk','odi-fw-lib.sh','odi-fw-stream.sh','odi-fw-compare.sh','odi-firmware-worker.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src'/n).read_bytes()
 for n in ['fix_speed.sh','fix_sw_ver.sh','fix_vlan_tag.sh','fix_vlan_fwdop.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src/anime'/n).read_bytes()
 mods['etc/scripts/odi-panel-boot.sh']=(PROJECT/'src/odi-panel-boot.sh').read_bytes()
 mods['home/httpd/web/legacy.html']=before['home/httpd/web/index.html']['data']
-mods['home/httpd/web/index.html']=b'<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=/panel/index.html"><title>ODI Panel</title></head><body><a href="/panel/index.html">ODI Panel</a> | <a href="/legacy.html">Original interface</a></body></html>\n'
 conf=before['home/httpd/boa.conf']['data'].decode()
 assert 'Auth / /var/boaSuper.passwd' in conf
 conf+='\n# ODI Panel: CGI inherits administrator authentication; no new listener.\nAddType application/x-httpd-cgi cgi\nAddType text/css css\nAuth /panel /var/boaSuper.passwd\n'
 mods['home/httpd/boa.conf']=conf.encode()
 rc=before['etc/init.d/rc3']['data'].decode();assert rc.count('/etc/insdrv.sh')==1
 mods['etc/init.d/rc3']=rc.replace('/etc/insdrv.sh','/etc/insdrv.sh\n/etc/scripts/odi-panel-boot.sh').replace('/etc/runlansds.sh','/etc/runlansds.sh\n/etc/scripts/odi-mods-run.sh >/dev/null 2>&1 &\n/etc/scripts/odi-log-run.sh >/dev/null 2>&1 &').encode()
+# Full debug can arm native RAW+parsed capture before initial OMCI exchange.
+omci_start=before['etc/runomci.sh']['data'].decode()
+assert omci_start.count('omci_app -s ')==1 and omci_start.count('get_omci_log_format ()\n{')==1
+omci_start=omci_start.replace('get_omci_log_format ()\n{','get_omci_log_format ()\n{\n if [ -f /tmp/odi-debug/boot-active ] && [ -f /tmp/odi-debug/ready ]; then echo "both ffffffff"; return; fi')
+omci_start=omci_start.replace('omci_app -s ','/etc/scripts/odi-debug.sh boot\nomci_app -s ')
+mods['etc/runomci.sh']=omci_start.encode()
 # Theme and translate original ASP pages while retaining every form and ASP handler.
 native_injection=(f'<link rel="stylesheet" href="/panel/native.css?v={VERSION}"><script src="/panel/translations.js?v={VERSION}"></script><script src="/panel/i18n.js?v={VERSION}"></script><script src="/panel/native.js?v={VERSION}"></script>').encode()
 native_pages=[]
@@ -105,8 +110,8 @@ for route in json.loads((PROJECT/'native-pages.json').read_text()):
  content=re.sub(br'(<head\b[^>]*>)',lambda m:m[0]+marker,content,count=1,flags=re.I)
  content=re.sub(br'(<meta\b[^>]*http-equiv\s*=\s*[\x22\x27]?refresh[^>]*>)',lambda m:re.sub(br'URL\s*=\s*[^\x22\x27>]+',('URL=/panel/'+target+'?v='+VERSION).encode(),m[0],flags=re.I),content,flags=re.I)
  mods['home/httpd/web/panel/'+target]=content
-landing=mods['home/httpd/web/index.html'].decode().replace('/panel/index.html','/panel/index.html?v='+VERSION)
-mods['home/httpd/web/index.html']=landing.encode()
+# Serve the panel at the native root entry, which also handles reauthentication.
+mods['home/httpd/web/index.html']=mods['home/httpd/web/panel/index.html']
 # A CRLF shebang breaks scripts on the ONU, even if host text readers hide it.
 for name,content in mods.items():
  if name.endswith(('.cgi','.sh')):assert b'\r' not in content,f'Non-LF script: {name}'
@@ -116,12 +121,14 @@ header='\n'.join(item['line'] for name,item in before.items() if name not in mod
 (out/'empty').mkdir();(out/'overlay').mkdir()
 root=before['/']['fields']
 args=[tools/'mksquashfs',out/'empty',out/'rootfs','-comp','lzma','-b',str(block),'-always-use-fragments','-no-xattrs','-noappend','-no-sparse','-nopad','-processors','1','-mkfs-time',str(epoch),'-root-time',root[1],'-root-mode',root[2],'-root-uid',root[3],'-root-gid',root[4],'-pf',out/'patched.pseudo','-p',f'home/httpd/web/panel D {epoch} 755 0 0']
+web_epoch=int(os.environ.get('SOURCE_DATE_EPOCH',str(int(time.time()))))
 for i,(name,content) in enumerate(mods.items()):
  p=out/'overlay'/str(i);p.write_bytes(content)
  if name in before:
   old=before[name]['fields'];assert old[0]=='R'
   timestamp,mode,uid,gid=old[1:5]
  else:timestamp,mode,uid,gid=str(epoch),('755' if name.endswith(('.cgi','.sh')) else '644'),'0','0'
+ if name.startswith('home/httpd/web/'):timestamp=str(web_epoch)
  args+=['-p',f'{name} F {timestamp} {mode} {uid} {gid} cat {shlex.quote(str(p))}']
 run(*args)
 run(tools/'unsquashfs','-no-progress','-pf',out/'verified.pseudo',out/'rootfs')
@@ -131,7 +138,10 @@ for name,item in before.items():
  if name not in mods:assert after[name]['compare']==item['compare'],name
 for name,content in mods.items():
  assert after[name]['data']==content,name
- if name in before:assert after[name]['fields'][:5]==before[name]['fields'][:5],name
+ if name in before:
+  expected_meta=list(before[name]['fields'][:5])
+  if name.startswith('home/httpd/web/'):expected_meta[1]=str(web_epoch)
+  assert after[name]['fields'][:5]==expected_meta,name
  else:assert after[name]['fields'][3:5]==['0','0'],name
 assert after['home/httpd/web/panel']['fields']==['D',str(epoch),'755','0','0']
 data['rootfs']=(out/'rootfs').read_bytes()
