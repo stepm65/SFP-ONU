@@ -4,6 +4,8 @@
   "checks": [
     "accepted upload is not treated as verified flash",
     "background phases are polled to verified bank",
+    "aborted and failed network polls recover without another upload",
+    "prolonged disconnection remains unconfirmed and authentication errors fail immediately",
     "dead worker cannot report success",
     "reload exposes resume monitoring and blocks duplicate upload"
   ]

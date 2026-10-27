@@ -1,15 +1,15 @@
 {
   "base_sha256": "79c5ce4e62f4cb334b4335ad405d14f8c905b8b61d56ca636486d1ef91632623",
-  "firmware_sha256": "6892345c9009ffeb6f8999eaafc0c132e77a4e798dc604bd537dba97b48a1cdf",
+  "firmware_sha256": "720c1db2d5dac43f7d939f13883d88815c4990158fd616cf8cb1338c19a13495",
   "base_version": "V1.1.8-240408",
   "base_tag": "SFU-240408",
-  "panel_version": "1.9.15",
+  "panel_version": "1.9.16",
   "tar_changes": [],
   "kernel_sha256": "c1350bfeffbee446d726d59cf8f2467bd2f7fab7a9f6d32941d687c4654a203f",
   "native_pages_themed": 181,
   "kernel_bytes": 876153,
   "kernel_limit": 1359872,
-  "rootfs_bytes": 2245474,
+  "rootfs_bytes": 2251067,
   "rootfs_limit": 2572288,
   "lzma_block_bytes": 1048576,
   "modified_files": [

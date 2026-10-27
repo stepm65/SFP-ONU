@@ -1,0 +1,22 @@
+{
+  "version": "1.9.16",
+  "firmware_sha256": "720c1db2d5dac43f7d939f13883d88815c4990158fd616cf8cb1338c19a13495",
+  "release_channel": "stable",
+  "physical_onu_test_this_version": false,
+  "user_report": "The browser displayed an aborted signal during flash writing; the device later reported VERIFIED bank=1 and no firmware error.",
+  "checks": [
+    "aborted and failed network polls retry and recover without another upload; a verified status remains required",
+    "prolonged disconnection remains unconfirmed; authentication errors and worker failures are not retried as network errors",
+    "existing firmware form/protocol, localization and built version consistency tests",
+    "all non-web files including the firmware worker are byte-identical to 1.9.15; upload CGI and API logic unchanged",
+    "baseline 1.9.15 firmware worker passed factory-installer deletion and two-bank readback fixtures; current archive and partition bounds checked by the builder"
+  ],
+  "not_run": [
+    "physical 1.9.16 ONU flash update or OLT session",
+    "recovery from a real device/network interruption"
+  ],
+  "known_limits": [
+    "a lost upload response can still leave its result unconfirmed; check the actual bank and image before retrying or rebooting",
+    "1.9.15 may display an abort while the background worker continues and verifies the bank"
+  ]
+}

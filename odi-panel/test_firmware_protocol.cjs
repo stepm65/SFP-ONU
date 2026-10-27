@@ -8,8 +8,17 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert'),{JSDOM}=require
  w.XMLHttpRequest=class{constructor(){this.upload={};}open(method,url){assert.equal(url,'/panel/upload.cgi');assert.equal(method,'POST');}setRequestHeader(){}send(){this.status=200;this.responseText='protocol=3\naccepted=1\nbank=1\nok=1\n';this.onload();}};
  w.events=[];const result=await vm.runInContext("sendFirmware(new Blob(['test']),'1',(k,v)=>window.events.push([k,v]),()=>{})",c);
  assert.equal(result.bank,'1');assert.deepEqual([...w.events.filter(x=>x[0]==='phase').map(x=>x[1])],['checking','writing','verified']);assert.equal(samples.length,0);
+ const originalTimeout=w.setTimeout,originalNow=w.Date.now;w.clock=1;w.setTimeout=(fn,ms)=>{w.clock+=ms;w.Promise.resolve().then(fn);return 1;};w.Date.now=()=>w.clock;
+ w.events=[];w.attempt=0;
+ vm.runInContext("readApi=async()=>{if(window.attempt++===0)throw new DOMException('signal is aborted without reason','AbortError');if(window.attempt===2)throw new TypeError('Failed to fetch');return {firmware_phase:'verified',firmware_status:'VERIFIED bank=1'};}",c);
+ const resumed=await vm.runInContext("monitorFirmware('1',(k,v)=>window.events.push([k,v]))",c);assert.equal(resumed.bank,'1');assert.deepEqual([...w.events.filter(x=>x[0]==='connection').map(x=>x[1])],['waiting','waiting','restored']);assert.equal(w.attempt,3);
+ w.events=[];w.clock=1;w.setTimeout=(fn)=>{w.clock+=90000;w.Promise.resolve().then(fn);return 1;};
+ vm.runInContext("readApi=async()=>{throw new DOMException('signal is aborted without reason','AbortError')}",c);
+ await assert.rejects(vm.runInContext("monitorFirmware('1',(k,v)=>window.events.push([k,v]))",c));assert(!w.events.some(e=>e[0]==='phase'&&e[1]==='verified'));
+ w.events=[];vm.runInContext("readApi=async()=>{throw new Error('Administrator sign-in required')}",c);await assert.rejects(vm.runInContext("monitorFirmware('1',(k,v)=>window.events.push([k,v]))",c));assert.equal(w.events.length,0);
+ w.setTimeout=originalTimeout;w.Date.now=originalNow;
  vm.runInContext("readApi=async()=>({firmware_phase:'checking',firmware_status:'CHECKING bank=1',firmware_worker_alive:'0'})",c);
  await assert.rejects(vm.runInContext("monitorFirmware('1',()=>{})",c));
  vm.runInContext("state.firmware_status='WRITING bank=1';state.firmware_phase='readback';render()",c);assert(w.document.getElementById('resume-update'));assert(w.document.querySelector('#upload button[type=submit]').disabled);
- w.close();const report={result:'passed',scope:'jsdom + mocked XHR/worker status',checks:['accepted upload is not treated as verified flash','background phases are polled to verified bank','dead worker cannot report success','reload exposes resume monitoring and blocks duplicate upload']};fs.writeFileSync(p+'/firmware-protocol-test-report.json',JSON.stringify(report,null,2));console.log(report);
+ w.close();const report={result:'passed',scope:'jsdom + mocked XHR/worker status',checks:['accepted upload is not treated as verified flash','background phases are polled to verified bank','aborted and failed network polls recover without another upload','prolonged disconnection remains unconfirmed and authentication errors fail immediately','dead worker cannot report success','reload exposes resume monitoring and blocks duplicate upload']};fs.writeFileSync(p+'/firmware-protocol-test-report.json',JSON.stringify(report,null,2));console.log(report);
 })().catch(e=>{console.error(e);process.exit(1)});

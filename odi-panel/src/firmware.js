@@ -34,8 +34,20 @@ function sendFirmware(file,bank,onEvent,onTransfer){return new Promise((resolve,
  request.send(new Blob(['csrf='+state.csrf+'\nbank='+bank+'\n',file]));
 });}
 async function monitorFirmware(bank,onEvent){
+ let failures=0,firstFailure=null;
  for(;;){
-  const result=await readApi('operation',20000),phase=result.firmware_phase;
+  let result;
+  try{result=await readApi('operation',20000);}
+  catch(error){
+   const transient=error?.name==='AbortError'||error?.name==='TimeoutError'||error?.name==='TypeError'||/signal is aborted|the operation was aborted|failed to fetch|networkerror/i.test(error?.message||'');
+   if(!transient)throw error;
+   if(firstFailure===null)firstFailure=Date.now();
+   if(Date.now()-firstFailure>=180000)throw new Error(bi('Связь с устройством не восстановилась. Проверьте состояние банка перед повтором или перезагрузкой.','Connection did not recover. Check the bank status before retrying or rebooting.'));
+   failures++;onEvent('connection','waiting');
+   await new Promise(resolve=>setTimeout(resolve,Math.min(10000,2000*failures)));continue;
+  }
+  if(failures)onEvent('connection','restored');failures=0;firstFailure=null;
+  const phase=result.firmware_phase;
   if(phase)onEvent('phase',phase);if(result.firmware_log)onEvent('log',result.firmware_log);
   if(result.firmware_worker_alive==='0'&&phase!=='verified'&&phase!=='failed')throw new Error(firmwareErrors.WORKER_STOPPED);
   if(phase==='failed')throw new Error(firmwareErrors[result.firmware_error]||result.firmware_error||firmwareUnknown);
@@ -43,7 +55,7 @@ async function monitorFirmware(bank,onEvent){
   await new Promise(resolve=>setTimeout(resolve,1200));
  }
 }
-function bindFirmware(){const resume=document.getElementById('resume-update');if(resume)resume.onclick=async()=>{if(busy)return;busy=true;resume.disabled=true;try{const match=String(state.firmware_status).match(/bank=([01])/);if(!match)throw new Error(firmwareUnknown);await monitorFirmware(match[1],(key,value)=>{if(key==='phase')document.getElementById('resume-update-status').textContent=({receiving:bi('Получение файла','Receiving file'),checking:bi('Проверка архива','Checking archive'),writing:bi('Запись прошивки','Writing firmware'),readback:bi('Проверка записи','Verifying write'),verified:bi('Запись проверена','Write verified')})[value]||value;});busy=false;await load();toast(bi('Фоновое обновление завершено и проверено.','Background update completed and verified.'));}catch(e){toast(e.message,true);}finally{busy=false;resume.disabled=false;restartLive();}};const form=document.getElementById('upload');if(!form)return;form.onsubmit=async e=>{
+function bindFirmware(){const resume=document.getElementById('resume-update');if(resume)resume.onclick=async()=>{if(busy)return;busy=true;resume.disabled=true;try{const match=String(state.firmware_status).match(/bank=([01])/);if(!match)throw new Error(firmwareUnknown);await monitorFirmware(match[1],(key,value)=>{if(key==='phase')document.getElementById('resume-update-status').textContent=({receiving:bi('Получение файла','Receiving file'),checking:bi('Проверка архива','Checking archive'),writing:bi('Запись прошивки','Writing firmware'),readback:bi('Проверка записи','Verifying write'),verified:bi('Запись проверена','Write verified')})[value]||value;else if(key==='connection'&&value==='waiting')document.getElementById('resume-update-status').textContent=bi('Связь временно прервалась. Ожидаем ответ устройства.','Connection interrupted. Waiting for the device.');});busy=false;await load();toast(bi('Фоновое обновление завершено и проверено.','Background update completed and verified.'));}catch(e){toast(e.message,true);}finally{busy=false;resume.disabled=false;restartLive();}};const form=document.getElementById('upload');if(!form)return;form.onsubmit=async e=>{
  e.preventDefault();if(preview||busy)return;
  const file=form.elements.binary.files[0],bank=form.elements.bank.value;
  if(!file||!file.name.toLowerCase().endsWith('.tar')||file.size>8388500){toast('Выберите TAR-файл размером не более 8 МиБ.',true);return;}
@@ -64,7 +76,7 @@ function bindFirmware(){const resume=document.getElementById('resume-update');if
  }
  function updateElapsed(){const seconds=Math.floor((Date.now()-started)/1000);progress.querySelector('#upload-elapsed').innerHTML='<span>'+bi('Прошло','Elapsed')+'</span> '+Math.floor(seconds/60)+':'+String(seconds%60).padStart(2,'0');}
  showPhase('receiving');updateElapsed();const elapsedTimer=setInterval(updateElapsed,1000);
- function event(key,value){if(key==='phase')showPhase(value);else if(key==='log')progress.querySelector('#upload-log').textContent=value||'—';else if(key==='sent'&&current===0)detail.textContent=bi('Файл передан. Ожидаем проверку архива на стике.','File sent. Waiting for the archive check on the stick.');}
+ function event(key,value){if(key==='phase')showPhase(value);else if(key==='log')progress.querySelector('#upload-log').textContent=value||'-';else if(key==='connection'&&value==='waiting')detail.textContent=bi('Связь временно прервалась. Ожидаем ответ устройства и продолжаем проверять состояние.','Connection interrupted. Waiting for the device and continuing to check the update.');else if(key==='connection'&&value==='restored')showPhase(phases[current]);else if(key==='sent'&&current===0)detail.textContent=bi('Файл передан. Ожидаем проверку архива на стике.','File sent. Waiting for the archive check on the stick.');}
  try{
   await sendFirmware(file,bank,event,(loaded,total)=>{if(current!==0||total<=0)return;const percent=Math.min(100,Math.floor(loaded/total*100));bar.max=100;bar.value=percent;detail.innerHTML='<span>'+bi('Передано','Transferred')+'</span> '+percent+'% · '+(loaded/1048576).toFixed(2)+' / '+(total/1048576).toFixed(2)+' <span>'+bi('МиБ','MiB')+'</span>';});
   showPhase('verified');clearInterval(elapsedTimer);updateElapsed();busy=false;dirty=false;await load();const nextStatus=document.getElementById('upload-status');
