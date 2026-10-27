@@ -4,7 +4,7 @@ const pause=()=>new Promise(r=>setTimeout(r,20));
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(__dirname+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#profiles',runScripts:'outside-only'});
  const w=dom.window,d=w.document,c=dom.getInternalVMContext();w.confirm=()=>true;
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(__dirname+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(__dirname+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
  await pause();
  let writes=[];w.fetch=async()=>{throw new Error('Preparing a profile must not access the device');};
  const before=vm.runInContext('JSON.stringify(state)',c);

@@ -1,0 +1,23 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');
+const {JSDOM}=require('../tools/dom/node_modules/jsdom');
+const p=__dirname;
+(async()=>{
+ const dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#link',runScripts:'outside-only'}),w=dom.window,c=dom.getInternalVMContext(),d=w.document;
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8'),c);
+ await new Promise(r=>setTimeout(r,30));
+ assert(d.querySelector('[data-settings="mod-speed"]'));
+ assert(d.querySelector('[name="MOD_FLOWCONTROL"]'));
+ assert(d.querySelector('#rb-commands').value.includes('egress-rate=1200M'));
+ assert(!d.querySelector('#rb-commands').value.includes('ether8'));
+ vm.runInContext("assertResult=rbCommands({name:'sfp-custom',rate:'900',shaper:true,flow:true,queue:true})",c);
+ assert(w.assertResult.includes('name="sfp-custom"')&&w.assertResult.includes('egress-rate=900M'));
+ assert.throws(()=>vm.runInContext("rbCommands({name:'x;reboot',rate:'900'})",c));
+ w.location.hash='identity';await new Promise(r=>setTimeout(r,30));
+ vm.runInContext("state.OMCI_CUSTOM_ME='65536';state.OMCI_VEIP_SLOT_ID='14';render()",c);
+ const flag=d.querySelector('#veip-custom-bit'),mask=d.querySelector('[name=OMCI_CUSTOM_ME]');
+ flag.checked=true;flag.dispatchEvent(new w.Event('change'));assert.equal(mask.value,'65792');
+ flag.checked=false;flag.dispatchEvent(new w.Event('change'));assert.equal(mask.value,'65536');
+ assert(!/\?{3}/.test(fs.readFileSync(p+'/src/uplink.js','utf8')));
+ const report={result:'passed',scope:'jsdom, no hardware',checks:['upload and flow controls render','RB5009 configurable egress and interface','no unrelated LAN queue edits','command injection rejected','VEIP bit preserves other bits','Russian strings are not corrupted']};
+ fs.writeFileSync(p+'/uplink-ui-test-report.json',JSON.stringify(report,null,2));console.log(report);
+})().catch(e=>{console.error(e);process.exitCode=1});

@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert'),{JSDOM}=require('../tools/dom/node_modules/jsdom');
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(__dirname+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#firmware',runScripts:'outside-only'}),w=dom.window,d=w.document,c=dom.getInternalVMContext();w.confirm=()=>true;
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(__dirname+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(__dirname+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
  await new Promise(r=>setTimeout(r,20));assert(d.querySelector('[name=bank]').disabled);
  vm.runInContext('preview=false;load=async()=>render();pauseLive=async()=>{};restartLive=()=>{};confirmAction=async()=>true;render();',c);
  w.ODILang.set('ru');

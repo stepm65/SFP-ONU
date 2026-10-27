@@ -2,9 +2,9 @@
 # Target BusyBox (SFU 240408) has no mv, tr, head, tail, od, cut, wc, rmdir or touch.
 # Trusted parser: the persistent configuration is data, never shell source.
 MODCONF=/var/config/odi-panel-mods.conf
-MODKEYS='MOD_SPEED MOD_SWVER MOD_VLAN MOD_VLANS MOD_ENTITIES MOD_FWDOP MOD_PAIRS'
+MODKEYS='MOD_SPEED MOD_FLOWCONTROL MOD_SPEED_WATCH MOD_SWVER MOD_VLAN MOD_VLANS MOD_ENTITIES MOD_FWDOP MOD_PAIRS'
 mod_default() {
- case "$1" in MOD_SPEED|MOD_SWVER) printf 0;; MOD_VLAN) printf off;; MOD_FWDOP) printf 0x02;; esac
+ case "$1" in MOD_SPEED|MOD_FLOWCONTROL|MOD_SPEED_WATCH|MOD_SWVER) printf 0;; MOD_VLAN) printf off;; MOD_FWDOP) printf 0x02;; esac
 }
 mod_get() {
  mg=$(sed -n "s/^$1=//p" "$MODCONF" 2>/dev/null)
@@ -13,7 +13,7 @@ mod_get() {
 }
 mod_valid() {
  case "$1" in
- MOD_SPEED|MOD_SWVER) case "$2" in 0|1) return 0;; esac;;
+ MOD_SPEED|MOD_FLOWCONTROL|MOD_SPEED_WATCH|MOD_SWVER) case "$2" in 0|1) return 0;; esac;;
  MOD_VLAN) case "$2" in off|tag|fwdop) return 0;; esac;;
  MOD_FWDOP) echo "$2" | grep -Eq '^0x[0-9A-Fa-f]{2}$';return $?;;
  MOD_ENTITIES) [ -z "$2" ] && return 0;[ "${#2}" -le 120 ] && echo "$2" | grep -Eq '^0x[0-9A-Fa-f]{1,4}( 0x[0-9A-Fa-f]{1,4})*$';return $?;;

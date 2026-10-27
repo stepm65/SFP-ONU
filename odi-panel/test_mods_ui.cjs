@@ -3,10 +3,10 @@ const delay=()=>new Promise(r=>setTimeout(r,25));
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(__dirname+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#mods',runScripts:'outside-only'}),w=dom.window,d=w.document,c=dom.getInternalVMContext();
  w.confirm=()=>true;
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(__dirname+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(__dirname+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
  await delay();assert.equal(d.querySelectorAll('[data-settings^="mod-"]').length,3);
  let saved=JSON.parse(vm.runInContext('JSON.stringify(state)',c)),requests=[];
- w.apiStub=async(action,params)=>{if(action){assert.equal(action,'mods');requests.push({...params});Object.assign(saved,params);return {ok:'1'};}return {...saved};};
+ w.apiStub=async(action,params)=>{if(action==='uplink_apply')return {ok:'1',uplink_rc:'0'};if(action){assert.equal(action,'mods');requests.push({...params});Object.assign(saved,params);return {ok:'1'};}return {...saved};};
  vm.runInContext('preview=false;api=window.apiStub;restartLive=()=>{};',c);
  let vlan=d.querySelector('[data-settings="mod-vlan"]');
  assert(vlan.elements.MOD_PAIRS.disabled&&vlan.elements.MOD_VLANS.disabled);

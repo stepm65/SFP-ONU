@@ -3,7 +3,7 @@ const delay=()=>new Promise(r=>setTimeout(r,25));
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(__dirname+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#identity',runScripts:'outside-only'}),w=dom.window,d=w.document,c=dom.getInternalVMContext();
  let answers=false,confirmations=0;w.confirm=()=>{confirmations++;return answers;};
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(__dirname+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(__dirname+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
  await delay();const loid=d.querySelector('[name=LOID]');loid.value='keep-this-draft';loid.dispatchEvent(new w.Event('input',{bubbles:true}));w.location.hash='vlan';await delay();assert.equal(w.location.hash,'#identity');assert.equal(d.querySelector('[name=LOID]'),loid);assert.equal(loid.value,'keep-this-draft');assert.equal(confirmations,1);
  answers=true;w.location.hash='vlan';await delay();assert(d.querySelector('[data-settings=vlan]'));
  assert.equal(vm.runInContext("ponStage('ONU State: 4')",c),'O4');assert.equal(vm.runInContext("ponStage('READ_ERROR rc=1 state: 5')",c),null);assert.equal(vm.runInContext("ponStage('ONU State: 5')",c),'O5');

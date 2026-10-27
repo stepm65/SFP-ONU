@@ -3,7 +3,7 @@ const {JSDOM}=require('../tools/dom/node_modules/jsdom');
 const p=__dirname,wait=()=>new Promise(r=>setTimeout(r,20));
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#identity',runScripts:'outside-only'}),w=dom.window,d=w.document,c=dom.getInternalVMContext();
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
  await wait();vm.runInContext("preview=false; window.posts=[]; api=async(a,params)=>{window.posts.push(params);Object.assign(state,params);}; load=async()=>render(); render();",c);
  let pass=()=>d.querySelector('[name=GPON_PLOAM_PASSWD]'),format=()=>d.querySelector('#ploam-format');
  // Nothing saved: no card may claim a pending reboot (unnamed buttons once matched an empty key).

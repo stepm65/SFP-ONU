@@ -1,7 +1,7 @@
 {
   "result": "passed",
   "environment": "jsdom with incremental XHR/upload byte fixtures; no real Boa, network or hardware",
-  "version": "1.9.10",
+  "version": "1.9.11",
   "checks": [
     "inactive bank choice and preview guards",
     "CSRF and target bank upload envelope",

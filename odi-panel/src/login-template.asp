@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="odi-panel-version" content="1.9.10"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<meta charset="utf-8"><meta name="odi-panel-version" content="1.9.11"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ODI · Вход</title>
 <script src="md5.js" type="text/javascript"></script>
@@ -30,7 +30,7 @@ function setpass() {
 </form>
 <p class="note" data-en="Administrator access is required to manage settings.">Для управления настройками нужны права администратора.</p>
 </section></main>
-<footer><span data-en="Local device management">Локальное управление устройством</span> · ODI Panel 1.9.10</footer>
+<footer><span data-en="Local device management">Локальное управление устройством</span> · ODI Panel 1.9.11</footer>
 <script>
 (function(){
  var language=document.getElementById('language'),pass=document.getElementById('password'),reveal=document.getElementById('reveal'),lang='ru';

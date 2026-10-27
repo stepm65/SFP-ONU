@@ -33,6 +33,13 @@ def make(root):
         host = shutil.which('dash' if name in ('sh', 'ash') else name, path=HOST_PATH) if name in REAL else None
         if host:
             if sys.platform == 'cygwin':
+                if name == 'mkdir':
+                    # MSYS mkdir -p probes inaccessible ancestors above the
+                    # managed workspace, even when the target already exists.
+                    # Python handles existing directories without that probe.
+                    target.write_text('#!/usr/bin/python3\nimport os,sys\na=sys.argv[1:]\np="-p" in a\ntry:\n for x in a:\n  if x != "-p":\n   if p: os.makedirs(x,exist_ok=True)\n   else: os.mkdir(x)\nexcept OSError as e:\n print(e,file=sys.stderr);sys.exit(1)\n')
+                    target.chmod(0o755)
+                    continue
                 # MSYS may copy executables instead of making symlinks. Those
                 # copies lose adjacent DLLs under this deliberately limited PATH.
                 target.write_text('#!/bin/sh\nexec '+shlex.quote(host)+' "$@"\n')

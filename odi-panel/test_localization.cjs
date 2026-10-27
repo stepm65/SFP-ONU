@@ -5,7 +5,7 @@ const src=path.join(__dirname,'src');
 const pause=()=>new Promise(r=>setTimeout(r,15));
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(src+'/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1',runScripts:'outside-only'}),w=dom.window,d=w.document;
- w.confirm=()=>true;for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(src+'/'+f,'utf8'),dom.getInternalVMContext());
+ w.confirm=()=>true;for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(src+'/'+f,'utf8'),dom.getInternalVMContext());
  await pause();let misses=[];
  for(const tab of ['native-recovery','overview','identity','vlan','link','firmware','mods','wan','diagnostics','profiles']){
   w.location.hash=tab;await pause();w.ODILang.set('en');await pause();

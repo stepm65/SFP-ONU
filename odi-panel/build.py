@@ -56,9 +56,9 @@ from hotfix.patch_boa import patch as patch_boa
 boa_binary,boa_patch_report=patch_boa(before['bin/boa']['data'])
 mods={'bin/boa':boa_binary}
 (out/'boa-patch-report.json').write_text(json.dumps(boa_patch_report,indent=2)+'\n')
-for n in ['index.html','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js']:
+for n in ['index.html','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','uplink.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js']:
  mods['home/httpd/web/panel/'+n]=(PROJECT/'src'/n).read_bytes()
-for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh']:
+for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src'/n).read_bytes()
 for n in ['fix_speed.sh','fix_sw_ver.sh','fix_vlan_tag.sh','fix_vlan_fwdop.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src/anime'/n).read_bytes()

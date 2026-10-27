@@ -5,13 +5,13 @@ export PATH
 LC_ALL=C
 export LC_ALL
 umask 077
-PANEL_VERSION=1.9.10
+PANEL_VERSION=1.9.11
 STATE=/tmp/odi-panel
 FLASH=/etc/scripts/flash
 NV=/bin/nv
 XML=/bin/xmlconfig
 . /etc/scripts/odi-mods-lib.sh
-KEYS='OMCI_TM_OPT GPON_SN GPON_PLOAM_FORMAT GPON_PLOAM_PASSWD LOID LOID_PASSWD PON_VENDOR_ID GPON_ONU_MODEL HW_HWVER HW_SERIAL_NO OUI OMCI_OLT_MODE OMCI_FAKE_OK OMCC_VER OMCI_SW_VER1 OMCI_SW_VER2 ELAN_MAC_ADDR MAC_KEY VLAN_CFG_TYPE VLAN_MANU_MODE VLAN_MANU_TAG_VID VLAN_MANU_TAG_PRI LAN_SPEED_MODE'
+KEYS='OMCI_TM_OPT OMCI_VEIP_SLOT_ID OMCI_CUSTOM_ME GPON_SN GPON_PLOAM_FORMAT GPON_PLOAM_PASSWD LOID LOID_PASSWD PON_VENDOR_ID GPON_ONU_MODEL HW_HWVER HW_SERIAL_NO OUI OMCI_OLT_MODE OMCI_FAKE_OK OMCC_VER OMCI_SW_VER1 OMCI_SW_VER2 ELAN_MAC_ADDR MAC_KEY VLAN_CFG_TYPE VLAN_MANU_MODE VLAN_MANU_TAG_VID VLAN_MANU_TAG_PRI LAN_SPEED_MODE'
 hex() {
  printf '%s' "$1" | awk 'BEGIN{for(i=1;i<256;i++)ord[sprintf("%c",i)]=i} {if(NR>1)printf "0a";for(i=1;i<=length($0);i++)printf "%02x",ord[substr($0,i,1)]}'
 }
@@ -71,6 +71,8 @@ if [ "$REQUEST_METHOD" = GET ]; then
  emit pending_keys "$(cat "$STATE/pending-keys" 2>/dev/null)"
  emit mods_status "$(cat "$STATE/mods-status" 2>/dev/null)"
  emit mods_log "$(cat "$STATE/mods.log" 2>/dev/null)"
+ for item in status ingress egress ability ports; do emit "uplink_$item" "$(cat "$STATE/uplink-$item" 2>/dev/null)"; done
+ for item in LAN_SDS_MODE DEVICE_TYPE PON_MODE; do emit "$item" "$(get_flash "$item")"; done
  emit firmware_phase "$(cat "$STATE/firmware-phase" 2>/dev/null)"
  emit boot_confirmed "$(get_nv sw_active)"
  mirror=unknown
@@ -99,13 +101,22 @@ case "$CONTENT_LENGTH" in ''|*[!0-9]*) fail '400 Bad Request' 'Invalid request l
 [ "${#CONTENT_LENGTH}" -le 4 ] && [ "$CONTENT_LENGTH" -le 4096 ] || fail '413 Payload Too Large' 'Request exceeds 4096 bytes'
 case "$CONTENT_TYPE" in 'text/plain'|'text/plain;charset=UTF-8'|'text/plain; charset=UTF-8') ;; *) fail '415 Unsupported Media Type' 'text/plain required';; esac
 IFS= read -r action
-case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
+case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
 IFS= read -r supplied
 [ "$supplied" = "csrf=$token" ] || fail '403 Forbidden' 'Invalid CSRF token. Reload the page.'
 mkdir "$STATE/write.lock" 2>/dev/null || fail '409 Conflict' 'Another operation is running'
 WORK=$STATE/write.lock
 trap 'rm -r "$WORK"' 0
 trap 'exit 1' 1 2 15
+[ ! -d "$STATE/read.lock" ] || fail '409 Conflict' 'Diagnostics running. Retry after collection.'
+case "$action" in uplink_apply|uplink_check)
+ while IFS= read -r extra; do [ -z "$extra" ] || fail '400 Bad Request' 'Uplink operation accepts no parameters'; done
+ /etc/scripts/odi-uplink.sh "${action#uplink_}" api >/dev/null 2>&1
+ uplink_rc=$?
+ [ "$uplink_rc" != 75 ] || fail '409 Conflict' 'Uplink operation is already running'
+ headers; emit uplink_rc "$uplink_rc"
+ for item in status ingress egress ability ports; do emit "uplink_$item" "$(cat "$STATE/uplink-$item" 2>/dev/null)"; done
+ emit ok 1; exit 0;; esac
 # All request values are hex-encoded printable ASCII; decoded data never becomes shell code.
 decode() {
  dec=''; rest=$1
@@ -128,6 +139,8 @@ valid() {
  OUI) [ "${#vv}" = 6 ] && case "$vv" in *[!0-9A-Fa-f]*) false;; *) true;; esac;;
  OMCI_OLT_MODE) case "$vv" in 0|1|2|3) true;; *) false;; esac;;
  OMCI_TM_OPT) case "$vv" in 0|1|2) true;; *) false;; esac;;
+ OMCI_VEIP_SLOT_ID) case "$vv" in ''|*[!0-9]*) false;; *) [ "${#vv}" -le 3 ] && [ "$vv" -le 255 ];; esac;;
+ OMCI_CUSTOM_ME) case "$vv" in ''|*[!0-9]*) false;; *) [ "${#vv}" -le 10 ] && awk -v n="$vv" 'BEGIN{exit !(n<=4294967295)}';; esac;;
  OMCI_FAKE_OK|VLAN_CFG_TYPE|VLAN_MANU_MODE) case "$vv" in 0|1) true;; *) false;; esac;;
  LAN_SPEED_MODE) case "$vv" in 1|2|3|4|5|6|7) true;; *) false;; esac;;
  OMCC_VER) case "$vv" in 128|129|130|131|132|133|134|150|160|161|162|163|176|177|178|179) true;; *) false;; esac;;
@@ -189,6 +202,7 @@ while IFS='=' read -r key value; do
   case " $KEYS sw_custom_version0 sw_custom_version1 " in *" $key "*) ;; *) fail '400 Bad Request' 'Unknown field';; esac
   [ ! -f "$WORK/new-$key" ] || fail '400 Bad Request' 'Duplicate field'
   decode "$value" && valid "$key" "$dec" || fail '400 Bad Request' "Invalid value: $key"
+  case "$key" in OMCI_CUSTOM_ME|OMCI_VEIP_SLOT_ID) dec=$(awk -v n="$dec" 'BEGIN{printf "%.0f",n}');; esac
   [ "$key" != OUI ] || dec=$(norm_oui "$dec")
   old=$(get_value "$key") || fail '400 Bad Request' "Unsupported field: $key"
   printf '%s' "$dec" >"$WORK/new-$key"; printf '%s' "$old" >"$WORK/old-$key"

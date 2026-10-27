@@ -11,7 +11,7 @@ for(const invalid of ['','xyz','00112233445','00112233445566','00:11-22:33:44:55
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#identity',runScripts:'outside-only'}),w=dom.window;
  let network=0;w.fetch=()=>{network++;throw Error('unexpected network');};
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8'),dom.getInternalVMContext());
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8'),dom.getInternalVMContext());
  await new Promise(r=>setTimeout(r,20));const mac=w.document.querySelector('[name=ELAN_MAC_ADDR]'),key=w.document.querySelector('[name=MAC_KEY]');
  mac.value='00:11:22:33:44:55';w.document.getElementById('generate-mackey').click();assert.equal(mac.value,'001122334455');assert.equal(key.value,generate(mac.value));assert.equal(network,0);
  w.ODILang.set('en');assert.equal(key.value,generate(mac.value));assert(w.document.querySelector('[data-settings=mac] button[type=submit]').disabled);

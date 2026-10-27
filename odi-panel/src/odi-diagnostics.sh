@@ -27,7 +27,10 @@ diag_mib() {
  diag_run /bin/omcicli mib get "$me"
  cp "$DWORK/out" "$DWORK/mib"
  # This firmware lists entities first; attributes require a second read per entity.
- awk 'tolower($1)=="entityid:" && $2~/^0x[0-9A-Fa-f]+$/{if(!seen[$2]++)print $2}' "$DWORK/mib" >"$DWORK/entities"
+ # The old first-12 limit hid all upstream priority queues behind downstream IDs.
+ awk -v me="$me" 'tolower($1)=="entityid:" && $2~/^0x[0-9A-Fa-f]+$/ && !seen[$2]++ {
+  if(me==277 && $2~/^0x[89aAbBcCdDeEfF][0-9A-Fa-f]{3}$/)up[++u]=$2;else other[++n]=$2
+ }END{for(i=1;i<=u;i++)print up[i];for(i=1;i<=n;i++)print other[i]}' "$DWORK/mib" >"$DWORK/entities"
  entity_count=0
  : >"$DWORK/details"
  while IFS= read -r entity; do
@@ -46,6 +49,7 @@ diag_collect() {
  [ ! -d "$STATE/write.lock" ] || return 1
  mkdir "$STATE/read.lock" 2>/dev/null || return 1
  DWORK=$STATE/read.lock
+ if [ -d "$STATE/write.lock" ]; then rm -r "$DWORK"; return 1; fi
  diag_started=$(diag_now)
  diag_incomplete=0
  trap 'rm -r "$DWORK"' 0
@@ -59,7 +63,7 @@ diag_collect() {
  emit firmware_phase "$(cat "$STATE/firmware-phase" 2>/dev/null)"
  emit firmware_error "$(cat "$STATE/firmware-error" 2>/dev/null)"
  emit link_actual "$(cat /proc/lan_sds/lan_sds_cfg 2>/dev/null)"
- for key in PON_MODE DEVICE_TYPE DUAL_MGMT_MODE OMCI_DBGLVL OMCI_LOGFILE VLAN_CFG_TYPE VLAN_MANU_MODE; do emit "$key" "$(get_flash "$key")"; done
+ for key in PON_MODE DEVICE_TYPE DUAL_MGMT_MODE OMCI_DBGLVL OMCI_LOGFILE VLAN_CFG_TYPE VLAN_MANU_MODE LAN_SPEED_MODE LAN_SDS_MODE OMCI_TM_OPT OMCI_CUSTOM_ME OMCI_VEIP_SLOT_ID; do emit "$key" "$(get_flash "$key")"; done
  diag_read pon_state /bin/diag gpon get onu-state
  for metric in rx-power tx-power temperature voltage bias-current; do
   diag_read "optic_$metric" /bin/diag pon get transceiver "$metric"
@@ -69,10 +73,18 @@ diag_collect() {
  diag_read auth_uptime /bin/omcicli get authuptime
  emit mods_status "$(cat "$STATE/mods-status" 2>/dev/null)"
  emit mods_log "$(cat "$STATE/mods.log" 2>/dev/null | diag_redact)"
+ for item in status ingress egress ability ports; do emit "uplink_$item" "$(cat "$STATE/uplink-$item" 2>/dev/null)"; done
  if [ "$QUERY_STRING" = diagnostics ]; then
   # Capture connections first, then the UNI/bridge topology omitted in 1.9.7.
   diag_read connections /bin/omcicli dump conn
-  for class in 11 47 329 256 257 45 266 268 262 84 171 78 79 277 7; do diag_mib "$class"; done
+  diag_read upstream_queue0 /bin/omcicli mib get 277 0x8000
+  diag_read port_status /bin/diag port get status port all
+  diag_read bandwidth_ingress /bin/diag bandwidth get ingress port all
+  diag_read bandwidth_egress /bin/diag bandwidth get egress port all
+  diag_read upstream_flows /bin/diag gpon show us-flow
+  diag_read tcont0_queues /bin/diag pon get t-cont 0 queue-list
+  diag_read tcont0_queue0 /bin/diag pon get t-cont 0 queue-id 0
+  for class in 11 47 329 256 257 45 266 268 262 84 171 78 79 277 278 280 7; do diag_mib "$class"; done
   for class in 84 171; do emit "baseline_$class" "$(cat "$STATE/baseline-$class" 2>/dev/null | diag_redact)"; done
   emit baseline_uptime "$(cat "$STATE/baseline-uptime" 2>/dev/null)"
   emit firmware_log "$(cat "$STATE/firmware-update.log" 2>/dev/null | diag_redact | awk 'NR<=100{print}')"

@@ -2,7 +2,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert'),{JSDOM}=require
 const p=__dirname,version=fs.readFileSync(p+'/VERSION','utf8').trim();
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1',runScripts:'outside-only'}),w=dom.window,d=w.document,c=dom.getInternalVMContext();w.confirm=()=>true;
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
  await new Promise(r=>setTimeout(r,30));vm.runInContext('restartLive=()=>{};preview=false;',c);
  for(const path of JSON.parse(fs.readFileSync(p+'/native-pages.json','utf8'))){
   assert.equal(vm.runInContext('nativeFrameURL('+JSON.stringify('/'+path)+')',c),'/panel/odi-native-'+path.replaceAll('/','_')+'?v='+version);

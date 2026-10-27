@@ -10,7 +10,7 @@ assert re.fullmatch(r'\d+\.\d+\.\d+', VERSION), 'Invalid panel VERSION'
 def sync_sources(check=False):
     rules = {
         'index.html': [
-            (r'(?<=\?v=)\d+\.\d+\.\d+', VERSION, 13),
+            (r'(?<=\?v=)\d+\.\d+\.\d+', VERSION, 14),
             (r'(?<=ODI Panel )\d+\.\d+\.\d+', VERSION, 1),
             (r'(?<=name="odi-panel-version" content=")\d+\.\d+\.\d+', VERSION, 1),
         ],
