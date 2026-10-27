@@ -5,7 +5,7 @@ export PATH
 LC_ALL=C
 export LC_ALL
 umask 077
-PANEL_VERSION=1.9.16
+PANEL_VERSION=1.9.17
 STATE=/tmp/odi-panel
 FLASH=/etc/scripts/flash
 NV=/bin/nv
@@ -79,7 +79,9 @@ if [ "$REQUEST_METHOD" = GET ]; then
   case "$worker_pid" in ''|*[!0-9]*) ;; *) emit firmware_worker_alive "$(kill -0 "$worker_pid" 2>/dev/null && printf 1 || printf 0)";;esac
   emit firmware_phase "$(cat "$STATE/firmware-phase" 2>/dev/null)"
   emit firmware_error "$(cat "$STATE/firmware-error" 2>/dev/null)"
-  emit firmware_log "$(awk 'NR<=100{print}' "$STATE/firmware-update.log" 2>/dev/null)"
+  # Erase progress uses carriage returns, so line limits alone can return the
+  # entire log. Keep status polling small and show the most recent progress.
+  emit firmware_log "$(awk 'BEGIN{RS="\r"}{if(NR>1)s=s "\r";s=s $0;if(length(s)>2048)s=substr(s,length(s)-2047)}END{printf "%s",s}' "$STATE/firmware-update.log" 2>/dev/null)"
   emit ok 1; exit 0;;
  telemetry|diagnostics)
   . /etc/scripts/odi-diagnostics.sh
