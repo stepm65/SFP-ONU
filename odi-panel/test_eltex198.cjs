@@ -14,7 +14,7 @@ const pause=()=>new Promise(r=>setTimeout(r,20));
  assert.deepEqual(preset.settings,{OMCI_OLT_MODE:'0',OMCI_FAKE_OK:'0',VLAN_CFG_TYPE:'0'});
  assert.deepEqual(preset.mods,{MOD_SWVER:'0',MOD_VLAN:'off'});
  for(const key of ['GPON_SN','GPON_PLOAM_PASSWD','LOID','ELAN_MAC_ADDR','MAC_KEY','PON_VENDOR_ID','GPON_ONU_MODEL','HW_HWVER','OMCI_TM_OPT','OMCC_VER','LAN_SPEED_MODE'])assert(!Object.hasOwn(preset.settings,key));
- vm.runInContext("preview=false;state.OMCI_OLT_MODE='3';state.OMCI_FAKE_OK='1';state.VLAN_CFG_TYPE='1';state.MOD_VLAN='tag';state.MOD_SWVER='1';state.MOD_VLANS='200';paintProfile();",c);
+ vm.runInContext("preview=false;state.OMCI_OLT_MODE='3';state.OMCI_FAKE_OK='1';state.VLAN_CFG_TYPE='1';state.MOD_VLAN='tag';state.MOD_SWVER='1';state.MOD_VLANS='200';delete importedProfile.selection;paintProfile();",c);
  const identity=vm.runInContext('JSON.stringify(Object.fromEntries([...privateProfileKeys,"PON_VENDOR_ID","GPON_ONU_MODEL","LAN_SPEED_MODE"].map(k=>[k,state[k]])))',c);
  w.calls=writes;
  vm.runInContext("api=async(action,fields)=>{window.calls.push({action,fields:JSON.parse(JSON.stringify(fields))});Object.assign(state,fields);return {ok:'1'};};load=async()=>{};",c);

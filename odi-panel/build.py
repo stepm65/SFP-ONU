@@ -58,7 +58,7 @@ mods={'bin/boa':boa_binary}
 (out/'boa-patch-report.json').write_text(json.dumps(boa_patch_report,indent=2)+'\n')
 for n in ['index.html','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','uplink.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js']:
  mods['home/httpd/web/panel/'+n]=(PROJECT/'src'/n).read_bytes()
-for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh']:
+for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh','odi-log-lib.sh','odi-log-run.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src'/n).read_bytes()
 for n in ['fix_speed.sh','fix_sw_ver.sh','fix_vlan_tag.sh','fix_vlan_fwdop.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src/anime'/n).read_bytes()
@@ -70,7 +70,7 @@ assert 'Auth / /var/boaSuper.passwd' in conf
 conf+='\n# ODI Panel: CGI inherits administrator authentication; no new listener.\nAddType application/x-httpd-cgi cgi\nAddType text/css css\nAuth /panel /var/boaSuper.passwd\n'
 mods['home/httpd/boa.conf']=conf.encode()
 rc=before['etc/init.d/rc3']['data'].decode();assert rc.count('/etc/insdrv.sh')==1
-mods['etc/init.d/rc3']=rc.replace('/etc/insdrv.sh','/etc/insdrv.sh\n/etc/scripts/odi-panel-boot.sh').replace('/etc/runlansds.sh','/etc/runlansds.sh\n/etc/scripts/odi-mods-run.sh >/dev/null 2>&1 &').encode()
+mods['etc/init.d/rc3']=rc.replace('/etc/insdrv.sh','/etc/insdrv.sh\n/etc/scripts/odi-panel-boot.sh').replace('/etc/runlansds.sh','/etc/runlansds.sh\n/etc/scripts/odi-mods-run.sh >/dev/null 2>&1 &\n/etc/scripts/odi-log-run.sh >/dev/null 2>&1 &').encode()
 # Theme and translate original ASP pages while retaining every form and ASP handler.
 native_injection=(f'<link rel="stylesheet" href="/panel/native.css?v={VERSION}"><script src="/panel/translations.js?v={VERSION}"></script><script src="/panel/i18n.js?v={VERSION}"></script><script src="/panel/native.js?v={VERSION}"></script>').encode()
 native_pages=[]

@@ -1,0 +1,15 @@
+{
+  "result": "passed",
+  "scope": "jsdom + simulated authenticated writes, no physical ONU",
+  "checks": [
+    "presets compare without changing the device",
+    "credentials and SFP mode require explicit selection",
+    "group selection and selected count",
+    "private display toggle preserves selection",
+    "only selected settings are written",
+    "named export omits credentials by default",
+    "named profile round trip",
+    "diagnostic toggle and language preserve export draft",
+    "profile text is escaped"
+  ]
+}

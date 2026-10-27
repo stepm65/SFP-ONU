@@ -67,7 +67,7 @@ esac
  proc=subprocess.run(['/bin/sh',str(helper),'apply','boot'],capture_output=True);assert proc.returncode==75 and not writes() and not (state/'write.lock').exists();(state/'read.lock').rmdir();checks.append('diagnostics lock blocks uplink writes')
  # Authenticate the actual CGI and exercise its fixed no-parameter actions.
  token='12345678-1234-1234-1234-123456789abc';(state/'token').write_text(token+'\n')
- api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-mods-lib.sh',str(r/'lib.sh')).replace('/etc/scripts/odi-uplink.sh',str(helper)).replace('/tmp/odi-panel',str(state)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+devbin)
+ api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-log-lib.sh',devpath.logging_fixture(r)).replace('/etc/scripts/odi-mods-lib.sh',str(r/'lib.sh')).replace('/etc/scripts/odi-uplink.sh',str(helper)).replace('/tmp/odi-panel',str(state)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+devbin)
  cgi=r/'api.cgi';cgi.write_text(api)
  def request(action,user='admin',csrf=token,extra=''):
   body='action='+action+'\ncsrf='+csrf+'\n'+extra

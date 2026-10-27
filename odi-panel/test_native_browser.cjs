@@ -43,7 +43,7 @@ const server=http.createServer((req,res)=>{
    for(const mode of ['compact','diagnostic']){
    for(const section of ['status','pon','lan','arp','ping','stats','pon-stats','password','timer']){
     const frame=await open(build,version,section);await frame.locator('.native-table').first().waitFor({state:'attached'});
-    await page.locator('[data-layout-choice='+mode+']').click();await page.waitForTimeout(100);
+    if(await page.locator('body').getAttribute('data-layout')!==mode)await page.locator('#diagnostic-toggle').click();await page.waitForTimeout(100);
     const metrics=await frame.locator('body').evaluate(body=>{const data=body.querySelector('.native-properties')||body.querySelector('table'),cell=data.querySelector('td,th');return {mode:document.compatMode,font:getComputedStyle(cell).fontSize,family:getComputedStyle(cell).fontFamily,available:body.clientWidth-parseFloat(getComputedStyle(body).paddingLeft)-parseFloat(getComputedStyle(body).paddingRight),tableWidth:data.getBoundingClientRect().width,overflow:document.documentElement.scrollWidth>innerWidth,oldFills:body.querySelectorAll('tr[bgcolor],td[bgcolor],th[bgcolor]').length};});
     assert.equal(metrics.mode,'CSS1Compat',section);assert.equal(metrics.font,'12px',section);assert(metrics.family.includes('Segoe UI'),section);assert.equal(metrics.oldFills,0,section);assert.equal(metrics.overflow,false,section+' child overflow');assert(Math.abs(metrics.tableWidth-metrics.available)<3,section+' full-width table');
     assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),section+' shell overflow');

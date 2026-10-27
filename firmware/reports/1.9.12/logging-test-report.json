@@ -1,0 +1,15 @@
+{
+  "result": "passed",
+  "scope": "restricted POSIX shell, actual CGI, stateful SDK fixture and local TCP socket; no ONU or external server",
+  "checks": [
+    "IPv4/port/tag validation rejects shell syntax and invalid values",
+    "background worker records boot/PON/SFP without a browser and releases locks",
+    "rotation retains at most two 32 KiB files",
+    "event text cannot introduce shell syntax",
+    "firmware/settings write lock prevents SDK polling",
+    "real TCP delivery uses RFC 5424 header and RFC 6587 octet counting",
+    "logging CGI requires authentication and CSRF and rejects unknown fields",
+    "partial configuration merges, validates and verifies saved values",
+    "read, clear and disabled-remote test are fixed CGI operations"
+  ]
+}

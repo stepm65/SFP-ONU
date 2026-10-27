@@ -34,7 +34,7 @@ def exercise(shell,label):
   (r/'version').write_text('V1.1.8-240408\n');(r/'mode').write_text('lan_sds_mode = 1\n')
   (r/'mtd').write_text('mtd4: 0014c000 00001000 "k0"\nmtd5: 00274000 00001000 "r0"\nmtd6: 0014c000 00001000 "k1"\nmtd7: 00274000 00001000 "r1"\n')
   s=(BASE/'src/api.cgi').read_text()
-  replace={'/etc/scripts/odi-mods-lib.sh':str(r/'modslib'),'/tmp/odi-panel':str(r/'runtime'),'/var/config/odi-original-omci.conf':str(r/'original-omci.conf'),'/var/config/odi-invalid-bank':str(r/'invalid-bank'),'/etc/scripts/flash':str(r/'flash'),'/bin/nv':str(r/'nv'),'/bin/xmlconfig':str(r/'xml'),'/proc/sys/kernel/random/uuid':str(r/'uuid'),'/etc/version':str(r/'version'),'/proc/lan_sds/lan_sds_cfg':str(r/'mode'),'/proc/mtd':str(r/'mtd')}
+  replace={'/etc/scripts/odi-log-lib.sh':devpath.logging_fixture(r),'/etc/scripts/odi-mods-lib.sh':str(r/'modslib'),'/tmp/odi-panel':str(r/'runtime'),'/var/config/odi-original-omci.conf':str(r/'original-omci.conf'),'/var/config/odi-invalid-bank':str(r/'invalid-bank'),'/etc/scripts/flash':str(r/'flash'),'/bin/nv':str(r/'nv'),'/bin/xmlconfig':str(r/'xml'),'/proc/sys/kernel/random/uuid':str(r/'uuid'),'/etc/version':str(r/'version'),'/proc/lan_sds/lan_sds_cfg':str(r/'mode'),'/proc/mtd':str(r/'mtd')}
   replace['PATH=/bin:/sbin:/usr/bin:/usr/sbin']='PATH='+devbin
   for a,b in replace.items():
    assert a in s,a

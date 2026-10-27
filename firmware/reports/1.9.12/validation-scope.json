@@ -1,0 +1,26 @@
+{
+  "version": "1.9.12",
+  "firmware_sha256": "e48d203573b4f944ab99b51cd729e28c8026fff295b3cdc3abde02102b015158",
+  "physical_onu_test": false,
+  "olt_test": false,
+  "checks": [
+    "new journal shell/CGI with target command set, rotation and real loopback TCP delivery",
+    "50 authenticated CGI regressions and two boot-hook cases",
+    "profile selection/export and language preservation",
+    "Chromium profiles/logging at 390 and 1440 pixels, RU/EN, both rail states",
+    "built assets match sources, boot hook present, image checksums and partition limits",
+    "target BusyBox compressed help confirms nc supports -l/-p only; no unsupported -w or UDP used"
+  ],
+  "not_run": [
+    "physical ONU and Eltex OLT",
+    "real remote syslog receiver",
+    "new uploader on hardware"
+  ],
+  "known_issues": [
+    "install through legacy; new uploader disconnect unresolved",
+    "event polling can miss short transitions",
+    "local journal is volatile across reboot",
+    "TCP without TLS or resend queue; reception is not guaranteed while network is down"
+  ],
+  "logging_transport": "RFC 5424 over TCP, RFC 6587 octet counting"
+}

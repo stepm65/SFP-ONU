@@ -5,12 +5,13 @@ export PATH
 LC_ALL=C
 export LC_ALL
 umask 077
-PANEL_VERSION=1.9.11
+PANEL_VERSION=1.9.12
 STATE=/tmp/odi-panel
 FLASH=/etc/scripts/flash
 NV=/bin/nv
 XML=/bin/xmlconfig
 . /etc/scripts/odi-mods-lib.sh
+. /etc/scripts/odi-log-lib.sh
 KEYS='OMCI_TM_OPT OMCI_VEIP_SLOT_ID OMCI_CUSTOM_ME GPON_SN GPON_PLOAM_FORMAT GPON_PLOAM_PASSWD LOID LOID_PASSWD PON_VENDOR_ID GPON_ONU_MODEL HW_HWVER HW_SERIAL_NO OUI OMCI_OLT_MODE OMCI_FAKE_OK OMCC_VER OMCI_SW_VER1 OMCI_SW_VER2 ELAN_MAC_ADDR MAC_KEY VLAN_CFG_TYPE VLAN_MANU_MODE VLAN_MANU_TAG_VID VLAN_MANU_TAG_PRI LAN_SPEED_MODE'
 hex() {
  printf '%s' "$1" | awk 'BEGIN{for(i=1;i<256;i++)ord[sprintf("%c",i)]=i} {if(NR>1)printf "0a";for(i=1;i<=length($0);i++)printf "%02x",ord[substr($0,i,1)]}'
@@ -53,7 +54,14 @@ get_value() {
  esac
 }
 if [ "$REQUEST_METHOD" = GET ]; then
- case "$QUERY_STRING" in operation)
+ case "$QUERY_STRING" in logs)
+  headers
+  for key in $LOGKEYS;do emit "$key" "$(log_get "$key")";done
+  emit logger_status "$(cat "$STATE/logger-status" 2>/dev/null)"
+  emit syslog_status "$(cat "$STATE/syslog-status" 2>/dev/null)"
+  emit event_log "$(cat "$STATE/events.log.1" "$STATE/events.log" 2>/dev/null)"
+  emit ok 1;exit 0;;
+ operation)
   headers
   emit firmware_status "$(cat "$STATE/firmware-status" 2>/dev/null)"
   emit firmware_phase "$(cat "$STATE/firmware-phase" 2>/dev/null)"
@@ -66,6 +74,7 @@ if [ "$REQUEST_METHOD" = GET ]; then
   exit 0;; esac
  [ "$QUERY_STRING" = state ] || fail '400 Bad Request' 'Unknown query'
  headers; emit csrf "$token"
+ for key in $LOGKEYS;do emit "$key" "$(log_get "$key")";done
  emit panel_version "$PANEL_VERSION"
  emit uptime "$(cat /proc/uptime)"
  emit pending_keys "$(cat "$STATE/pending-keys" 2>/dev/null)"
@@ -101,7 +110,7 @@ case "$CONTENT_LENGTH" in ''|*[!0-9]*) fail '400 Bad Request' 'Invalid request l
 [ "${#CONTENT_LENGTH}" -le 4 ] && [ "$CONTENT_LENGTH" -le 4096 ] || fail '413 Payload Too Large' 'Request exceeds 4096 bytes'
 case "$CONTENT_TYPE" in 'text/plain'|'text/plain;charset=UTF-8'|'text/plain; charset=UTF-8') ;; *) fail '415 Unsupported Media Type' 'text/plain required';; esac
 IFS= read -r action
-case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
+case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check|action=logging|action=log_test|action=log_clear) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
 IFS= read -r supplied
 [ "$supplied" = "csrf=$token" ] || fail '403 Forbidden' 'Invalid CSRF token. Reload the page.'
 mkdir "$STATE/write.lock" 2>/dev/null || fail '409 Conflict' 'Another operation is running'
@@ -129,6 +138,33 @@ decode() {
   oct=$(printf '%03o' "$n"); ch=$(printf "\\$oct"); dec=$dec$ch
  done
 }
+if [ "$action" = logging ]; then
+ count=0
+ while IFS='=' read -r key value;do
+  case " $LOGKEYS " in *" $key "*) [ -n "$key" ] || fail '400 Bad Request' 'Unknown log field';; *) fail '400 Bad Request' 'Unknown log field';; esac
+  [ ! -f "$WORK/$key" ] || fail '400 Bad Request' 'Duplicate log field'
+  decode "$value" && log_valid "$key" "$dec" || fail '400 Bad Request' "Invalid value: $key"
+  printf '%s' "$dec" >"$WORK/$key";count=$((count+1))
+ done
+ [ "$count" -gt 0 ] || fail '400 Bad Request' 'No logging fields provided'
+ for key in $LOGKEYS;do [ -f "$WORK/$key" ] || log_get "$key" >"$WORK/$key";done
+ if [ "$(cat "$WORK/LOG_REMOTE")" = 1 ];then [ -s "$WORK/LOG_HOST" ] || fail '400 Bad Request' 'Syslog IPv4 address required';fi
+ for key in $LOGKEYS;do printf '%s=%s\n' "$key" "$(cat "$WORK/$key")";done >"$WORK/logging.conf"
+ cp "$WORK/logging.conf" "$LOGCONF" || fail '500 Internal Server Error' 'Cannot save logging configuration'
+ cmp "$WORK/logging.conf" "$LOGCONF" >/dev/null || fail '500 Internal Server Error' 'Logging read-back failed'
+ headers;for key in $LOGKEYS;do emit "$key" "$(log_get "$key")";done;emit ok 1;exit 0
+fi
+case "$action" in log_clear|log_test)
+ while IFS= read -r extra;do [ -z "$extra" ] || fail '400 Bad Request' 'Log operation accepts no parameters';done
+ if [ "$action" = log_clear ];then
+  mkdir "$STATE/events.lock" 2>/dev/null || fail '409 Conflict' 'Journal busy. Retry.'
+  rm -f "$STATE/events.log" "$STATE/events.log.1";rm -r "$STATE/events.lock"
+  headers;emit ok 1
+ else
+  /etc/scripts/odi-log-run.sh test >/dev/null 2>&1;test_rc=$?
+  headers;emit syslog_test_rc "$test_rc";emit syslog_status "$(cat "$STATE/syslog-status" 2>/dev/null)";emit ok 1
+ fi
+ exit 0;;esac
 valid() {
  vk=$1; vv=$2
  case "$vk" in

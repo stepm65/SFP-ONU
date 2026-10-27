@@ -30,7 +30,7 @@ else:print('value: -19.25 dBm')
  lib=(P/'src/odi-diagnostics.sh').read_text().replace('/bin/diag',str(r/'diag')).replace('/bin/omcicli',str(r/'omcicli'))
  (r/'diagnostics.sh').write_text(lib)
  devbin=devpath.make(r)
- api=(P/'src/api.cgi').read_text().replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+devbin).replace('/tmp/odi-panel',str(r/'runtime')).replace('/etc/scripts/flash',str(r/'flash')).replace('/bin/nv',str(r/'nv')).replace('/etc/scripts/odi-diagnostics.sh',str(r/'diagnostics.sh')).replace('/proc/sys/kernel/random/uuid',str(r/'uuid')).replace('/etc/scripts/odi-mods-lib.sh',str(P/'src/odi-mods-lib.sh'))
+ api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-log-lib.sh',devpath.logging_fixture(r)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+devbin).replace('/tmp/odi-panel',str(r/'runtime')).replace('/etc/scripts/flash',str(r/'flash')).replace('/bin/nv',str(r/'nv')).replace('/etc/scripts/odi-diagnostics.sh',str(r/'diagnostics.sh')).replace('/proc/sys/kernel/random/uuid',str(r/'uuid')).replace('/etc/scripts/odi-mods-lib.sh',str(P/'src/odi-mods-lib.sh'))
  (r/'api.cgi').write_text(api)
  def read(query,user='admin'):
   p=subprocess.run(['/bin/sh',str(r/'api.cgi')],env={**os.environ,'REQUEST_METHOD':'GET','QUERY_STRING':query,'REMOTE_USER':user},capture_output=True,text=True,timeout=65)

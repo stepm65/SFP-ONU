@@ -22,6 +22,16 @@ HOST_PATH = '/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin'
 HOST_TIMEOUT_SCALE = 6 if sys.platform == 'cygwin' else 1
 
 
+def logging_fixture(root, state=None):
+    root = Path(root)
+    state = Path(state) if state is not None else root / 'runtime'
+    target = root / 'loglib.sh'
+    target.write_text((P / 'src/odi-log-lib.sh').read_text()
+                      .replace('/var/config/odi-panel-logging.conf', str(root / 'logging.conf'))
+                      .replace('/tmp/odi-panel', str(state)))
+    return str(target)
+
+
 def make(root):
     """Create <root>/devbin and return its path."""
     d = Path(root) / 'devbin'

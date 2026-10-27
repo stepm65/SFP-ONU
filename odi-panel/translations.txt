@@ -573,3 +573,5 @@ UNI, мосты, GEM и T-CONT|UNI, bridges, GEM and T-CONT
 Загрузить актуальный интерфейс|Load current interface
 Загрузка процессора|CPU Usage
 Использование памяти|Memory Usage
+
+Панель диагностики|Diagnostic panel

@@ -71,6 +71,8 @@ diag_collect() {
  diag_read runtime_sn /bin/omcicli get sn
  diag_read loid_auth /bin/omcicli get loidauth
  diag_read auth_uptime /bin/omcicli get authuptime
+ emit event_log "$(cat "$STATE/events.log.1" "$STATE/events.log" 2>/dev/null | diag_redact)"
+ emit logger_status "$(cat "$STATE/logger-status" 2>/dev/null)"
  emit mods_status "$(cat "$STATE/mods-status" 2>/dev/null)"
  emit mods_log "$(cat "$STATE/mods.log" 2>/dev/null | diag_redact)"
  for item in status ingress egress ability ports; do emit "uplink_$item" "$(cat "$STATE/uplink-$item" 2>/dev/null)"; done
