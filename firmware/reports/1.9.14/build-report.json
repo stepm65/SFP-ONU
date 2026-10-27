@@ -1,15 +1,15 @@
 {
   "base_sha256": "79c5ce4e62f4cb334b4335ad405d14f8c905b8b61d56ca636486d1ef91632623",
-  "firmware_sha256": "c4256f6578ad7825d46757431bf1afea4adb86108733a15a939cf0c0ec143d67",
+  "firmware_sha256": "166e9827a05a0b1885b293274e429899a1d5c1ae18e91a414843a0bd43e6fe2a",
   "base_version": "V1.1.8-240408",
   "base_tag": "SFU-240408",
-  "panel_version": "1.9.13",
+  "panel_version": "1.9.14",
   "tar_changes": [],
   "kernel_sha256": "c1350bfeffbee446d726d59cf8f2467bd2f7fab7a9f6d32941d687c4654a203f",
   "native_pages_themed": 181,
   "kernel_bytes": 876153,
   "kernel_limit": 1359872,
-  "rootfs_bytes": 2244778,
+  "rootfs_bytes": 2245214,
   "rootfs_limit": 2572288,
   "lzma_block_bytes": 1048576,
   "modified_files": [
@@ -202,6 +202,7 @@
   ],
   "added_files": [
     "home/httpd/web/panel/index.html",
+    "home/httpd/web/panel/ui.css",
     "home/httpd/web/panel/panel.css",
     "home/httpd/web/panel/panel.js",
     "home/httpd/web/panel/api.cgi",

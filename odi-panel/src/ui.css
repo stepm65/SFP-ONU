@@ -1,0 +1,46 @@
+/* Shared by the panel, factory forms and the pre-authentication login. */
+:root {
+  color-scheme: light;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --text-small: 12px;
+  --text-body: 14px;
+  --text-title: 16px;
+  --text-page: 28px;
+  --ink: #172737;
+  --muted: #647584;
+  --line: #d7e1e6;
+  --blue: #007e92;
+  --nav: #0c202a;
+  --bg: #edf2f4;
+  --surface: #fff;
+  --surface-soft: #f8fbfc;
+  --green: #087956;
+  --amber: #bc6b10;
+  --danger: #a03932;
+  --radius-card: 8px;
+  --radius-control: 6px;
+  --control-height: 40px;
+  --space-card: 20px;
+}
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+* { box-sizing: border-box; }
+body { font: var(--text-body)/1.5 var(--font-ui); color: var(--ink); }
+button, input, select, textarea { font: inherit; }
+select { min-height: var(--control-height); }
+input[type=file] {
+  display: block; width: 100%; max-width: 100%; min-width: 0; padding: 8px;
+  border: 1px solid var(--line); border-radius: var(--radius-control);
+  background: var(--surface-soft); color: var(--ink); font: inherit;
+}
+input[type=file]::file-selector-button {
+  margin-right: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  padding: 7px 10px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+[hidden] { display: none !important; }

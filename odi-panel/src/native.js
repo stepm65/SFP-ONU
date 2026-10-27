@@ -7,15 +7,23 @@ function prepareNativeButtons(){document.querySelectorAll('input[type=submit],in
 });}
 function prepareNativeLayout(){
  // Change presentation only. Keep form nodes, names, handlers and posted values.
+ document.querySelectorAll('[style],font').forEach(element=>{
+  for(const name of ['font','font-size','font-family','line-height','letter-spacing'])element.style.removeProperty(name);
+  if(element.tagName==='FONT'){
+   const color=(element.getAttribute('color')||element.style.color||'').toLowerCase();
+   if(['red','#ff0000','#f00','rgb(255, 0, 0)'].includes(color))element.classList.add('native-warning');
+   element.removeAttribute('size');element.removeAttribute('face');element.removeAttribute('color');element.style.removeProperty('color');
+  }
+ });
  document.querySelectorAll('table').forEach(table=>{
+  for(const element of [table,...table.querySelectorAll('tr,td,th')]){
+   for(const name of ['width','height','bgcolor','border','cellpadding','cellspacing','align'])element.removeAttribute(name);
+  }
   if(table.classList.contains('native-table'))return;
   const rows=Array.from(table.rows).filter(row=>row.closest('table')===table);
   const columns=Math.max(0,...rows.map(row=>Array.from(row.cells).reduce((n,cell)=>n+cell.colSpan,0)));
   const controls=table.querySelector('input,select,textarea,button');
   table.classList.add('native-table');
-  for(const element of [table,...table.querySelectorAll('tr,td,th')]){
-   for(const name of ['width','height','bgcolor','border','cellpadding','cellspacing'])element.removeAttribute(name);
-  }
   if(columns<=1&&!controls){
    table.classList.add('native-note');
    for(const row of rows)if(!row.textContent.trim()&&!row.querySelector('img,input,button,select,textarea'))row.hidden=true;
@@ -30,6 +38,12 @@ function prepareNativeLayout(){
 }
 document.addEventListener('DOMContentLoaded',()=>{
  document.body.classList.toggle('embedded',parent!==window);prepareNativeButtons();prepareNativeLayout();ODILang.watch();
+ let stylePending=false;
+ const styleObserver=new MutationObserver(records=>{
+  if(stylePending||!records.some(record=>Array.from(record.addedNodes).some(node=>node.nodeType===1)))return;
+  stylePending=true;queueMicrotask(()=>{stylePending=false;prepareNativeButtons();prepareNativeLayout();});
+ });
+ styleObserver.observe(document.body,{childList:true,subtree:true});
  if(parent!==window){try{ODILang.set(parent.ODILang.get(),false);frameElement?.dispatchEvent(new Event('odi-native-ready'));}catch(_){} }
  else {const label=document.createElement('label');label.className='language-control';label.textContent='Language / Язык ';const select=document.createElement('select');select.id='language';select.innerHTML='<option value="ru">Русский</option><option value="en">English</option>';select.value=ODILang.get();select.onchange=()=>ODILang.set(select.value);label.append(select);document.body.prepend(label);}
  document.addEventListener('input',()=>{window.nativeDirty=true;});document.addEventListener('change',()=>{window.nativeDirty=true;});

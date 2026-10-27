@@ -37,12 +37,13 @@ async function discoverNativeMenu(){if(preview)return;try{
 }catch(_){} }
 
 function nativeEmbed(url,label){
- if(preview)return window.ODINativePreview?.[url]?`<iframe sandbox="allow-same-origin" class="native-frame" title="${esc(label)}" srcdoc="${esc(window.ODINativePreview[url])}"></iframe>`:'<p>Штатная страница доступна только на устройстве.</p>';
- return `<iframe class="native-frame" title="${esc(label)}" src="${esc(nativeFrameURL(url))}"></iframe>`;
+ const frameClass='native-frame'+(url==='/saveconf.asp'?' maintenance-frame':'');
+ if(preview)return window.ODINativePreview?.[url]?`<iframe sandbox="allow-same-origin" class="${frameClass}" title="${esc(label)}" srcdoc="${esc(window.ODINativePreview[url])}"></iframe>`:'<p>Штатная страница доступна только на устройстве.</p>';
+ return `<iframe class="${frameClass}" title="${esc(label)}" src="${esc(nativeFrameURL(url))}"></iframe>`;
 }
 function wan(){if(!nativeWan.pon&&!nativeWan.mode)return vlan();return header('WAN','Штатные разделы WAN, доступные в меню этой прошивки.')+
  (nativeWan.pon?card('Подключение через PON','Форма присутствует в штатном меню устройства. Таблица WAN задаётся отдельно от ручного PVID; изменения могут влиять на передачу трафика.',nativeEmbed(nativeWan.pon,'Подключение через PON')):'')+
- (nativeWan.mode?card('Расширенные настройки','Выбор типа WAN-интерфейса общего SDK. Это не переключатель GPON/EPON.',`<details><summary>Выбор WAN-интерфейса</summary><p class="muted">Шаблон содержит ATM, Ethernet, PTM и Wireless. Их наличие не означает поддержку стиком; менять этот параметр для обычной настройки GPON не требуется.</p>${nativeEmbed(nativeWan.mode,'Выбор WAN-интерфейса')}</details>`):'');}
+ (nativeWan.mode?card('Расширенные настройки','Выбор типа WAN-интерфейса общего SDK. Это не переключатель GPON/EPON.',`<p class="muted">Шаблон содержит ATM, Ethernet, PTM и Wireless. Их наличие не означает поддержку стиком; менять этот параметр для обычной настройки GPON не требуется.</p>${nativeEmbed(nativeWan.mode,'Выбор WAN-интерфейса')}`):'');}
 
 const nativeFrameBindings=new Map();
 const dedicatedNativePages=new Set(['status.asp','status_pon.asp','tcpiplan.asp','wanmode.asp','multi_wan_generic.asp','gpon.asp','epon.asp','vlan.asp','omci_info.asp','arptable.asp','ping.asp','saveconf.asp','password.asp','rebootTime.asp','reboot.asp','upgrade.asp','stats.asp','admin/pon-stats.asp']);

@@ -6,7 +6,7 @@ p=Path(__file__).resolve().parent
 from release import VERSION, sync_sources
 sync_sources(check=True)
 root=p.parent/'base/files/home/httpd/web';en=json.loads((p/'native-en.json').read_text())
-css=(p/'src/native.css').read_text();pages={}
+css=(p/'src/ui.css').read_text()+'\n'+(p/'src/native.css').read_text();pages={}
 files=['status.asp','status_pon.asp','tcpiplan.asp','wanmode.asp','multi_wan_generic.asp','gpon.asp','epon.asp','vlan.asp','omci_info.asp','arptable.asp','ping.asp','saveconf.asp','password.asp','rebootTime.asp','reboot.asp','upgrade.asp','stats.asp','admin/pon-stats.asp']
 for name in files:
  s=((p/'src/saveconf.asp') if name=='saveconf.asp' else root/name).read_text()
@@ -22,12 +22,14 @@ for name in files:
   if node.name in ['input','button','select','textarea']:node['disabled']='disabled'
   if node.name=='input' and node.get('type','text') in ['submit','button','reset']:
    node.name='button';node.string=node.get('value','');node['type']='button'
+ viewport=soup.new_tag('meta',attrs={'name':'viewport','content':'width=device-width,initial-scale=1'})
+ if soup.head:soup.head.append(viewport)
  style=soup.new_tag('style');style.string=css
  if soup.head:soup.head.append(style)
  pages['/'+name]='<!doctype html>\n'+str(soup)
 pages=json.loads(subprocess.run(['node',str(p/'normalize_preview.cjs')],input=json.dumps(pages),capture_output=True,text=True,encoding='utf-8',check=True).stdout)
 pages['/boaform/formWanRedirect?redirect-url=/multi_wan_generic.asp&if=pon']=pages['/multi_wan_generic.asp']
-s=(p/'src/index.html').read_text().replace('href="/panel/','href="').replace('src="/panel/','src="').replace('?v='+VERSION,'').replace('<link rel="stylesheet" href="panel.css">','<style>'+(p/'src/panel.css').read_text()+'</style>')
+s=(p/'src/index.html').read_text().replace('href="/panel/','href="').replace('src="/panel/','src="').replace('?v='+VERSION,'').replace('<link rel="stylesheet" href="ui.css">','<style>'+(p/'src/ui.css').read_text()+'</style>').replace('<link rel="stylesheet" href="panel.css">','<style>'+(p/'src/panel.css').read_text()+'</style>')
 s=s.replace('<script defer src="translations.js"></script>','<script>window.ODINativePreview='+json.dumps(pages,ensure_ascii=False).replace('</','<\\/')+';</script><script defer src="translations.js"></script>')
 for file in ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js']:
  script=(p/'src'/file).read_text().replace("const preview = location.protocol", "const preview = true || location.protocol")

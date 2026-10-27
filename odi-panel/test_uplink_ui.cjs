@@ -20,4 +20,5 @@ const p=__dirname;
  assert(!/\?{3}/.test(fs.readFileSync(p+'/src/uplink.js','utf8')));
  const report={result:'passed',scope:'jsdom, no hardware',checks:['upload and flow controls render','RB5009 configurable egress and interface','no unrelated LAN queue edits','command injection rejected','VEIP bit preserves other bits','Russian strings are not corrupted']};
  fs.writeFileSync(p+'/uplink-ui-test-report.json',JSON.stringify(report,null,2));console.log(report);
+ w.close();
 })().catch(e=>{console.error(e);process.exitCode=1});

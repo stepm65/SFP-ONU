@@ -10,7 +10,7 @@ assert re.fullmatch(r'\d+\.\d+\.\d+', VERSION), 'Invalid panel VERSION'
 def sync_sources(check=False):
     rules = {
         'index.html': [
-            (r'(?<=\?v=)\d+\.\d+\.\d+', VERSION, 14),
+            (r'(?<=\?v=)\d+\.\d+\.\d+', VERSION, 15),
             (r'(?<=ODI Panel )\d+\.\d+\.\d+', VERSION, 1),
             (r'(?<=name="odi-panel-version" content=")\d+\.\d+\.\d+', VERSION, 1),
         ],
@@ -19,7 +19,7 @@ def sync_sources(check=False):
             (r'(?<=name="odi-panel-version" content=")\d+\.\d+\.\d+', VERSION, 1),
         ],
         'api.cgi': [(r'(?m)^PANEL_VERSION=\d+\.\d+\.\d+$', 'PANEL_VERSION=' + VERSION, 1)],
-        'saveconf.asp': [(r'(?<=\?v=)\d+\.\d+\.\d+', VERSION, 4)],
+        'saveconf.asp': [(r'(?<=\?v=)\d+\.\d+\.\d+', VERSION, 5)],
     }
     for name, replacements in rules.items():
         path = PROJECT / 'src' / name
@@ -27,6 +27,10 @@ def sync_sources(check=False):
         for pattern, replacement, expected_count in replacements:
             updated, count = re.subn(pattern, replacement, updated)
             assert count == expected_count, f'Unexpected version fields in {name}: {count}'
+        if name == 'login-template.asp':
+            tokens = '/* UI-TOKENS:START */\n' + (PROJECT / 'src/ui.css').read_text() + '\n/* UI-TOKENS:END */'
+            updated, count = re.subn(r'/\* UI-TOKENS:START \*/[\s\S]*?/\* UI-TOKENS:END \*/', lambda _: tokens, updated)
+            assert count == 1, 'Missing login UI tokens'
         if check:
             assert updated == original, f'Stale version in {name}; run python release.py'
         elif updated != original:

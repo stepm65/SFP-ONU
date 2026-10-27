@@ -56,7 +56,7 @@ from hotfix.patch_boa import patch as patch_boa
 boa_binary,boa_patch_report=patch_boa(before['bin/boa']['data'])
 mods={'bin/boa':boa_binary}
 (out/'boa-patch-report.json').write_text(json.dumps(boa_patch_report,indent=2)+'\n')
-for n in ['index.html','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','uplink.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js']:
+for n in ['index.html','ui.css','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','uplink.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js']:
  mods['home/httpd/web/panel/'+n]=(PROJECT/'src'/n).read_bytes()
 for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh','odi-log-lib.sh','odi-log-run.sh','odi-debug-lib.sh','odi-debug.sh','odi-debug-ring.awk','odi-fw-lib.sh','odi-fw-stream.sh','odi-fw-compare.sh','odi-firmware-worker.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src'/n).read_bytes()
@@ -77,7 +77,7 @@ omci_start=omci_start.replace('get_omci_log_format ()\n{','get_omci_log_format (
 omci_start=omci_start.replace('omci_app -s ','/etc/scripts/odi-debug.sh boot\nomci_app -s ')
 mods['etc/runomci.sh']=omci_start.encode()
 # Theme and translate original ASP pages while retaining every form and ASP handler.
-native_injection=(f'<link rel="stylesheet" href="/panel/native.css?v={VERSION}"><script src="/panel/translations.js?v={VERSION}"></script><script src="/panel/i18n.js?v={VERSION}"></script><script src="/panel/native.js?v={VERSION}"></script>').encode()
+native_injection=(f'<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="/panel/ui.css?v={VERSION}"><link rel="stylesheet" href="/panel/native.css?v={VERSION}"><script src="/panel/translations.js?v={VERSION}"></script><script src="/panel/i18n.js?v={VERSION}"></script><script src="/panel/native.js?v={VERSION}"></script>').encode()
 native_pages=[]
 for name,item in before.items():
  if name.startswith('home/httpd/web/') and name.endswith('.asp') and 'data' in item:

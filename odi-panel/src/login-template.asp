@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="odi-panel-version" content="1.9.13"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<meta charset="utf-8"><meta name="odi-panel-version" content="1.9.14"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ODI · Вход</title>
 <script src="md5.js" type="text/javascript"></script>
@@ -11,7 +11,56 @@ function setpass() {
 }
 </script>
 <style>
-:root{color-scheme:light;font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#152235;background:#f4f6fa}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column}header{display:flex;justify-content:space-between;align-items:center;padding:24px 32px;gap:20px}.brand{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:750;letter-spacing:1px}.mark{display:grid;place-items:center;width:39px;height:39px;border:2px solid #2263df;border-radius:12px;color:#2263df}.brand small{display:block;font-size:9px;letter-spacing:1.8px;font-weight:500;color:#65748a}select,button,input{font:inherit}select{background:white;border:1px solid #d5dfea;border-radius:8px;padding:8px;color:#152235}main{flex:1;display:grid;place-items:center;padding:28px 20px 64px}.card{background:white;border:1px solid #e1e7ef;border-radius:18px;box-shadow:0 14px 44px #15223508;width:100%;max-width:420px;padding:36px}.eyebrow{font-size:11px;letter-spacing:1.5px;color:#65748a;margin:0 0 12px}h1{font-size:28px;line-height:1.2;margin:0 0 12px;letter-spacing:-.5px}.intro{color:#65748a;margin:0 0 28px;font-size:14px}label{display:block;font-size:13px;font-weight:600;margin:0 0 8px}.field{margin-bottom:20px}input:not([type=hidden]):not([type=submit]){width:100%;height:46px;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;background:#fff;color:#152235}.password{position:relative}.password input{padding-right:86px!important}.reveal{position:absolute;right:5px;top:5px;height:36px;padding:0 10px;border:0;background:transparent;color:#2263df;font-size:12px;cursor:pointer}.submit{display:block;width:100%;height:46px;border:0;border-radius:8px;background:#2263df;color:white;font-weight:600;cursor:pointer;margin-top:26px}.submit:hover{background:#1954c7}:focus-visible{outline:3px solid #88b1ff;outline-offset:3px}.note{border-top:1px solid #e1e7ef;padding-top:20px;margin:24px 0 0;font-size:12px;color:#65748a}footer{text-align:center;padding:16px 20px 24px;color:#65748a;font-size:11px}.captcha{display:flex;gap:12px;align-items:center}.captcha img{border:1px solid #e1e7ef;border-radius:4px}@media(max-width:480px){header{padding:20px}.card{padding:28px 24px}main{padding:20px 16px 36px}h1{font-size:25px}}
+/* UI-TOKENS:START */
+/* Shared by the panel, factory forms and the pre-authentication login. */
+:root {
+  color-scheme: light;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --text-small: 12px;
+  --text-body: 14px;
+  --text-title: 16px;
+  --text-page: 28px;
+  --ink: #172737;
+  --muted: #647584;
+  --line: #d7e1e6;
+  --blue: #007e92;
+  --nav: #0c202a;
+  --bg: #edf2f4;
+  --surface: #fff;
+  --surface-soft: #f8fbfc;
+  --green: #087956;
+  --amber: #bc6b10;
+  --danger: #a03932;
+  --radius-card: 8px;
+  --radius-control: 6px;
+  --control-height: 40px;
+  --space-card: 20px;
+}
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+* { box-sizing: border-box; }
+body { font: var(--text-body)/1.5 var(--font-ui); color: var(--ink); }
+button, input, select, textarea { font: inherit; }
+select { min-height: var(--control-height); }
+input[type=file] {
+  display: block; width: 100%; max-width: 100%; min-width: 0; padding: 8px;
+  border: 1px solid var(--line); border-radius: var(--radius-control);
+  background: var(--surface-soft); color: var(--ink); font: inherit;
+}
+input[type=file]::file-selector-button {
+  margin-right: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-control);
+  padding: 7px 10px;
+  background: var(--surface-soft);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+[hidden] { display: none !important; }
+
+/* UI-TOKENS:END */
+:root{background:var(--bg)}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column}header{display:flex;justify-content:space-between;align-items:center;padding:24px 32px;gap:20px}.brand{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:750;letter-spacing:1px}.mark{display:grid;place-items:center;width:39px;height:39px;border:2px solid var(--blue);border-radius:12px;color:var(--blue)}.brand small{display:block;font-size:var(--text-small);letter-spacing:1.8px;font-weight:500;color:var(--muted)}select,button,input{font:inherit}select{background:white;border:1px solid var(--line);border-radius:var(--radius-control);padding:8px;color:var(--ink)}main{flex:1;display:grid;place-items:center;padding:28px 20px 64px}.card{background:white;border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:0 14px 44px var(--ink)08;width:100%;max-width:420px;padding:36px}.eyebrow{font-size:var(--text-small);letter-spacing:1.5px;color:var(--muted);margin:0 0 12px}h1{font-size:28px;line-height:1.2;margin:0 0 12px;letter-spacing:-.5px}.intro{color:var(--muted);margin:0 0 28px;font-size:14px}label{display:block;font-size:var(--text-body);font-weight:600;margin:0 0 8px}.field{margin-bottom:20px}input:not([type=hidden]):not([type=submit]){width:100%;height:var(--control-height);border:1px solid var(--line);border-radius:var(--radius-control);padding:10px 12px;background:#fff;color:var(--ink)}.password{position:relative}.password input{padding-right:86px!important}.reveal{position:absolute;right:5px;top:5px;height:30px;padding:0 10px;border:0;background:transparent;color:var(--blue);font-size:var(--text-small);cursor:pointer}.submit{display:block;width:100%;height:var(--control-height);border:0;border-radius:var(--radius-control);background:var(--blue);color:white;font-weight:600;cursor:pointer;margin-top:26px}.submit:hover{filter:brightness(.94)}:focus-visible{outline:3px solid #eaa442;outline-offset:3px}.note{border-top:1px solid var(--line);padding-top:20px;margin:24px 0 0;font-size:var(--text-small);color:var(--muted)}footer{text-align:center;padding:16px 20px 24px;color:var(--muted);font-size:var(--text-small)}.captcha{display:flex;gap:12px;align-items:center}.captcha img{border:1px solid var(--line);border-radius:4px}@media(max-width:480px){header{padding:20px}.card{padding:28px 24px}main{padding:20px 16px 36px}h1{font-size:25px}}
 </style>
 </head>
 <body>
@@ -30,7 +79,7 @@ function setpass() {
 </form>
 <p class="note" data-en="Administrator access is required to manage settings.">Для управления настройками нужны права администратора.</p>
 </section></main>
-<footer><span data-en="Local device management">Локальное управление устройством</span> · ODI Panel 1.9.13</footer>
+<footer><span data-en="Local device management">Локальное управление устройством</span> · ODI Panel 1.9.14</footer>
 <script>
 (function(){
  var language=document.getElementById('language'),pass=document.getElementById('password'),reveal=document.getElementById('reveal'),lang='ru';
