@@ -1,0 +1,22 @@
+{
+  "version": "1.9.18",
+  "firmware_sha256": "f30d6b927aa92cdc71ea6b8976aa31fabe877b071c73e2df79a4d3e82f2498a7",
+  "physical_onu_test_this_version": false,
+  "checks": [
+    "42 Chromium checks: RU/EN, 390/768/1440 px, seven main screens",
+    "76 Chromium checks against pages extracted from the final built firmware",
+    "stock logout POST fields and root sign-in navigation in a local HTTP fixture",
+    "logout errors and unsaved parent/embedded form drafts",
+    "native login challenge, language buttons and password visibility",
+    "profile import/export, localization, session entry and firmware UI/status protocol",
+    "kernel, non-web files, firmware worker and upload CGI are unchanged",
+    "API is unchanged except PANEL_VERSION; firmware.js and diagnostics.js are unchanged",
+    "source/built panel byte comparison; TAR integrity and partition size bounds"
+  ],
+  "unchanged_non_web_files": 243,
+  "limits": [
+    "no physical ONU test of 1.9.18 or its logout flow",
+    "logout fixture validates browser behavior, not live Boa session termination",
+    "no changes to GPON/OMCI runtime or claim of resolving Eltex reboot behavior"
+  ]
+}

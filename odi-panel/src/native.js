@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  });
  styleObserver.observe(document.body,{childList:true,subtree:true});
  if(parent!==window){try{ODILang.set(parent.ODILang.get(),false);frameElement?.dispatchEvent(new Event('odi-native-ready'));}catch(_){} }
- else {const label=document.createElement('label');label.className='language-control';label.textContent='Language / Язык ';const select=document.createElement('select');select.id='language';select.innerHTML='<option value="ru">Русский</option><option value="en">English</option>';select.value=ODILang.get();select.onchange=()=>ODILang.set(select.value);label.append(select);document.body.prepend(label);}
+ else {const control=document.createElement('div');control.className='language-control';control.innerHTML=languageSwitch();document.body.prepend(control);bindLanguageSwitch();}
  document.addEventListener('input',()=>{window.nativeDirty=true;});document.addEventListener('change',()=>{window.nativeDirty=true;});
  document.addEventListener('submit',()=>{window.nativeDirty=false;});
  if(parent!==window){try{

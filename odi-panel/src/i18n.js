@@ -21,7 +21,10 @@ window.ODILang=(()=>{
  doc.documentElement.lang=lang;
  }
  function watch(doc=document){apply(doc);let scheduled=false;new MutationObserver(()=>{if(scheduled)return;scheduled=true;queueMicrotask(()=>{scheduled=false;apply(doc);});}).observe(doc.documentElement,{childList:true,subtree:true,characterData:true});}
- function set(next,persist=true){if(!['ru','en'].includes(next))return;lang=next;if(persist)try{localStorage.setItem('odi-panel-language',lang);}catch(_){}apply(document);for(const selector of document.querySelectorAll('#language,#panel-language'))selector.value=lang;document.querySelectorAll('iframe').forEach(f=>{try{if(f.contentWindow.ODILang)f.contentWindow.ODILang.set(next,false);else if(f.hasAttribute('srcdoc'))apply(f.contentDocument);}catch(_){}});window.dispatchEvent(new Event('odi-language-change'));}
+ function set(next,persist=true){if(!['ru','en'].includes(next))return;lang=next;if(persist)try{localStorage.setItem('odi-panel-language',lang);}catch(_){}apply(document);for(const button of document.querySelectorAll('[data-language]'))button.setAttribute('aria-pressed',String(button.dataset.language===lang));document.querySelectorAll('iframe').forEach(f=>{try{if(f.contentWindow.ODILang)f.contentWindow.ODILang.set(next,false);else if(f.hasAttribute('srcdoc'))apply(f.contentDocument);}catch(_){}});window.dispatchEvent(new Event('odi-language-change'));}
  window.addEventListener('storage',e=>{if(e.key==='odi-panel-language')set(e.newValue,false);});
  return{t,apply,watch,set,get:()=>lang};
 })();
+
+function languageSwitch(){return '<div class="language-switch" role="group" aria-label="Language / Язык" data-no-translate><button type="button" data-language="ru">RU</button><button type="button" data-language="en">EN</button></div>';}
+function bindLanguageSwitch(){document.querySelectorAll('[data-language]').forEach(button=>{button.setAttribute('aria-pressed',String(button.dataset.language===ODILang.get()));button.onclick=()=>ODILang.set(button.dataset.language);});}

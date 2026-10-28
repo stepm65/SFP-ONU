@@ -17,8 +17,8 @@ for(const lang of ['ru','en']){
  d.getElementById('reveal').click();
  assert.equal(f.elements.namedItem('password').type,'text');
  assert.equal(w.challengeCalls,undefined);
- d.getElementById('language').value=lang==='ru'?'en':'ru';
- d.getElementById('language').dispatchEvent(new w.Event('change'));
+ d.querySelector('[data-language='+ (lang==='ru'?'en':'ru') +']').click();
+ assert.equal(d.documentElement.lang,lang==='ru'?'en':'ru');
  assert.equal(f.elements.namedItem('password').value,'test-password');
  f.dispatchEvent(new w.Event('submit',{cancelable:true}));
  assert.equal(w.challengeCalls,1);

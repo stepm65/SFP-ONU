@@ -1,0 +1,11 @@
+{
+  "result": "passed",
+  "checks": [
+    "diagnostics always visible despite old compact preference",
+    "RU/EN buttons preserve unsaved fields",
+    "backup separated from Profiles and selected under System",
+    "logout posts stock endpoint and fields and verifies session removal",
+    "active session, HTTP errors and network errors never count as successful logout",
+    "unsaved panel and embedded form drafts can cancel logout"
+  ]
+}

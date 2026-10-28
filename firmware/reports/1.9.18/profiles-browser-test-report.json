@@ -1,0 +1,28 @@
+{
+  "result": "passed",
+  "scope": "Chromium preview: profiles and logging controls, no ONU/OLT",
+  "checks": [
+    {
+      "width": 390,
+      "language": "ru",
+      "layout": "diagnostic"
+    },
+    {
+      "width": 390,
+      "language": "en",
+      "layout": "diagnostic"
+    },
+    {
+      "width": 1440,
+      "language": "ru",
+      "layout": "diagnostic"
+    },
+    {
+      "width": 1440,
+      "language": "en",
+      "layout": "diagnostic"
+    }
+  ],
+  "draftPreserved": true,
+  "scriptErrors": []
+}

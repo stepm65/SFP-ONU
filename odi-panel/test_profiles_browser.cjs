@@ -18,8 +18,8 @@ const server=http.createServer((req,res)=>{res.setHeader('Content-Type','text/ht
   const checks=[];
   for(const width of [390,1440]){
    await call('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:false});
-   for(const language of ['ru','en'])for(const layout of ['compact','diagnostic']){
-    await evaluate(`ODILang.set('${language}');setInterfaceLayout('${layout}');`);await wait(80);
+   for(const language of ['ru','en'])for(const layout of ['diagnostic']){
+    await evaluate(`ODILang.set('${language}');`);await wait(80);
     assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'page overflow '+width+' '+language+' '+layout);
     await evaluate("document.querySelector('[data-profile-preset=huawei]').click()");await wait(100);
     assert(await evaluate('document.querySelectorAll("[data-profile-key]").length===1'));
@@ -33,10 +33,10 @@ const server=http.createServer((req,res)=>{res.setHeader('Content-Type','text/ht
     assert(await evaluate('document.documentElement.scrollWidth<=innerWidth'),'logging controls overflow');
     await evaluate("location.hash='profiles'");await wait(100);
    }
-   await evaluate("ODILang.set('ru');setInterfaceLayout('compact');scrollTo(0,0)");
+   await evaluate("ODILang.set('ru');scrollTo(0,0)");
    const shot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});fs.writeFileSync(path.join(out,'profiles-'+width+'.png'),Buffer.from(shot.data,'base64'));
   }
-  await evaluate("document.getElementById('profile-name').value='Keep draft';document.getElementById('profile-name').dispatchEvent(new Event('input'));document.getElementById('diagnostic-toggle').click()");assert.equal(await evaluate("document.getElementById('profile-name').value"),'Keep draft');
-  assert.deepEqual(errors,[]);fs.writeFileSync(p+'/profiles-browser-test-report.json',JSON.stringify({result:'passed',scope:'Chromium preview: profiles and logging controls, no ONU/OLT',checks,draftPreserved:true,scriptErrors:errors},null,2));console.log('Chromium: profiles and logging at 8 layout/language/width combinations passed');
+  await evaluate("document.getElementById('profile-name').value='Keep draft';document.getElementById('profile-name').dispatchEvent(new Event('input'));document.querySelector('[data-language=en]').click()");assert.equal(await evaluate("document.getElementById('profile-name').value"),'Keep draft');
+  assert.deepEqual(errors,[]);fs.writeFileSync(p+'/profiles-browser-test-report.json',JSON.stringify({result:'passed',scope:'Chromium preview: profiles and logging controls, no ONU/OLT',checks,draftPreserved:true,scriptErrors:errors},null,2));console.log('Chromium: profiles and logging at 4 layout/language/width combinations passed');
  }finally{ws?.close();browser.kill();server.close();}
 })().catch(e=>{console.error(e);server.close();process.exitCode=1});

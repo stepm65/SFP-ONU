@@ -1,7 +1,7 @@
 'use strict';
 const preview = location.protocol === 'file:' || new URLSearchParams(location.search).get('preview') === '1';
 if(!preview&&(location.pathname!=='/'||location.search))history.replaceState(null,'','/'+(location.hash||'#overview'));
-const titles={overview:'Обзор',identity:'ONU / OMCI',vlan:'VLAN',link:'Режим порта',firmware:'Прошивка',mods:'Моды Anime4000',wan:'WAN',diagnostics:'Диагностика PON / OMCI',profiles:'Профили и резервная копия'};
+const titles={overview:'Обзор',identity:'ONU / OMCI',vlan:'VLAN',link:'Режим порта',firmware:'Прошивка',mods:'Моды Anime4000',wan:'WAN',diagnostics:'Диагностика PON / OMCI',profiles:'Профили'};
 const modes={'1':'1G · 1000Base-X','2':'1G · SGMII PHY','3':'1G · SGMII MAC','4':'2,5G · HiSGMII PHY','5':'2,5G · HiSGMII MAC','6':'2,5G · 2500Base-X','7':'1G · SGMII Force'};
 let state={},tab='overview',busy=false,dirty=false,noticeTimer;
 const $=s=>document.querySelector(s);
@@ -55,7 +55,7 @@ async function save(f){if(preview||busy)return;if(f.dataset.settings==='mac'){tr
  const drafts=captureDrafts(f);busy=true;const buttons=f.querySelectorAll('button');buttons.forEach(b=>b.disabled=true);try{await api('save',params);dirty=false;busy=false;await load();restoreDrafts(drafts);dirty=drafts.length>0;vlanControls();formStatus();toast('Настройки сохранены и проверены. Перезагрузка выполняется отдельно.');}catch(e){busy=false;buttons.forEach(b=>b.disabled=false);toast(e.message,true);}}
 async function selectBank(bank){if(preview||busy)return;if(!await confirmAction('Загрузка из банка '+bank+'?','Будет изменён только выбор следующей загрузки. Текущий банк продолжит работу до перезагрузки.'))return;busy=true;try{await api('bank',{bank});busy=false;await load();toast('Для следующей загрузки выбран банк '+bank+'.');}catch(e){busy=false;toast(e.message,true);}}
 async function reboot(){if(preview||busy)return;if(!await confirmAction('Перезагрузить ONU?','Интернет и доступ к панели временно прервутся. Будут применены сохранённые настройки.'))return;busy=true;try{await api('reboot');$('#connection').textContent='Перезагрузка…';$('#connection').className='status';$('#main').innerHTML='<div class="card empty"><h2>Запрошена перезагрузка</h2><p class="muted">Дождитесь запуска ONU, затем нажмите «Обновить». При смене режима порта может потребоваться перенастройка SFP-порта роутера.</p></div>';toast('Запрос перезагрузки принят.');}catch(e){toast(e.message,true);}finally{busy=false;}}
-nativeNavigation();ODILang.watch();$('#language').value=ODILang.get();$('#language').onchange=e=>ODILang.set(e.target.value);discoverNativeMenu();
+nativeNavigation();ODILang.watch();bindLanguageSwitch();discoverNativeMenu();
 window.addEventListener('hashchange',navigateChanged);window.addEventListener('beforeunload',e=>{if(dirty){e.preventDefault();e.returnValue='';}});$('#refresh').onclick=async()=>{if(busy)return;if(dirty&&!await confirmAction('Обновить данные?','Несохранённые изменения будут потеряны.'))return;dirty=false;load();};initUX();load();
 
 function syncRuntimeVersion(){

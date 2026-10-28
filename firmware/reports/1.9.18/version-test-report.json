@@ -1,0 +1,16 @@
+{
+  "result": "passed",
+  "version": "1.9.18",
+  "checks": [
+    "src/index.html",
+    "src/login-template.asp",
+    "preview.html",
+    "login-preview.html",
+    "asset URLs, diagnostic version and profile source",
+    "release-1.9.18-final-sfu: home/httpd/web/admin/login.asp",
+    "release-1.9.18-final-sfu: home/httpd/web/login.asp",
+    "release-1.9.18-final-sfu: home/httpd/web/panel/index.html",
+    "release-1.9.18-final-sfu: API and diagnostics",
+    "release-1.9.18-final-sfu: versioned native LAN assets"
+  ]
+}

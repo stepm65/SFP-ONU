@@ -12,9 +12,9 @@ const p=__dirname,version=fs.readFileSync(p+'/VERSION','utf8').trim();
   assert(d.querySelector('iframe').getAttribute('src').startsWith('/panel/odi-native-'),name);
  }
  w.history.replaceState(null,'','#native-language');vm.runInContext('render()',c);assert(!d.querySelector('iframe'));
- const choice=d.getElementById('panel-language');assert(choice);assert.deepEqual([...choice.options].map(o=>o.value),['ru','en']);
- choice.value='en';choice.dispatchEvent(new w.Event('change'));assert.equal(w.ODILang.get(),'en');assert.equal(d.getElementById('language').value,'en');assert.equal(w.localStorage.getItem('odi-panel-language'),'en');
- w.ODILang.set('ru');assert.equal(choice.value,'ru');assert.equal(d.getElementById('language').value,'ru');
+ const choice=d.querySelector('#main .language-switch');assert(choice);assert.deepEqual([...choice.querySelectorAll('[data-language]')].map(o=>o.dataset.language),['ru','en']);
+ choice.querySelector('[data-language=en]').click();assert.equal(w.ODILang.get(),'en');assert.equal(d.querySelector('#language [aria-pressed=true]').dataset.language,'en');assert.equal(w.localStorage.getItem('odi-panel-language'),'en');
+ w.ODILang.set('ru');assert.equal(choice.querySelector('[aria-pressed=true]').dataset.language,'ru');assert.equal(d.querySelector('#language [aria-pressed=true]').dataset.language,'ru');
  d.querySelector('meta[name="odi-panel-version"]').content='1.9.5';vm.runInContext('state.panel_version='+JSON.stringify(version)+';syncRuntimeVersion()',c);
  assert(d.querySelector('footer').textContent.startsWith('ODI Panel '+version));assert(d.querySelector('#version-mismatch a').getAttribute('href').includes('v='+version));
  d.querySelector('meta[name="odi-panel-version"]').content=version;vm.runInContext('syncRuntimeVersion()',c);assert(!d.getElementById('version-mismatch'));

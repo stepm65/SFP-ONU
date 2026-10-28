@@ -1,0 +1,218 @@
+{
+  "result": "passed",
+  "scope": "Chromium preview and local factory logout fixture; no physical device",
+  "checks": [
+    {
+      "lang": "ru",
+      "width": 390,
+      "tab": "overview"
+    },
+    {
+      "lang": "ru",
+      "width": 390,
+      "tab": "identity"
+    },
+    {
+      "lang": "ru",
+      "width": 390,
+      "tab": "profiles"
+    },
+    {
+      "lang": "ru",
+      "width": 390,
+      "tab": "native-backup"
+    },
+    {
+      "lang": "ru",
+      "width": 390,
+      "tab": "firmware"
+    },
+    {
+      "lang": "ru",
+      "width": 390,
+      "tab": "diagnostics"
+    },
+    {
+      "lang": "ru",
+      "width": 390,
+      "tab": "native-password"
+    },
+    {
+      "lang": "ru",
+      "width": 768,
+      "tab": "overview"
+    },
+    {
+      "lang": "ru",
+      "width": 768,
+      "tab": "identity"
+    },
+    {
+      "lang": "ru",
+      "width": 768,
+      "tab": "profiles"
+    },
+    {
+      "lang": "ru",
+      "width": 768,
+      "tab": "native-backup"
+    },
+    {
+      "lang": "ru",
+      "width": 768,
+      "tab": "firmware"
+    },
+    {
+      "lang": "ru",
+      "width": 768,
+      "tab": "diagnostics"
+    },
+    {
+      "lang": "ru",
+      "width": 768,
+      "tab": "native-password"
+    },
+    {
+      "lang": "ru",
+      "width": 1440,
+      "tab": "overview"
+    },
+    {
+      "lang": "ru",
+      "width": 1440,
+      "tab": "identity"
+    },
+    {
+      "lang": "ru",
+      "width": 1440,
+      "tab": "profiles"
+    },
+    {
+      "lang": "ru",
+      "width": 1440,
+      "tab": "native-backup"
+    },
+    {
+      "lang": "ru",
+      "width": 1440,
+      "tab": "firmware"
+    },
+    {
+      "lang": "ru",
+      "width": 1440,
+      "tab": "diagnostics"
+    },
+    {
+      "lang": "ru",
+      "width": 1440,
+      "tab": "native-password"
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "tab": "overview"
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "tab": "identity"
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "tab": "profiles"
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "tab": "native-backup"
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "tab": "firmware"
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "tab": "diagnostics"
+    },
+    {
+      "lang": "en",
+      "width": 390,
+      "tab": "native-password"
+    },
+    {
+      "lang": "en",
+      "width": 768,
+      "tab": "overview"
+    },
+    {
+      "lang": "en",
+      "width": 768,
+      "tab": "identity"
+    },
+    {
+      "lang": "en",
+      "width": 768,
+      "tab": "profiles"
+    },
+    {
+      "lang": "en",
+      "width": 768,
+      "tab": "native-backup"
+    },
+    {
+      "lang": "en",
+      "width": 768,
+      "tab": "firmware"
+    },
+    {
+      "lang": "en",
+      "width": 768,
+      "tab": "diagnostics"
+    },
+    {
+      "lang": "en",
+      "width": 768,
+      "tab": "native-password"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "tab": "overview"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "tab": "identity"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "tab": "profiles"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "tab": "native-backup"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "tab": "firmware"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "tab": "diagnostics"
+    },
+    {
+      "lang": "en",
+      "width": 1440,
+      "tab": "native-password"
+    }
+  ],
+  "logout": "POST, session verification and root sign-in navigation",
+  "scriptErrors": []
+}

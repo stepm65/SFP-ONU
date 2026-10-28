@@ -41,18 +41,18 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
   if(build){await evaluate('pauseLive();state={...demo,...state};render();');await settle();}
   for(const width of [390,1440]){
    await call('Emulation.setDeviceMetricsOverride',{width,height:1000,deviceScaleFactor:1,mobile:width===390});
-   for(const language of ['ru','en'])for(const rail of ['compact','diagnostic']){
-    await evaluate(`ODILang.set('${language}');setInterfaceLayout('${rail}');`);
-    for(const tab of ['overview','identity','vlan','link','mods','firmware','diagnostics','profiles','native-password']){
+   for(const language of ['ru','en'])for(const rail of ['diagnostic']){
+    await evaluate(`ODILang.set('${language}');`);
+    for(const tab of ['overview','identity','vlan','link','mods','firmware','diagnostics','profiles','native-backup','native-password']){
      await evaluate(`dirty=false;location.hash='#${tab}'`);await settle();
      const m=await evaluate('('+measure.toString()+')(document)');assert(!m.overflow,`${width} ${language} ${rail} ${tab} shell overflow`);assert.deepEqual(m.tiny,[],`${width} ${language} ${rail} ${tab} small text: ${JSON.stringify(m.tiny)}`);
      assert(await evaluate(`Array.from(document.querySelectorAll('.card-head h2')).every(e=>getComputedStyle(e).fontSize==='16px')`),tab+' card heading');
-     if(tab==='profiles'){
-      assert(await evaluate(`document.querySelector('.profile-native-backup').tagName==='SECTION'&&!document.querySelector('.profile-native-backup').closest('details')`));await frameReady();
+     if(tab==='native-backup'){
+      await frameReady();
       assert(await evaluate(`document.querySelector('.maintenance-frame').getBoundingClientRect().height>400`),'maintenance visible at first open');
       const native=await evaluate('('+measure.toString()+')(document.querySelector(".maintenance-frame").contentDocument)');assert.equal(native.font,m.font);assert.equal(native.family,m.family);assert.deepEqual(native.tiny,[]);assert(!native.overflow,'maintenance overflow');
       const sizes=await evaluate(`(()=>{const d=document.querySelector('.maintenance-frame').contentDocument;return [...d.querySelectorAll('button,input:not([type=hidden]):not([type=radio]),select')].filter(e=>e.getClientRects().length).map(e=>d.defaultView.getComputedStyle(e).fontSize)})()`);assert(sizes.every(s=>s==='14px'),JSON.stringify(sizes));
-      if(language==='ru'&&rail==='compact')await capture('profiles-'+width);
+      if(language==='ru'&&rail==='diagnostic')await capture('profiles-'+width);
      }
      checks.push({width,language,rail,tab});
     }
