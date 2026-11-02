@@ -11,13 +11,11 @@ case "$1" in start|boot|worker|stop) ;; *) exit 2;; esac
 if [ "$1" = boot ] && [ "$(debug_get DEBUG_BOOT)" != 1 ];then exit 0;fi
 mkdir -p "$DEBUGROOT" || exit 1
 if [ "$1" = stop ];then
+ rm -f "$DEBUGROOT/reboot-until"
  : >"$DEBUGROOT/stop"
  if grep -q '^state=stop_failed$' "$DEBUGROOT/status" 2>/dev/null;then
-  debug_cli set logfile 0 || exit 1
-  while IFS= read -r reader;do
-   case "$reader" in ''|*[!0-9]*) continue;; esac
-   if grep -q 'odi-debug-ring.awk' "/proc/$reader/cmdline" 2>/dev/null;then kill "$reader" 2>/dev/null;fi
-  done <"$DEBUGROOT/readers"
+  debug_cli set logfile 0 -1 "$DEBUGROOT/off" || exit 1
+  debug_stop_readers
   rm -f /tmp/omcilog /tmp/omcilog.par "$DEBUGROOT/ready" "$DEBUGROOT/boot-active"
   debug_status stopped;rm -r "$DEBUGROOT/running"
  fi
@@ -29,42 +27,39 @@ if [ "$1" != worker ];then
  # All removed files are fixed outputs inside this session directory.
  rm -f "$DEBUGROOT/stop" "$DEBUGROOT/status" "$DEBUGROOT/reader-error" "$DEBUGROOT/raw" "$DEBUGROOT/raw.1" "$DEBUGROOT/parsed" "$DEBUGROOT/parsed.1" "$DEBUGROOT/wire" "$DEBUGROOT/wire.1" "$DEBUGROOT/sent-new" "$DEBUGROOT/syslog-status" "$DEBUGROOT/ready" "$DEBUGROOT/failed" "$DEBUGROOT/credentials-wire"
  rm -f "$DEBUGROOT/previous-omcilog" "$DEBUGROOT/previous-omcilog.par" "$DEBUGROOT/native-before.txt" "$DEBUGROOT/credentials.txt"
+ rm -f "$DEBUGROOT/reboot-until" "$DEBUGROOT/registration" "$DEBUGROOT/registration.1" "$DEBUGROOT/reg-wire" "$DEBUGROOT/reg-wire.1"
  started=$(log_tick);seconds=$(debug_get DEBUG_SECONDS);remote=$(debug_get DEBUG_REMOTE);debug_status preparing
  mode=live;[ "$1" != boot ] || mode=boot
  /etc/scripts/odi-debug.sh worker "$mode" </dev/null >/dev/null 2>&1 &
- if [ "$mode" = live ];then
-  attempt=0
-  while [ "$attempt" -lt 5 ] && [ ! -d "$DEBUGROOT/running" ];do sleep 1;attempt=$((attempt+1));done
-  rm -r "$DEBUGROOT/starting"
-  [ -d "$DEBUGROOT/running" ] || exit 1
-  exit 0
- fi
  # A short bounded handshake reports preparation failures to CGI/startup.
  attempt=0
- while [ "$attempt" -lt 5 ];do
+ while [ "$attempt" -lt 10 ];do
   [ ! -f "$DEBUGROOT/ready" ] || { rm -r "$DEBUGROOT/starting";exit 0; }
   [ ! -f "$DEBUGROOT/failed" ] || { rm -r "$DEBUGROOT/starting";exit 1; }
   sleep 1;attempt=$((attempt+1))
  done
+ : >"$DEBUGROOT/stop"
  rm -r "$DEBUGROOT/starting";exit 1
 fi
 mkdir "$DEBUGROOT/running" 2>/dev/null || exit 75
-seconds=$(debug_get DEBUG_SECONDS);remote=$(debug_get DEBUG_REMOTE)
-if ! debug_valid DEBUG_SECONDS "$seconds" || ! debug_valid DEBUG_REMOTE "$remote";then
+seconds=$(debug_get DEBUG_SECONDS);remote=$(debug_get DEBUG_REMOTE);registration=$(debug_get DEBUG_REGISTRATION)
+if ! debug_valid DEBUG_SECONDS "$seconds" || ! debug_valid DEBUG_REMOTE "$remote" || ! debug_valid DEBUG_REGISTRATION "$registration";then
  debug_status invalid_config;: >"$DEBUGROOT/failed";rm -r "$DEBUGROOT/running";exit 2
 fi
 worker_mode=$2;finish_state=stopped
-started=$(log_tick);sent=0;cli_pid='';cli_timer='';net_pid='';net_timer='';raw_pid='';parsed_pid='';trace_on=0;owns_fifo=0
+started=$(log_tick);sent=0;reg_sent=0;reg_seq=0;reg_last=0;reg_mib=0;reg_o5=0;cli_pid='';cli_timer='';net_pid='';net_timer='';raw_pid='';parsed_pid='';trace_on=0;owns_fifo=0
 cleanup() {
+ rm -f "$DEBUGROOT/reboot-until"
  # Closing the native writers before removing FIFO readers avoids SIGPIPE.
- if [ "$trace_on" = 1 ];then debug_cli set logfile 0 || { debug_status stop_failed;return; };fi
+ if [ "$trace_on" = 1 ];then debug_cli set logfile 0 -1 "$DEBUGROOT/off" || { debug_status stop_failed;return; };fi
  # Allow complete final records to drain after fclose in the native daemon.
  if [ -n "$raw_pid$parsed_pid" ];then
-  (sleep 2;printf 'drain_timeout\n' >"$DEBUGROOT/reader-error";[ -z "$raw_pid" ] || kill "$raw_pid" 2>/dev/null;[ -z "$parsed_pid" ] || kill "$parsed_pid" 2>/dev/null) & drain_timer=$!
+  (sleep 2;printf 'drain_timeout\n' >"$DEBUGROOT/reader-error";debug_stop_readers) & drain_timer=$!
   [ -z "$raw_pid" ] || wait "$raw_pid" 2>/dev/null
   [ -z "$parsed_pid" ] || wait "$parsed_pid" 2>/dev/null
   kill "$drain_timer" 2>/dev/null;wait "$drain_timer" 2>/dev/null
  fi
+ debug_send || :
  [ -z "$net_pid" ] || kill "$net_pid" 2>/dev/null
  [ -z "$net_timer" ] || kill "$net_timer" 2>/dev/null
  if [ "$owns_fifo" = 1 ];then rm -f /tmp/omcilog /tmp/omcilog.par;fi
@@ -80,7 +75,7 @@ rm -f "$DEBUGROOT/failed" "$DEBUGROOT/ready"
 if [ "$worker_mode" != boot ];then
  debug_cli get logfile || :
  cp "$DEBUGROOT/cli-result" "$DEBUGROOT/native-before.txt"
- debug_cli set logfile 0 || { finish_state=disable_failed;: >"$DEBUGROOT/failed";exit 1; }
+ debug_cli set logfile 0 -1 "$DEBUGROOT/off" || { finish_state=disable_failed;: >"$DEBUGROOT/failed";exit 1; }
 fi
 # Default logging file names are fixed in libomci_mib.so (SFU 240408).
 for item in /tmp/omcilog /tmp/omcilog.par;do
@@ -96,19 +91,25 @@ mknod /tmp/omcilog p && mknod /tmp/omcilog.par p || { finish_state=fifo_setup_fa
 for part in raw raw.1 parsed parsed.1 wire wire.1 credentials-wire;do : >"$DEBUGROOT/$part";done
 awk -v output="$DEBUGROOT/raw" -v wire="$DEBUGROOT/wire" -v errorfile="$DEBUGROOT/reader-error" -f /etc/scripts/odi-debug-ring.awk </tmp/omcilog & raw_pid=$!
 awk -v output="$DEBUGROOT/parsed" -v errorfile="$DEBUGROOT/reader-error" -f /etc/scripts/odi-debug-ring.awk </tmp/omcilog.par & parsed_pid=$!
-printf '%s\n%s\n' "$raw_pid" "$parsed_pid" >"$DEBUGROOT/readers"
+printf '%s %s\n%s %s\n' "$raw_pid" "$(debug_pid_tick "$raw_pid")" "$parsed_pid" "$(debug_pid_tick "$parsed_pid")" >"$DEBUGROOT/readers"
 trace_on=1
 if [ "$worker_mode" != boot ];then
- debug_cli set logfile 3 ffffffff || { finish_state=native_trace_setup_failed;: >"$DEBUGROOT/failed";exit 1; }
+ debug_cli set logfile 3 -1 /tmp/omcilog && debug_trace_ready || { finish_state=native_trace_setup_failed;: >"$DEBUGROOT/failed";exit 1; }
 fi
-debug_status capturing
 if [ "$worker_mode" = boot ];then printf 1 >"$DEBUGROOT/boot-active";fi
 : >"$DEBUGROOT/ready"
 if [ "$worker_mode" = boot ];then
  # Native startup will open the FIFO writers after this handshake.
- printf 'DEBUG_SECONDS=%s\nDEBUG_REMOTE=%s\nDEBUG_BOOT=0\n' "$seconds" "$remote" >"$DEBUGROOT/boot-consumed"
+ printf 'DEBUG_SECONDS=%s\nDEBUG_REMOTE=%s\nDEBUG_BOOT=0\nDEBUG_REGISTRATION=%s\n' "$seconds" "$remote" "$registration" >"$DEBUGROOT/boot-consumed"
  cp "$DEBUGROOT/boot-consumed" "$DEBUGCONF"
+ # ready releases runomci.sh; only then can its native daemon answer CLI.
+ attempt=0
+ while ! debug_trace_ready;do
+  attempt=$((attempt+1));[ "$attempt" -lt 10 ] && [ ! -f "$DEBUGROOT/stop" ] || { finish_state=native_trace_setup_failed;: >"$DEBUGROOT/failed";exit 1; }
+  sleep 1
+ done
 fi
+debug_status capturing
 {
  printf 'PRIVATE FULL DEBUG - unredacted values\nuptime=%s\n' "$(log_tick)"
  IFS= read -r capture_boot </proc/sys/kernel/random/boot_id;printf 'kernel_boot_id=%s\n' "$capture_boot"
@@ -119,6 +120,7 @@ if [ "$remote" = 1 ];then awk '{print (NR-1000) "|CREDENTIAL " $0}' "$DEBUGROOT/
 while :;do
  [ ! -f "$DEBUGROOT/stop" ] || break
  [ $(($(log_tick)-started)) -lt "$seconds" ] || break
+ [ "$registration" != 1 ] || debug_registration
  debug_send || :
  debug_status capturing
  sleep 1

@@ -1,0 +1,46 @@
+{
+  "result": "passed",
+  "scope": "original MIPS library emulation, libc file operations stubbed; no device",
+  "binary_sha256": "150377a291ca622f0b3d09f0ef2ed0369240a974a5d19fc765e0686fd6024c19",
+  "without_filename": [],
+  "with_filename": [
+    [
+      "close",
+      4369
+    ],
+    [
+      "close",
+      8738
+    ],
+    [
+      "open",
+      "/tmp/omcilog",
+      "w+"
+    ],
+    [
+      "open",
+      "/tmp/omcilog.par",
+      "w+"
+    ]
+  ],
+  "stop_to_regular_files": [
+    [
+      "close",
+      4369
+    ],
+    [
+      "close",
+      8738
+    ],
+    [
+      "open",
+      "/tmp/odi-debug/off",
+      "w+"
+    ],
+    [
+      "open",
+      "/tmp/odi-debug/off.par",
+      "w+"
+    ]
+  ]
+}

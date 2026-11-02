@@ -1,0 +1,9 @@
+{
+  "result": "passed",
+  "scope": "actual host shell, real FIFOs and persistent native-writer fixture; not physical ONU",
+  "checks": [
+    "live capture closes old descriptors, reopens both FIFOs explicitly, records RAW/parsed/registration, drains and removes FIFO on stop",
+    "boot FIFO-ready handshake precedes native startup; capturing requires readback; boot arm is consumed once",
+    "wrong native action-mask readback refuses capturing and safely closes writers"
+  ]
+}

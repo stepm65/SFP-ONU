@@ -31,6 +31,10 @@ const server=http.createServer((req,res)=>{
      if(tab==='native-backup')assert(await evaluate("!!document.querySelector('#main .maintenance-frame')"));
      if(width===1440||width===390&&tab==='overview'){
       const shot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:true});fs.writeFileSync(path.join(shots,lang,(width===390?'mobile':tab)+'.png'),Buffer.from(shot.data,'base64'));
+      if(width===1440&&tab==='diagnostics'){
+       await evaluate("document.querySelector('[data-guard-action=start]').closest('section').scrollIntoView({block:'start'})");
+       const probeShot=await call('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(shots,lang,'reboot-probe.png'),Buffer.from(probeShot.data,'base64'));
+      }
      }
      checks.push({lang,width,tab});
     }

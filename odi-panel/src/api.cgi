@@ -5,7 +5,7 @@ export PATH
 LC_ALL=C
 export LC_ALL
 umask 077
-PANEL_VERSION=1.9.18
+PANEL_VERSION=1.9.19
 STATE=/tmp/odi-panel
 FLASH=/etc/scripts/flash
 NV=/bin/nv
@@ -64,6 +64,9 @@ if [ "$REQUEST_METHOD" = GET ]; then
    emit "debug_$kind""_bytes" "$total"
   done
   emit debug_syslog_status "$(cat "$DEBUGROOT/syslog-status" 2>/dev/null)"
+  emit debug_guard_remaining "$(debug_guard_remaining)"
+  emit debug_reboot_events "$(cat "$DEBUGROOT/reboot-events.1" "$DEBUGROOT/reboot-events" 2>/dev/null)"
+  emit debug_registration "$(cat "$DEBUGROOT/registration" 2>/dev/null)"
   emit ok 1;exit 0;;
  logs)
   headers
@@ -126,7 +129,7 @@ case "$CONTENT_LENGTH" in ''|*[!0-9]*) fail '400 Bad Request' 'Invalid request l
 [ "${#CONTENT_LENGTH}" -le 4 ] && [ "$CONTENT_LENGTH" -le 4096 ] || fail '413 Payload Too Large' 'Request exceeds 4096 bytes'
 case "$CONTENT_TYPE" in 'text/plain'|'text/plain;charset=UTF-8'|'text/plain; charset=UTF-8') ;; *) fail '415 Unsupported Media Type' 'text/plain required';; esac
 IFS= read -r action
-case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check|action=logging|action=log_test|action=log_clear|action=debug_config|action=debug_start|action=debug_stop|action=debug_export) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
+case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check|action=logging|action=log_test|action=log_clear|action=debug_config|action=debug_start|action=debug_stop|action=debug_export|action=debug_guard_start|action=debug_guard_stop) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
 IFS= read -r supplied
 [ "$supplied" = "csrf=$token" ] || fail '403 Forbidden' 'Invalid CSRF token. Reload the page.'
 mkdir "$STATE/write.lock" 2>/dev/null || fail '409 Conflict' 'Another operation is running'
@@ -171,13 +174,28 @@ if [ "$action" = debug_config ];then
  cp "$WORK/debug.conf" "$DEBUGCONF" && cmp "$WORK/debug.conf" "$DEBUGCONF" >/dev/null || fail '500 Internal Server Error' 'Debug configuration read-back failed'
  headers;for key in $DEBUGKEYS;do emit "$key" "$(debug_get "$key")";done;emit ok 1;exit 0
 fi
-case "$action" in debug_start|debug_stop|debug_export)
+case "$action" in debug_start|debug_stop|debug_export|debug_guard_start|debug_guard_stop)
  while IFS= read -r extra;do [ -z "$extra" ] || fail '400 Bad Request' 'Debug action accepts no parameters';done
+ if [ "$action" = debug_guard_start ];then
+  grep -q '^state=capturing$' "$DEBUGROOT/status" && [ -d "$DEBUGROOT/running" ] && [ ! -f "$DEBUGROOT/stop" ] || fail '409 Conflict' 'Start full capture before arming the reboot probe'
+  guard_started=$(sed -n 's/^started_uptime=//p' "$DEBUGROOT/status")
+  guard_seconds=$(sed -n 's/^seconds=//p' "$DEBUGROOT/status")
+  case "$guard_started" in ''|*[!0-9]*) fail '409 Conflict' 'Invalid capture clock';; esac
+  [ "${#guard_started}" -le 9 ] && debug_valid DEBUG_SECONDS "$guard_seconds" || fail '409 Conflict' 'Invalid capture duration'
+  guard_now=$(log_tick);guard_until=$((guard_now+300));guard_end=$((guard_started+guard_seconds))
+  [ "$guard_until" -le "$guard_end" ] || guard_until=$guard_end
+  [ "$guard_until" -gt "$guard_now" ] || fail '409 Conflict' 'Capture expired'
+  printf '%s\n' "$guard_until" >"$DEBUGROOT/reboot-until"
+  headers;emit debug_guard_remaining "$(debug_guard_remaining)";emit ok 1;exit 0
+ fi
+ if [ "$action" = debug_guard_stop ];then
+  rm -f "$DEBUGROOT/reboot-until";headers;emit debug_guard_remaining 0;emit ok 1;exit 0
+ fi
  if [ "$action" = debug_export ];then
   [ ! -d "$DEBUGROOT/running" ] && [ ! -d "$DEBUGROOT/starting" ] || fail '409 Conflict' 'Stop full debug before downloading'
   [ -f "$DEBUGROOT/credentials.txt" ] || fail '409 Conflict' 'No private capture is available'
   set -- status credentials.txt
-  for part in raw raw.1 parsed parsed.1 native-before.txt previous-omcilog previous-omcilog.par reader-error syslog-status;do [ ! -f "$DEBUGROOT/$part" ] || set -- "$@" "$part";done
+  for part in raw raw.1 parsed parsed.1 registration registration.1 reboot-events reboot-events.1 native-before.txt previous-omcilog previous-omcilog.par reader-error syslog-status;do [ ! -f "$DEBUGROOT/$part" ] || set -- "$@" "$part";done
   printf 'Content-Type: application/x-tar\r\nContent-Disposition: attachment; filename="ODI-full-debug-PRIVATE.tar"\r\nCache-Control: no-store\r\nX-Content-Type-Options: nosniff\r\n\r\n'
   tar -cf - -C "$DEBUGROOT" "$@";exit $?
  fi

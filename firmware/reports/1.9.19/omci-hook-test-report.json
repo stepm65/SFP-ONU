@@ -1,0 +1,29 @@
+{
+  "original_sha256": "49be07183fcf11dbc2fea82ee914da5dcaead8e3049a8e770febf5c528617484",
+  "patched_sha256": "55078c02e3188afcec1a77c211172def4fbdd6844f4d787594e170bf5e6d0dae",
+  "ranges": [
+    {
+      "offset": "0x10c08",
+      "bytes": 4
+    },
+    {
+      "offset": "0x10c40",
+      "bytes": 4
+    },
+    {
+      "offset": "0x1e894",
+      "bytes": 39
+    }
+  ],
+  "scope": "native normal/custom handler executed under MIPS emulation; no physical ONU",
+  "boot_mask_parser": "strtoul base 10 at VA 0x4063b4; -1 sets UINT32_MAX; ffffffff would parse as zero",
+  "result": "passed",
+  "checks": [
+    "successful response and task delay preserved",
+    "only normal reboot calls guarded script",
+    "custom feature 42/43 untouched",
+    "only three declared ranges changed",
+    "shared software-activation reboot command unchanged",
+    "unknown binary rejected"
+  ]
+}

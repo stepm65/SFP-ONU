@@ -1,0 +1,42 @@
+{
+  "version": "1.9.19",
+  "firmware_sha256": "e3aaebc04521b8f48d177845aa0ff2af4d164138b1734090cc1af8cec6b9475e",
+  "physical_onu_test_this_version": false,
+  "checks": [
+    "exact native MIPS ONU-G Reboot handler emulation: response/delay/default hook/custom feature branch",
+    "original native logging setter emulation: both file descriptors closed/reopened only with explicit path",
+    "restricted shell and real CGI: opt-in probe, deadline, malformed/expired state, CSRF and original reboot fixture",
+    "real FIFOs with persistent native-writer fixture: live/boot startup, readback failure and drained shutdown",
+    "private ring buffers, resumed registration sequence, archive export and two RFC 6587 TCP streams",
+    "native PON state string fixtures; ordinary logging and local TCP receiver",
+    "42 Chromium language/responsive checks and factory logout fixture; refreshed RU/EN screenshots",
+    "76 Chromium checks against pages extracted from final built firmware",
+    "firmware upload/status UI regressions and actual CGI log-tail bound",
+    "TAR MD5, kernel CRC32, partition bounds, full SquashFS comparison and source/built byte equality"
+  ],
+  "changed_non_web_files": [
+    "bin/omci_app",
+    "etc/runomci.sh",
+    "etc/scripts/odi-debug-lib.sh",
+    "etc/scripts/odi-debug-ring.awk",
+    "etc/scripts/odi-debug.sh",
+    "etc/scripts/odi-log-lib.sh",
+    "etc/scripts/odi-log-run.sh",
+    "etc/scripts/odi-omci-reboot.sh"
+  ],
+  "preserved": [
+    "kernel",
+    "drivers",
+    "OMCI libraries",
+    "Boa patch",
+    "firmware bank writer and upload protocol",
+    "subscriber settings"
+  ],
+  "limits": [
+    "no physical ONU test of this firmware, its boot capture, or reboot probe",
+    "Eltex test export confirms a received Reboot; it does not establish why the OLT sends it",
+    "ONU-G interception acknowledges without restarting only for the opted-in bounded diagnostic interval; it is not an OLT compatibility fix",
+    "hardware counter reads may clear counts; samples and MIB snapshots are not atomic",
+    "RAM history is volatile; syslog delivery and uninterrupted capture are not guaranteed"
+  ]
+}

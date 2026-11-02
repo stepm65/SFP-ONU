@@ -29,7 +29,7 @@ fi
 IFS= read -r boot_id </proc/sys/kernel/random/boot_id
 case "$boot_id" in ''|*[!a-f0-9-]*) boot_id=unknown;; esac
 log_event "event=LOGGER_START boot=$boot_id" || :
-last_stage='';last_mode='';last_mods='';last_config='';heartbeat=0
+last_stage='';last_mode='';last_mods='';last_config='';last_reboot='';heartbeat=0
 while :; do
  config="$(log_get LOG_LOCAL):$(log_get LOG_REMOTE):$(log_get LOG_HOST):$(log_get LOG_PORT):$(log_get LOG_TAG)"
  if [ "$config" != "$last_config" ]; then log_event 'event=LOG_CONFIG_CHANGED' || :;last_config=$config; fi
@@ -42,7 +42,7 @@ while :; do
    kill "$read_timer" 2>/dev/null;wait "$read_timer" 2>/dev/null;read_pid='';read_timer=''
    stage=read_error
    if [ "$read_rc" = 0 ]; then
-    stage=$(sed -n 's/.*ONU *State *: *O\{0,1\}\([1-7]\).*/O\1/p' "$LOGSTATE/logger.lock/pon")
+    stage=$(log_pon_state "$LOGSTATE/logger.lock/pon")
     case "$stage" in O1|O2|O3|O4|O5|O6|O7) ;; *) stage=unknown;; esac
    fi
    mode=$(sed -n 's/.*lan_sds_mode *= *\([0-7]\).*/\1/p' /proc/lan_sds/lan_sds_cfg 2>/dev/null)
@@ -53,6 +53,10 @@ while :; do
   if [ -n "$mode" ] && [ "$mode" != "$last_mode" ]; then log_event "event=SFP_MODE mode=$mode" || :;last_mode=$mode; fi
  fi
  mods=$(sed -n 's/^speed=//p' "$LOGSTATE/mods-status" 2>/dev/null)
+ reboot_event=$(awk 'END{print}' /tmp/odi-debug/reboot-events 2>/dev/null)
+ if [ -n "$reboot_event" ] && [ "$reboot_event" != "$last_reboot" ];then
+  log_event "${reboot_event#* } request_${reboot_event%% *}" || :;last_reboot=$reboot_event
+ fi
  case "$mods" in off|0|1|2|3|75) ;; *) mods=unknown;; esac
  if [ "$mods" != "$last_mods" ]; then log_event "event=MOD_RESULT speed=$mods" || :;last_mods=$mods; fi
  now=$(log_tick)

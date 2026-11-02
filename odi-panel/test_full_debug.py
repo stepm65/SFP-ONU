@@ -58,23 +58,39 @@ esac
  server=socket.socket();server.bind(('127.0.0.1',0));server.listen();port=server.getsockname()[1];received=[]
  def receiver():
   server.settimeout(30)
-  with server.accept()[0] as conn:
-   chunks=[]
-   while part:=conn.recv(4096):chunks.append(part)
-   received.append(b''.join(chunks))
+  for _ in range(2):
+   with server.accept()[0] as conn:
+    chunks=[]
+    while part:=conn.recv(4096):chunks.append(part)
+    received.append(b''.join(chunks))
  thread=threading.Thread(target=receiver,daemon=True);thread.start()
  (r/'nc').write_text('#!/usr/bin/python3\nimport sys,socket\nwith socket.create_connection((sys.argv[1],int(sys.argv[2])),timeout=2) as s:s.sendall(sys.stdin.buffer.read())\n');(r/'nc').chmod(0o755)
  dl=r/'debuglib.sh';dl.write_text(dl.read_text().replace('/bin/nc',str(r/'nc')).replace('sleep 2;','sleep 12;' if devpath.HOST_TIMEOUT_SCALE>1 else 'sleep 2;'))
  (r/'logging.conf').write_text(f'LOG_HOST=127.0.0.1\nLOG_PORT={port}\nLOG_TAG=debug-test\nLOG_REMOTE=0\n')
  (debug/'credentials-wire').write_text('-999|CREDENTIAL PLOAM=FAKE-PLOAM\n')
  (debug/'wire.1').unlink();(debug/'wire').write_text('1|'+frames[0]+'\n')
+ (debug/'reg-wire').write_text('1|uptime=20 Total RX OMCI: 2\n')
  source='PATH='+path+';export PATH;. '+shlex.quote(lib)+';remote=1;sent=-1001;debug_send'
  proc=subprocess.run(['/bin/sh','-c',source],capture_output=True,text=True,timeout=45*devpath.HOST_TIMEOUT_SCALE);assert proc.returncode==0,proc.stderr
  thread.join(30);server.close();assert received
- data=received[0];messages=[]
+ assert len(received)==2
+ data=b''.join(received);messages=[]
  while data:
   count,rest=data.split(b' ',1);count=int(count);messages.append(rest[:count]);data=rest[count:]
- assert len(messages)==2 and b'FAKE-PLOAM' in messages[0] and frames[0].encode() in messages[1]
+ assert len(messages)==3 and b'FAKE-PLOAM' in messages[0] and frames[0].encode() in messages[1]
+ assert b'REGISTRATION - seq=1 uptime=20 Total RX OMCI: 2' in messages[2]
  checks.append('explicit full syslog includes unredacted credentials and complete RAW frames with RFC 6587 framing')
+ checks.append('registration counters use their own framed syslog stream and sequence cursor')
+ # Repeated registration appends resume sequence and rotation accounting.
+ for first,last in [(0,250),(250,375)]:
+  args=['/usr/bin/awk','-v','output='+str(debug/'reg'),'-v','wire='+str(debug/'reg-ring'),'-v','errorfile='+str(debug/'reg-error'),'-v','limit=32768','-v','initial_seq='+str(first),'-v','seqfile='+str(debug/'reg-seq')]
+  for key,name in [('initial_bytes','reg'),('initial_wirebytes','reg-ring')]:args+=['-v',key+'='+str((debug/name).stat().st_size if (debug/name).exists() else 0)]
+  args+=['-f',str(P/'src/odi-debug-ring.awk')]
+  subprocess.run(args,input='\n'.join(frames[first:last])+'\n',text=True,check=True)
+ assert (debug/'reg-seq').read_text().strip()=='375'
+ ids=[int(line.split('|')[0]) for name in ['reg-ring.1','reg-ring'] for line in (debug/name).read_text().splitlines()]
+ assert ids==list(range(ids[0],376))
+ assert all((debug/n).stat().st_size<=32768 for n in ['reg','reg.1','reg-ring','reg-ring.1'])
+ checks.append('registration ring resumes monotonic sequence across appends and caps each file at 32 KiB')
 report={'result':'passed','scope':'host shell/CGI, streaming ring, PRIVATE TAR and loopback TCP; native ONU FIFO/OMCI writer and boot activation require physical testing','checks':checks}
 (P/'full-debug-test-report.json').write_text(json.dumps(report,indent=2)+'\n');print(json.dumps(report,indent=2))

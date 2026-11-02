@@ -22,6 +22,13 @@ log_valid() {
  return 1
 }
 log_tick() { IFS=' ' read -r lt rest </proc/uptime; printf '%s' "${lt%%.*}"; }
+log_pon_state() {
+ # Native SDK: "ONU state: Operation State(O5)"; older builds: "ONU State: 5".
+ awk '{s=tolower($0);if(s !~ /onu[ \t]+state[ \t]*:/)next;
+  sub(/^.*onu[ \t]+state[ \t]*:[ \t]*/,"",s);
+  if(s ~ /^o?[1-7][ \t]*$/){gsub(/[o \t]/,"",s);print "O" s;exit}
+  if(match(s,/\(o[1-7]\)/)){print toupper(substr(s,RSTART+1,2));exit}}' "$1"
+}
 log_local() {
  [ "$(log_get LOG_LOCAL)" = 1 ] || return 0
  mkdir -p "$LOGSTATE" || return 1

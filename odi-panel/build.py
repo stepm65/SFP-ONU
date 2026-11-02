@@ -53,12 +53,15 @@ def read_pseudo(path):
  return entries,blob
 before,blob=read_pseudo(out/'original.pseudo')
 from hotfix.patch_boa import patch as patch_boa
+from hotfix.patch_omci import patch as patch_omci
 boa_binary,boa_patch_report=patch_boa(before['bin/boa']['data'])
-mods={'bin/boa':boa_binary}
+omci_binary,omci_patch_report=patch_omci(before['bin/omci_app']['data'])
+mods={'bin/boa':boa_binary,'bin/omci_app':omci_binary}
 (out/'boa-patch-report.json').write_text(json.dumps(boa_patch_report,indent=2)+'\n')
+(out/'omci-patch-report.json').write_text(json.dumps(omci_patch_report,indent=2)+'\n')
 for n in ['index.html','ui.css','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','uplink.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js']:
  mods['home/httpd/web/panel/'+n]=(PROJECT/'src'/n).read_bytes()
-for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh','odi-log-lib.sh','odi-log-run.sh','odi-debug-lib.sh','odi-debug.sh','odi-debug-ring.awk','odi-fw-lib.sh','odi-fw-stream.sh','odi-fw-compare.sh','odi-firmware-worker.sh']:
+for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh','odi-log-lib.sh','odi-log-run.sh','odi-debug-lib.sh','odi-debug.sh','odi-debug-ring.awk','odi-omci-reboot.sh','odi-fw-lib.sh','odi-fw-stream.sh','odi-fw-compare.sh','odi-firmware-worker.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src'/n).read_bytes()
 for n in ['fix_speed.sh','fix_sw_ver.sh','fix_vlan_tag.sh','fix_vlan_fwdop.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src/anime'/n).read_bytes()
@@ -73,7 +76,7 @@ mods['etc/init.d/rc3']=rc.replace('/etc/insdrv.sh','/etc/insdrv.sh\n/etc/scripts
 # Full debug can arm native RAW+parsed capture before initial OMCI exchange.
 omci_start=before['etc/runomci.sh']['data'].decode()
 assert omci_start.count('omci_app -s ')==1 and omci_start.count('get_omci_log_format ()\n{')==1
-omci_start=omci_start.replace('get_omci_log_format ()\n{','get_omci_log_format ()\n{\n if [ -f /tmp/odi-debug/boot-active ] && [ -f /tmp/odi-debug/ready ]; then echo "both ffffffff"; return; fi')
+omci_start=omci_start.replace('get_omci_log_format ()\n{','get_omci_log_format ()\n{\n if [ -f /tmp/odi-debug/boot-active ] && [ -f /tmp/odi-debug/ready ]; then echo "both -1"; return; fi')
 omci_start=omci_start.replace('omci_app -s ','/etc/scripts/odi-debug.sh boot\nomci_app -s ')
 mods['etc/runomci.sh']=omci_start.encode()
 # Theme and translate original ASP pages while retaining every form and ASP handler.

@@ -1,6 +1,6 @@
 {
   "result": "passed",
-  "version": "1.9.18",
+  "version": "1.9.19",
   "scope": "Chromium on extracted firmware web assets; synthetic ASP values, factory inline initializers disabled, no form submissions or physical ONU",
   "checks": [
     {
