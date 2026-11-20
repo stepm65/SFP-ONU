@@ -1,0 +1,101 @@
+# Publishes a GitHub release for a version tag (v1.9.20, ...).
+# The firmware TAR is the one committed in firmware/ and listed in firmware/SHA256SUMS;
+# the job rebuilds it from source as a cross-check and packages the source ZIP.
+# Re-running for an existing tag updates its title, notes and files.
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to publish, e.g. v1.9.20'
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.event.inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    env:
+      TAG: ${{ github.event.inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ github.event.inputs.tag || github.ref_name }}
+
+      - name: Check tag, version and committed firmware
+        id: meta
+        run: |
+          set -eu
+          version=$(cat odi-panel/VERSION)
+          [ "$TAG" = "v$version" ] || { echo "::error::Tag $TAG does not match odi-panel/VERSION ($version)"; exit 1; }
+          tar_name="ODI-Panel-$version-RU-EN-SFU-240408.tar"
+          [ -f "firmware/$tar_name" ] || { echo "::error::firmware/$tar_name is missing"; exit 1; }
+          [ -f "firmware/RELEASE-v$version.md" ] || { echo "::error::firmware/RELEASE-v$version.md is missing"; exit 1; }
+          [ -f "firmware/reports/$version/build-report.json" ] || { echo "::error::firmware/reports/$version/build-report.json is missing"; exit 1; }
+          (cd firmware && sha256sum -c SHA256SUMS)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tar=$tar_name" >> "$GITHUB_OUTPUT"
+
+      - name: Install build tools
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q squashfs-tools
+          python3 -m pip install --quiet beautifulsoup4
+          (cd tools/dom && npm ci --no-audit --no-fund)
+
+      - name: Rebuild from source and compare
+        run: |
+          set -eu
+          version=${{ steps.meta.outputs.version }}
+          epoch=$(python3 -c "import json,sys;d=json.load(open('firmware/reports/$version/validation-scope.json'));print(d.get('reproducible_build',{}).get('SOURCE_DATE_EPOCH',''))" 2>/dev/null || true)
+          if [ -n "$epoch" ]; then export SOURCE_DATE_EPOCH="$epoch"; fi
+          python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin rebuild >/dev/null
+          committed=$(sha256sum "firmware/${{ steps.meta.outputs.tar }}" | cut -d' ' -f1)
+          rebuilt=$(sha256sum "rebuild/${{ steps.meta.outputs.tar }}" | cut -d' ' -f1)
+          {
+            echo "### $TAG"
+            echo "| | SHA256 |"
+            echo "|---|---|"
+            echo "| committed TAR | \`$committed\` |"
+            echo "| rebuilt in CI | \`$rebuilt\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$committed" = "$rebuilt" ]; then
+            echo "Rebuilt TAR is byte-identical to the committed one." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::Rebuilt TAR differs from the committed one (tool versions or timestamps). The committed TAR is published."
+          fi
+
+      - name: Package source ZIP
+        run: |
+          set -eu
+          version=${{ steps.meta.outputs.version }}
+          mkdir -p base "release-$version-sfu"
+          cp rebuild/original.pseudo base/
+          python3 odi-panel/inspect_base.py
+          cp "firmware/reports/$version/build-report.json" "release-$version-sfu/"
+          cp "firmware/${{ steps.meta.outputs.tar }}" "release-$version-sfu/"
+          python3 odi-panel/package.py "release-$version-sfu"
+          ls -l "ODI-Panel-$version-RU-EN-SFU-240408.zip"
+
+      - name: Create or update the release
+        run: |
+          set -eu
+          version=${{ steps.meta.outputs.version }}
+          files="firmware/${{ steps.meta.outputs.tar }} ODI-Panel-$version-RU-EN-SFU-240408.zip firmware/SHA256SUMS"
+          notes="firmware/RELEASE-v$version.md"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release edit "$TAG" --title "ODI Panel $version" --notes-file "$notes" --draft=false
+            gh release upload "$TAG" $files --clobber
+          else
+            gh release create "$TAG" $files --title "ODI Panel $version" --notes-file "$notes" --verify-tag
+          fi
+          gh release view "$TAG" --json url,assets --jq '.url, (.assets[] | "\(.name) \(.size)")' >> "$GITHUB_STEP_SUMMARY"
