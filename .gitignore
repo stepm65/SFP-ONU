@@ -20,3 +20,4 @@ Huawei-working-reference-RU.md
 /odi-panel/base
 __pycache__/
 *.pyc
+/rebuild/
