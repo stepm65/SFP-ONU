@@ -3,3 +3,4 @@
 *.tar binary
 *.gz binary
 *.zip binary
+*.woff2 binary

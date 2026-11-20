@@ -17,7 +17,10 @@ BASES={
 base_sha=sha(base.read_bytes());assert base_sha in BASES,'Unexpected base: only the reviewed ODI SFU 240408 TAR is supported'
 profile=BASES[base_sha]
 def run(*args):
- p=subprocess.run(list(map(str,args)),capture_output=True)
+ # mksquashfs refuses SOURCE_DATE_EPOCH together with explicit -mkfs-time/-root-time;
+ # the variable is only used here for web file timestamps.
+ env={k:v for k,v in os.environ.items() if k!='SOURCE_DATE_EPOCH'}
+ p=subprocess.run(list(map(str,args)),capture_output=True,env=env)
  if p.returncode:raise RuntimeError(p.stderr.decode(errors='replace'))
  return p.stdout
 names=['fwu.sh','rootfs','uImage','fwu_ver','hw_ver','md5.txt']
@@ -65,11 +68,15 @@ for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.s
  mods['etc/scripts/'+n]=(PROJECT/'src'/n).read_bytes()
 for n in ['fix_speed.sh','fix_sw_ver.sh','fix_vlan_tag.sh','fix_vlan_fwdop.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src/anime'/n).read_bytes()
+# Self-hosted fonts (SIL OFL 1.1): the panel and login make no external requests.
+FONTS=['exo-2-latin.woff2','exo-2-cyrillic.woff2','jura-latin.woff2','jura-cyrillic.woff2','jetbrains-mono-latin.woff2','jetbrains-mono-cyrillic.woff2','OFL.txt']
+for n in FONTS:
+ mods['home/httpd/web/panel/fonts/'+n]=(PROJECT/'src/fonts'/n).read_bytes()
 mods['etc/scripts/odi-panel-boot.sh']=(PROJECT/'src/odi-panel-boot.sh').read_bytes()
 mods['home/httpd/web/legacy.html']=before['home/httpd/web/index.html']['data']
 conf=before['home/httpd/boa.conf']['data'].decode()
 assert 'Auth / /var/boaSuper.passwd' in conf
-conf+='\n# ODI Panel: CGI inherits administrator authentication; no new listener.\nAddType application/x-httpd-cgi cgi\nAddType text/css css\nAuth /panel /var/boaSuper.passwd\n'
+conf+='\n# ODI Panel: CGI inherits administrator authentication; no new listener.\nAddType application/x-httpd-cgi cgi\nAddType text/css css\nAddType font/woff2 woff2\nAuth /panel /var/boaSuper.passwd\n'
 mods['home/httpd/boa.conf']=conf.encode()
 rc=before['etc/init.d/rc3']['data'].decode();assert rc.count('/etc/insdrv.sh')==1
 mods['etc/init.d/rc3']=rc.replace('/etc/insdrv.sh','/etc/insdrv.sh\n/etc/scripts/odi-panel-boot.sh').replace('/etc/runlansds.sh','/etc/runlansds.sh\n/etc/scripts/odi-mods-run.sh >/dev/null 2>&1 &\n/etc/scripts/odi-log-run.sh >/dev/null 2>&1 &').encode()
@@ -123,7 +130,7 @@ header='\n'.join(item['line'] for name,item in before.items() if name not in mod
 (out/'patched.pseudo').write_bytes(header.encode()+MARK+blob)
 (out/'empty').mkdir();(out/'overlay').mkdir()
 root=before['/']['fields']
-args=[tools/'mksquashfs',out/'empty',out/'rootfs','-comp','lzma','-b',str(block),'-always-use-fragments','-no-xattrs','-noappend','-no-sparse','-nopad','-processors','1','-mkfs-time',str(epoch),'-root-time',root[1],'-root-mode',root[2],'-root-uid',root[3],'-root-gid',root[4],'-pf',out/'patched.pseudo','-p',f'home/httpd/web/panel D {epoch} 755 0 0']
+args=[tools/'mksquashfs',out/'empty',out/'rootfs','-comp','lzma','-b',str(block),'-always-use-fragments','-no-xattrs','-noappend','-no-sparse','-nopad','-processors','1','-mkfs-time',str(epoch),'-root-time',root[1],'-root-mode',root[2],'-root-uid',root[3],'-root-gid',root[4],'-pf',out/'patched.pseudo','-p',f'home/httpd/web/panel D {epoch} 755 0 0','-p',f'home/httpd/web/panel/fonts D {epoch} 755 0 0']
 web_epoch=int(os.environ.get('SOURCE_DATE_EPOCH',str(int(time.time()))))
 for i,(name,content) in enumerate(mods.items()):
  p=out/'overlay'/str(i);p.write_bytes(content)
@@ -136,7 +143,7 @@ for i,(name,content) in enumerate(mods.items()):
 run(*args)
 run(tools/'unsquashfs','-no-progress','-pf',out/'verified.pseudo',out/'rootfs')
 after,_=read_pseudo(out/'verified.pseudo')
-assert set(after)==set(before)|set(mods)|{'home/httpd/web/panel'}
+assert set(after)==set(before)|set(mods)|{'home/httpd/web/panel','home/httpd/web/panel/fonts'}
 for name,item in before.items():
  if name not in mods:assert after[name]['compare']==item['compare'],name
 for name,content in mods.items():
@@ -147,6 +154,7 @@ for name,content in mods.items():
   assert after[name]['fields'][:5]==expected_meta,name
  else:assert after[name]['fields'][3:5]==['0','0'],name
 assert after['home/httpd/web/panel']['fields']==['D',str(epoch),'755','0','0']
+assert after['home/httpd/web/panel/fonts']['fields']==['D',str(epoch),'755','0','0']
 data['rootfs']=(out/'rootfs').read_bytes()
 assert len(kernel)<=0x14c000 and len(data['rootfs'])<=0x274000
 assert struct.unpack_from('<H',data['rootfs'],20)[0]==2 and struct.unpack_from('<I',data['rootfs'],12)[0]==block
