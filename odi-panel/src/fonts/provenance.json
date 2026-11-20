@@ -1,0 +1,29 @@
+{
+  "note": "Variable woff2 subsets (latin, cyrillic) taken unmodified from Fontsource npm packages. All fonts: SIL Open Font License 1.1.",
+  "fonts": {
+    "Exo 2": {
+      "package": "@fontsource-variable/exo-2",
+      "version": "5.1.1",
+      "files": {
+        "exo-2-latin.woff2": "4a259dde317e08aa5d37e6eb684e222ae833516b2a0fccba36ee5e36224f16be",
+        "exo-2-cyrillic.woff2": "b47f37d67877becd66794516601cce5703d182857945ec9d1e7137a1ead38192"
+      }
+    },
+    "Jura": {
+      "package": "@fontsource-variable/jura",
+      "version": "5.1.1",
+      "files": {
+        "jura-latin.woff2": "4b652d4132b2cd01a8a239687d502f08d050266a4cbc662ba08925e3bbe7b694",
+        "jura-cyrillic.woff2": "1ea4dfe39a7429de76377c98806afe8f1da0aa38d3d37b8eda241db017e2b7a9"
+      }
+    },
+    "JetBrains Mono": {
+      "package": "@fontsource-variable/jetbrains-mono",
+      "version": "5.1.2",
+      "files": {
+        "jetbrains-mono-latin.woff2": "18be452724bfdc236c074ca94a249a7f41a86752c7d04ab258ce9ed5651f6a7e",
+        "jetbrains-mono-cyrillic.woff2": "d274604c40757f98f07df623a8b8fb5194508a6fa4f5413a7a107f09e3b7452a"
+      }
+    }
+  }
+}

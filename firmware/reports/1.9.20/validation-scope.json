@@ -1,0 +1,47 @@
+{
+  "version": "1.9.20",
+  "firmware_sha256": "9f03ef90944e0373ba07d89a91b4ba1d3d35784f3bdb28be06e6626c5a16c5a2",
+  "physical_onu_test_this_version": false,
+  "reproducible_build": {
+    "SOURCE_DATE_EPOCH": 1763625600,
+    "identical_tar_from_two_builds": true
+  },
+  "checks": [
+    "31 jsdom/Chromium JavaScript test scripts passed, including release and unified browser checks against pages extracted from the built SquashFS",
+    "Python backend, firmware, diagnostics, debug guard, uplink and version tests passed",
+    "refreshed RU/EN screenshots rendered with the self-hosted fonts",
+    "TAR MD5, kernel CRC32, partition bounds, full SquashFS comparison and source/built byte equality"
+  ],
+  "not_passing_in_this_environment": {
+    "tests": [
+      "test_debug_lifecycle.py",
+      "test_logging.py",
+      "test_mods.py",
+      "test_ui.cjs"
+    ],
+    "note": "fail identically on unmodified 1.9.19 in the same container (shell timing, local syslog receiver, preview fixture); not affected by this change"
+  },
+  "changed_files_vs_1.9.19": [
+    "home/httpd/web/panel/ui.css",
+    "home/httpd/web/panel/panel.css",
+    "home/httpd/web/panel/native.css",
+    "login pages and themed factory pages (version and shared tokens)",
+    "home/httpd/boa.conf (AddType font/woff2)",
+    "home/httpd/web/panel/fonts/* (added)"
+  ],
+  "preserved": [
+    "kernel",
+    "drivers",
+    "bin/omci_app",
+    "bin/boa patch",
+    "CGI and device scripts",
+    "firmware bank writer and upload protocol",
+    "subscriber settings"
+  ],
+  "rootfs_bytes": 2404514,
+  "rootfs_limit": 2572288,
+  "limits": [
+    "no physical ONU test of this firmware",
+    "font loading on the login page before sign-in depends on the factory web server; system fonts are the fallback"
+  ]
+}

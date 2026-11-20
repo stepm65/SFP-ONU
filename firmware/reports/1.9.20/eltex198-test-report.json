@@ -1,0 +1,14 @@
+{
+  "result": "passed",
+  "scope": "jsdom; simulated API; no ONU/OLT hardware test",
+  "checks": [
+    "preset preparation has no device writes",
+    "only selected fields saved; credentials and port identity preserved",
+    "same O5 across reboot records uptime reset",
+    "empty uptime does not imply reboot",
+    "final state used after long collection",
+    "native timer read is read-only; unavailable differs from disabled",
+    "expanded MIB export redacts SerialNum",
+    "topology and incomplete collection are visible"
+  ]
+}

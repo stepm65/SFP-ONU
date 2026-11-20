@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ru">
 <head>
-<meta charset="utf-8"><meta name="odi-panel-version" content="1.9.19"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
+<meta charset="utf-8"><meta name="odi-panel-version" content="1.9.20"><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"><meta http-equiv="Pragma" content="no-cache"><meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>ODI · Вход</title>
 <script src="md5.js" type="text/javascript"></script>
@@ -13,10 +13,18 @@ function setpass() {
 <style>
 /* UI-TOKENS:START */
 /* Shared by the panel, factory forms and the pre-authentication login. */
+/* Fonts are served from the stick itself (SIL OFL 1.1, see /panel/fonts/OFL.txt); no external requests. */
+@font-face { font-family: "Exo 2"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("/panel/fonts/exo-2-cyrillic.woff2") format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+@font-face { font-family: "Exo 2"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("/panel/fonts/exo-2-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "Jura"; font-style: normal; font-weight: 300 700; font-display: swap; src: url("/panel/fonts/jura-cyrillic.woff2") format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+@font-face { font-family: "Jura"; font-style: normal; font-weight: 300 700; font-display: swap; src: url("/panel/fonts/jura-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url("/panel/fonts/jetbrains-mono-cyrillic.woff2") format("woff2"); unicode-range: U+0301,U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116; }
+@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 100 800; font-display: swap; src: url("/panel/fonts/jetbrains-mono-latin.woff2") format("woff2"); unicode-range: U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD; }
 :root {
   color-scheme: light;
-  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Consolas, monospace;
+  --font-ui: "Exo 2", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --font-display: "Jura", "Exo 2", "Segoe UI", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Consolas, monospace;
   --text-small: 12px;
   --text-body: 14px;
   --text-title: 16px;
@@ -64,7 +72,7 @@ input[type=file]::file-selector-button {
 .language-switch button[aria-pressed=true]{background:var(--blue);color:white}
 
 /* UI-TOKENS:END */
-:root{background:var(--bg)}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column}header{display:flex;justify-content:space-between;align-items:center;padding:24px 32px;gap:20px}.brand{display:flex;align-items:center;gap:12px;font-size:23px;font-weight:750;letter-spacing:1px}.mark{display:grid;place-items:center;width:39px;height:39px;border:2px solid var(--blue);border-radius:12px;color:var(--blue)}.brand small{display:block;font-size:var(--text-small);letter-spacing:1.8px;font-weight:500;color:var(--muted)}select,button,input{font:inherit}select{background:white;border:1px solid var(--line);border-radius:var(--radius-control);padding:8px;color:var(--ink)}main{flex:1;display:grid;place-items:center;padding:28px 20px 64px}.card{background:white;border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:0 14px 44px var(--ink)08;width:100%;max-width:420px;padding:36px}.eyebrow{font-size:var(--text-small);letter-spacing:1.5px;color:var(--muted);margin:0 0 12px}h1{font-size:28px;line-height:1.2;margin:0 0 12px;letter-spacing:-.5px}.intro{color:var(--muted);margin:0 0 28px;font-size:14px}label{display:block;font-size:var(--text-body);font-weight:600;margin:0 0 8px}.field{margin-bottom:20px}input:not([type=hidden]):not([type=submit]){width:100%;height:var(--control-height);border:1px solid var(--line);border-radius:var(--radius-control);padding:10px 12px;background:#fff;color:var(--ink)}.password{position:relative}.password input{padding-right:86px!important}.reveal{position:absolute;right:5px;top:5px;height:30px;padding:0 10px;border:0;background:transparent;color:var(--blue);font-size:var(--text-small);cursor:pointer}.submit{display:block;width:100%;height:var(--control-height);border:0;border-radius:var(--radius-control);background:var(--blue);color:white;font-weight:600;cursor:pointer;margin-top:26px}.submit:hover{filter:brightness(.94)}:focus-visible{outline:3px solid #eaa442;outline-offset:3px}.note{border-top:1px solid var(--line);padding-top:20px;margin:24px 0 0;font-size:var(--text-small);color:var(--muted)}footer{text-align:center;padding:16px 20px 24px;color:var(--muted);font-size:var(--text-small)}.captcha{display:flex;gap:12px;align-items:center}.captcha img{border:1px solid var(--line);border-radius:4px}@media(max-width:480px){header{padding:20px}.card{padding:28px 24px}main{padding:20px 16px 36px}h1{font-size:25px}}
+:root{background:var(--bg)}*{box-sizing:border-box}body{margin:0;min-height:100vh;display:flex;flex-direction:column}header{display:flex;justify-content:space-between;align-items:center;padding:24px 32px;gap:20px}.brand{display:flex;align-items:center;gap:12px;font-family:var(--font-display);font-size:23px;font-weight:700;letter-spacing:1px}.mark{display:grid;place-items:center;width:39px;height:39px;border:2px solid var(--blue);border-radius:12px;color:var(--blue)}.brand small{display:block;font-family:var(--font-ui);font-size:var(--text-small);letter-spacing:1.8px;font-weight:500;color:var(--muted)}select,button,input{font:inherit}select{background:white;border:1px solid var(--line);border-radius:var(--radius-control);padding:8px;color:var(--ink)}main{flex:1;display:grid;place-items:center;padding:28px 20px 64px}.card{background:white;border:1px solid var(--line);border-radius:var(--radius-card);box-shadow:0 14px 44px var(--ink)08;width:100%;max-width:420px;padding:36px}.eyebrow{font-size:var(--text-small);letter-spacing:1.5px;color:var(--muted);margin:0 0 12px}h1{font-family:var(--font-display);font-weight:700;font-size:28px;line-height:1.2;margin:0 0 12px;letter-spacing:0}.intro{color:var(--muted);margin:0 0 28px;font-size:14px}label{display:block;font-size:var(--text-body);font-weight:600;margin:0 0 8px}.field{margin-bottom:20px}input:not([type=hidden]):not([type=submit]){width:100%;height:var(--control-height);border:1px solid var(--line);border-radius:var(--radius-control);padding:10px 12px;background:#fff;color:var(--ink)}.password{position:relative}.password input{padding-right:86px!important}.reveal{position:absolute;right:5px;top:5px;height:30px;padding:0 10px;border:0;background:transparent;color:var(--blue);font-size:var(--text-small);cursor:pointer}.submit{display:block;width:100%;height:var(--control-height);border:0;border-radius:var(--radius-control);background:var(--blue);color:white;font-weight:600;cursor:pointer;margin-top:26px}.submit:hover{filter:brightness(.94)}:focus-visible{outline:3px solid #eaa442;outline-offset:3px}.note{border-top:1px solid var(--line);padding-top:20px;margin:24px 0 0;font-size:var(--text-small);color:var(--muted)}footer{text-align:center;padding:16px 20px 24px;color:var(--muted);font-size:var(--text-small)}.captcha{display:flex;gap:12px;align-items:center}.captcha img{border:1px solid var(--line);border-radius:4px}@media(max-width:480px){header{padding:20px}.card{padding:28px 24px}main{padding:20px 16px 36px}h1{font-size:25px}}
 </style>
 </head>
 <body>
@@ -83,7 +91,7 @@ input[type=file]::file-selector-button {
 </form>
 <p class="note" data-en="Administrator access is required to manage settings.">Для управления настройками нужны права администратора.</p>
 </section></main>
-<footer><span data-en="Local device management">Локальное управление устройством</span> · ODI Panel 1.9.19</footer>
+<footer><span data-en="Local device management">Локальное управление устройством</span> · ODI Panel 1.9.20</footer>
 <script>
 (function(){
  var language=document.getElementById('language'),pass=document.getElementById('password'),reveal=document.getElementById('reveal'),lang='ru';

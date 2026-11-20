@@ -6,7 +6,13 @@ p=Path(__file__).resolve().parent
 from release import VERSION, sync_sources
 sync_sources(check=True)
 root=p.parent/'base/files/home/httpd/web';en=json.loads((p/'native-en.json').read_text())
+import base64
+def embed_fonts(text):
+ return re.sub(r'url\("/panel/fonts/([a-z0-9-]+\.woff2)"\)',lambda m:'url("data:font/woff2;base64,'+base64.b64encode((p/'src/fonts'/m[1]).read_bytes()).decode()+'")',text)
+ui_css=embed_fonts((p/'src/ui.css').read_text())
+# Native snapshots keep /panel/fonts/ URLs; the preview swaps in one shared copy at runtime.
 css=(p/'src/ui.css').read_text()+'\n'+(p/'src/native.css').read_text();pages={}
+font_data={f.name:'data:font/woff2;base64,'+base64.b64encode(f.read_bytes()).decode() for f in sorted((p/'src/fonts').glob('*.woff2'))}
 files=['status.asp','status_pon.asp','tcpiplan.asp','wanmode.asp','multi_wan_generic.asp','gpon.asp','epon.asp','vlan.asp','omci_info.asp','arptable.asp','ping.asp','saveconf.asp','password.asp','rebootTime.asp','reboot.asp','upgrade.asp','stats.asp','admin/pon-stats.asp']
 for name in files:
  s=((p/'src/saveconf.asp') if name=='saveconf.asp' else root/name).read_text()
@@ -29,8 +35,8 @@ for name in files:
  pages['/'+name]='<!doctype html>\n'+str(soup)
 pages=json.loads(subprocess.run(['node',str(p/'normalize_preview.cjs')],input=json.dumps(pages),capture_output=True,text=True,encoding='utf-8',check=True).stdout)
 pages['/boaform/formWanRedirect?redirect-url=/multi_wan_generic.asp&if=pon']=pages['/multi_wan_generic.asp']
-s=(p/'src/index.html').read_text().replace('href="/panel/','href="').replace('src="/panel/','src="').replace('?v='+VERSION,'').replace('<link rel="stylesheet" href="ui.css">','<style>'+(p/'src/ui.css').read_text()+'</style>').replace('<link rel="stylesheet" href="panel.css">','<style>'+(p/'src/panel.css').read_text()+'</style>')
-s=s.replace('<script defer src="translations.js"></script>','<script>window.ODINativePreview='+json.dumps(pages,ensure_ascii=False).replace('</','<\\/')+';</script><script defer src="translations.js"></script>')
+s=(p/'src/index.html').read_text().replace('href="/panel/','href="').replace('src="/panel/','src="').replace('?v='+VERSION,'').replace('<link rel="stylesheet" href="ui.css">','<style>'+ui_css+'</style>').replace('<link rel="stylesheet" href="panel.css">','<style>'+(p/'src/panel.css').read_text()+'</style>')
+s=s.replace('<script defer src="translations.js"></script>','<script>window.ODINativePreview='+json.dumps(pages,ensure_ascii=False).replace('</','<\\/')+';(function(f){for(const k in window.ODINativePreview)window.ODINativePreview[k]=window.ODINativePreview[k].replace(/\\/panel\\/fonts\\/([a-z0-9-]+\\.woff2)/g,(m,n)=>f[n]||m);})('+json.dumps(font_data)+');</script><script defer src="translations.js"></script>')
 for file in ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js']:
  script=(p/'src'/file).read_text().replace("const preview = location.protocol", "const preview = true || location.protocol")
  s=s.replace('<script defer src="'+file+'"></script>','<script>'+script.replace('</script','<\\/script')+'</script>')
@@ -41,7 +47,7 @@ s=s.replace('</body>', ''.join(scripts)+'</body>')
 (p/'native-preview.json').write_text(json.dumps(pages,ensure_ascii=False))
 
 # Use the same login template as both firmware routes. This preview cannot log in.
-login=(p/'src/login-template.asp').read_text()
+login=embed_fonts((p/'src/login-template.asp').read_text())
 login=login.replace('<% passwd2xmit(); %>', 'return false;')
 login=re.sub(r'<script src="md5.js"[^>]*></script>', '', login)
 login=login.replace('action="/boaform/admin/formLogin"', 'action="#"').replace('onsubmit="setpass()"', 'onsubmit="return false"')

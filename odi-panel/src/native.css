@@ -8,8 +8,8 @@ font, table, tbody, tr, td, th { font: inherit; }
 body .native-table td, body .native-table th { font: inherit; }
 font { font: inherit !important; color: inherit !important; }
 font.native-warning { color: var(--danger) !important; }
-h1 { font-size: var(--text-page); line-height: 1.2; margin: 0 0 8px; }
-h2 { font-size: var(--text-title); line-height: 1.4; margin: 20px 0 12px; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: var(--text-page); line-height: 1.2; margin: 0 0 8px; }
+h2 { font-family: var(--font-display); font-weight: 700; font-size: var(--text-title); line-height: 1.4; margin: 20px 0 12px; }
 h3 { font-size: var(--text-body); margin: 0 0 12px; }
 small { font-size: var(--text-small); color: var(--muted); }
 form { margin: 0 0 20px; }

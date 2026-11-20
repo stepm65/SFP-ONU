@@ -1,0 +1,11 @@
+{
+  "result": "passed",
+  "scope": "jsdom, expired-session HTTP responses simulated; no physical Boa timeout test",
+  "checks": [
+    "old versioned deep link canonicalises to native root entry",
+    "all assets/CGI use absolute panel paths",
+    "expired-session sign-in banner survives initial load failure",
+    "reauthentication uses root in another tab and preserves draft",
+    "System omits language/logout duplicates; topbar controls remain"
+  ]
+}
