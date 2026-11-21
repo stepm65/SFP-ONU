@@ -1,4 +1,6 @@
-# Publishes a GitHub release for a version tag (v1.9.20, ...).
+# Publishes a GitHub release for a panel version.
+# Runs when odi-panel/VERSION changes on main (the workflow creates the vX.Y.Z tag itself),
+# when a v* tag is pushed, or manually for a given tag.
 # The firmware TAR is the one committed in firmware/ and listed in firmware/SHA256SUMS;
 # the job rebuilds it from source as a cross-check and packages the source ZIP.
 # Re-running for an existing tag updates its title, notes and files.
@@ -6,11 +8,13 @@ name: Release
 
 on:
   push:
+    branches: [main]
+    paths: ['odi-panel/VERSION']
     tags: ['v*']
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Existing tag to publish, e.g. v1.9.20'
+        description: 'Tag to publish, e.g. v1.9.21 (created on main if it does not exist yet)'
         required: true
 
 permissions:
@@ -24,15 +28,40 @@ jobs:
   release:
     runs-on: ubuntu-24.04
     env:
-      TAG: ${{ github.event.inputs.tag || github.ref_name }}
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: refs/tags/${{ github.event.inputs.tag || github.ref_name }}
+
+      - name: Resolve tag and source commit
+        id: tag
+        run: |
+          set -eu
+          case "${{ github.event_name }}:${{ github.ref_type }}" in
+            push:tag)  tag="${{ github.ref_name }}" ;;
+            push:branch) tag="v$(cat odi-panel/VERSION)" ;;
+            *) tag="${{ github.event.inputs.tag }}" ;;
+          esac
+          remote=$(git ls-remote origin "refs/tags/$tag" | cut -f1)
+          if [ -n "$remote" ]; then
+            if [ "${{ github.event_name }}:${{ github.ref_type }}" = "push:branch" ]; then
+              echo "Tag $tag already exists; nothing to publish for this push." >> "$GITHUB_STEP_SUMMARY"
+              echo "skip=true" >> "$GITHUB_OUTPUT"; echo "tag=$tag" >> "$GITHUB_OUTPUT"; exit 0
+            fi
+            git fetch --depth=1 origin "refs/tags/$tag:refs/tags/$tag"
+            git checkout -q "refs/tags/$tag"
+            echo "create=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "create=true" >> "$GITHUB_OUTPUT"
+          fi
+          echo "skip=false" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       - name: Check tag, version and committed firmware
+        if: steps.tag.outputs.skip != 'true'
         id: meta
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
           set -eu
           version=$(cat odi-panel/VERSION)
@@ -46,6 +75,7 @@ jobs:
           echo "tar=$tar_name" >> "$GITHUB_OUTPUT"
 
       - name: Install build tools
+        if: steps.tag.outputs.skip != 'true'
         run: |
           sudo apt-get update -q
           sudo apt-get install -y -q squashfs-tools
@@ -53,6 +83,9 @@ jobs:
           (cd tools/dom && npm ci --no-audit --no-fund)
 
       - name: Rebuild from source and compare
+        if: steps.tag.outputs.skip != 'true'
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
           set -eu
           version=${{ steps.meta.outputs.version }}
@@ -75,6 +108,7 @@ jobs:
           fi
 
       - name: Package source ZIP
+        if: steps.tag.outputs.skip != 'true'
         run: |
           set -eu
           version=${{ steps.meta.outputs.version }}
@@ -87,6 +121,9 @@ jobs:
           ls -l "ODI-Panel-$version-RU-EN-SFU-240408.zip"
 
       - name: Create or update the release
+        if: steps.tag.outputs.skip != 'true'
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
         run: |
           set -eu
           version=${{ steps.meta.outputs.version }}
@@ -96,6 +133,6 @@ jobs:
             gh release edit "$TAG" --title "ODI Panel $version" --notes-file "$notes" --draft=false
             gh release upload "$TAG" $files --clobber
           else
-            gh release create "$TAG" $files --title "ODI Panel $version" --notes-file "$notes" --verify-tag
+            gh release create "$TAG" $files --title "ODI Panel $version" --notes-file "$notes" --target "${{ steps.tag.outputs.sha }}"
           fi
           gh release view "$TAG" --json url,assets --jq '.url, (.assets[] | "\(.name) \(.size)")' >> "$GITHUB_STEP_SUMMARY"
