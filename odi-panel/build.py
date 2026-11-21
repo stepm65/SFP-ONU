@@ -62,9 +62,9 @@ omci_binary,omci_patch_report=patch_omci(before['bin/omci_app']['data'])
 mods={'bin/boa':boa_binary,'bin/omci_app':omci_binary}
 (out/'boa-patch-report.json').write_text(json.dumps(boa_patch_report,indent=2)+'\n')
 (out/'omci-patch-report.json').write_text(json.dumps(omci_patch_report,indent=2)+'\n')
-for n in ['index.html','ui.css','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','uplink.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js']:
+for n in ['index.html','ui.css','panel.css','panel.js','api.cgi','upload.cgi','translations.js','i18n.js','native-menu.js','native.js','native.css','uplink.js','mods.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','terminal.js','ux.js','layout.js']:
  mods['home/httpd/web/panel/'+n]=(PROJECT/'src'/n).read_bytes()
-for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh','odi-log-lib.sh','odi-log-run.sh','odi-debug-lib.sh','odi-debug.sh','odi-debug-ring.awk','odi-omci-reboot.sh','odi-fw-lib.sh','odi-fw-stream.sh','odi-fw-compare.sh','odi-firmware-worker.sh']:
+for n in ['odi-mods-lib.sh','odi-mods-run.sh','odi-diagnostics.sh','odi-uplink.sh','odi-log-lib.sh','odi-log-run.sh','odi-debug-lib.sh','odi-debug.sh','odi-debug-ring.awk','odi-omci-reboot.sh','odi-fw-lib.sh','odi-fw-stream.sh','odi-fw-compare.sh','odi-firmware-worker.sh','odi-terminal.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src'/n).read_bytes()
 for n in ['fix_speed.sh','fix_sw_ver.sh','fix_vlan_tag.sh','fix_vlan_fwdop.sh']:
  mods['etc/scripts/'+n]=(PROJECT/'src/anime'/n).read_bytes()

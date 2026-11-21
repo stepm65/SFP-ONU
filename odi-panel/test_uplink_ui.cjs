@@ -3,7 +3,7 @@ const {JSDOM}=require('../tools/dom/node_modules/jsdom');
 const p=__dirname;
 (async()=>{
  const dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#link',runScripts:'outside-only'}),w=dom.window,c=dom.getInternalVMContext(),d=w.document;
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8'),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','terminal.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8'),c);
  await new Promise(r=>setTimeout(r,30));
  assert(d.querySelector('[data-settings="mod-speed"]'));
  assert(d.querySelector('[name="MOD_FLOWCONTROL"]'));

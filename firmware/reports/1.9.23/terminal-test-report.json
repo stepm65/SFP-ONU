@@ -1,0 +1,20 @@
+{
+  "result": "passed",
+  "cases": 12,
+  "checks": [
+    "state reports the terminal off by default with a 900 s window",
+    "commands are refused while the terminal is off",
+    "enable requires a local client address, the CSRF token and no parameters",
+    "enable opens a 15-minute window and logs a credential-free event",
+    "runs shell commands, keeps the working directory, returns exit code and stderr",
+    "rejects multi-line, oversized, duplicate and empty commands",
+    "a command over the time limit is stopped together with its child processes",
+    "output is capped by ulimit -f and the RAM buffer is emptied after each command",
+    "one command at a time; Abort stops the running command",
+    "command history stays in RAM and is not forwarded to the event log or syslog",
+    "the window expires by uptime; expired terminals refuse commands",
+    "disable closes the window immediately"
+  ],
+  "path": "device command set only (device-commands.txt)",
+  "environment": "host POSIX shell; no ONU"
+}

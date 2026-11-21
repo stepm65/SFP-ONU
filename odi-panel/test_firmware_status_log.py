@@ -22,6 +22,7 @@ with tempfile.TemporaryDirectory(dir=project) as tmp:
         'STATE=/tmp/odi-panel': 'STATE=' + str(runtime),
         '/etc/scripts/odi-mods-lib.sh': str(root / 'mods'),
         '/etc/scripts/odi-log-lib.sh': str(root / 'log'),
+        '/etc/scripts/odi-terminal.sh': str(project / 'src/odi-terminal.sh'),
         'PATH=/bin:/sbin:/usr/bin:/usr/sbin': 'PATH=' + devpath.make(root),
     }.items():
         assert old in source

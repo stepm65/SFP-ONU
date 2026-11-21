@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert'),{JSDOM}=require('../tools/dom/node_modules/jsdom');
 (async()=>{
  const p=__dirname,dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#firmware',runScripts:'outside-only'}),w=dom.window,c=dom.getInternalVMContext();
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8'),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','terminal.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8'),c);
  await new Promise(r=>setTimeout(r,25));
  let requests=[],samples=[{firmware_phase:'checking',firmware_status:'CHECKING bank=1',firmware_worker_alive:'1'},{firmware_phase:'writing',firmware_status:'WRITING bank=1',firmware_worker_alive:'1'},{firmware_phase:'verified',firmware_status:'VERIFIED bank=1'}];
  w.samples=samples;vm.runInContext("readApi=async q=>{if(q!=='operation')throw Error(q);return window.samples.shift();}",c);

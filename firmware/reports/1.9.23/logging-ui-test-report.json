@@ -1,0 +1,12 @@
+{
+  "result": "passed",
+  "scope": "jsdom + simulated CGI, no hardware",
+  "checks": [
+    "local 64KiB journal and TCP syslog controls",
+    "endpoint validation",
+    "settings save readback updates state without reboot",
+    "journal uses textContent",
+    "fixed test action",
+    "RU/EN controls"
+  ]
+}

@@ -1,7 +1,7 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert'),{JSDOM}=require('../tools/dom/node_modules/jsdom');
 (async()=>{
  const p=__dirname,dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#diagnostics',runScripts:'outside-only'}),w=dom.window,d=w.document,c=dom.getInternalVMContext();
- for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
+ for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','terminal.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
  await new Promise(r=>setTimeout(r,25));const form=d.querySelector('[data-settings=debug]');assert(form);assert.equal(form.elements.DEBUG_REMOTE.value,'0');assert.equal(form.elements.DEBUG_BOOT.value,'0');assert.equal(form.elements.DEBUG_SECONDS.value,'180');
  let calls=[];w.calls=calls;vm.runInContext("preview=false;api=async(a,params)=>{window.calls.push({a,params});return {...params,ok:'1',debug_rc:'0'};};readApi=async()=>({debug_status:'state=capturing\\nstarted_uptime=10\\nupdated_uptime=20',debug_raw_bytes:'96',debug_parsed_bytes:'256'});",c);
  form.elements.DEBUG_SECONDS.value='60';form.elements.DEBUG_REMOTE.value='1';form.elements.DEBUG_BOOT.value='1';

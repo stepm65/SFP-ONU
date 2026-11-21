@@ -29,7 +29,7 @@ case "$1" in
 esac
 '''.replace('ROOT',shlex.quote(str(debug)))
  (r/'debug.sh').write_text(fixture);(r/'debug.sh').chmod(0o755)
- api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-log-lib.sh',lib).replace('/etc/scripts/odi-mods-lib.sh',str(P/'src/odi-mods-lib.sh')).replace('/etc/scripts/odi-debug.sh',str(r/'debug.sh')).replace('/tmp/odi-panel',str(state)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+path)
+ api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-terminal.sh',str(P/'src/odi-terminal.sh')).replace('/etc/scripts/odi-log-lib.sh',lib).replace('/etc/scripts/odi-mods-lib.sh',str(P/'src/odi-mods-lib.sh')).replace('/etc/scripts/odi-debug.sh',str(r/'debug.sh')).replace('/tmp/odi-panel',str(state)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+path)
  (r/'api').write_text(api)
  def request(action=None,fields=None,user='admin',csrf=token,query='debug_status'):
   body=b'' if action is None else ('action='+action+'\ncsrf='+csrf+'\n'+''.join(k+'='+v.encode().hex()+'\n' for k,v in (fields or {}).items())).encode()

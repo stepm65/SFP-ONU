@@ -26,7 +26,7 @@ with tempfile.TemporaryDirectory(dir=P) as temp:
  (debug/'reboot-until').write_text('1100');(debug/'status').write_text('state=stopped\n');assert run()=='1\n'
  checks.append('disabled, expired, excessive, malformed and stopped sessions execute original reboot; armed capture skips it')
  (state/'token').write_text('test-token\n')
- api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-log-lib.sh',lib).replace('/etc/scripts/odi-mods-lib.sh',str(P/'src/odi-mods-lib.sh')).replace('/tmp/odi-panel',str(state)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+path)
+ api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-terminal.sh',str(P/'src/odi-terminal.sh')).replace('/etc/scripts/odi-log-lib.sh',lib).replace('/etc/scripts/odi-mods-lib.sh',str(P/'src/odi-mods-lib.sh')).replace('/tmp/odi-panel',str(state)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+path)
  (r/'api').write_text(api)
  def request(action, token='test-token', user='admin', extra=''):
   body=f'action={action}\ncsrf={token}\n'+extra

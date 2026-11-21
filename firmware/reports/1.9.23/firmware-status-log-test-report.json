@@ -1,0 +1,9 @@
+{
+  "result": "passed",
+  "scope": "actual CGI with simulated state and 57 KB carriage-return erase log",
+  "checks": [
+    "status and verified phase preserved",
+    "most recent log limited to 2048 bytes",
+    "original log unchanged"
+  ]
+}
