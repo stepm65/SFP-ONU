@@ -1,0 +1,9 @@
+{
+  "result": "passed",
+  "scope": "restricted host shell, real handler and CGI with simulated uptime/reboot destination; no physical device",
+  "checks": [
+    "disabled, expired, excessive, malformed and stopped sessions execute original reboot; armed capture skips it",
+    "authenticated CSRF-protected fixed CGI actions limit probe to five minutes and capture deadline; stop removes RAM state",
+    "actual SDK O1/O3/O5 strings and legacy formats recognized; unrelated digits rejected"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "result": "passed",
+  "environment": "jsdom and uploaded Lantiq UCI; no device writes",
+  "checks": [
+    "hash navigation cancellation keeps draft and DOM",
+    "accepted navigation proceeds",
+    "PON stage parser rejects failed read",
+    "VLAN entity and special VID parser",
+    "working GZ tar decompression and UCI SN/PLOAM mappings",
+    "Lantiq uvlan is reference only",
+    "suggested hardware mapping unchecked by default",
+    "whitelist rejects shell payload and mirrored fields",
+    "XML chain values ignored",
+    "sanitised export excludes secrets",
+    "polling preserves form DOM",
+    "auth expiry preserves edited form",
+    "no profile secrets in localStorage"
+  ]
+}
