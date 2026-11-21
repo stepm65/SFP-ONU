@@ -61,7 +61,7 @@ with socket.create_connection((sys.argv[-2],int(sys.argv[-1])),timeout=2) as s:
  assert not (state/'syslog.lock').exists() and not (state/'logger-test.lock').exists()
  # Actual CGI configuration save, authentication, test isolation and clear.
  (state/'token').write_text('test-token\n')
- api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-log-lib.sh',lib).replace('/etc/scripts/odi-mods-lib.sh',str(P/'src/odi-mods-lib.sh')).replace('/etc/scripts/odi-log-run.sh',str(r/'runner')).replace('/tmp/odi-panel',str(state)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+path)
+ api=(P/'src/api.cgi').read_text().replace('/etc/scripts/odi-terminal.sh',str(P/'src/odi-terminal.sh')).replace('/etc/scripts/odi-log-lib.sh',lib).replace('/etc/scripts/odi-mods-lib.sh',str(P/'src/odi-mods-lib.sh')).replace('/etc/scripts/odi-log-run.sh',str(r/'runner')).replace('/tmp/odi-panel',str(state)).replace('PATH=/bin:/sbin:/usr/bin:/usr/sbin','PATH='+path)
  (r/'api').write_text(api)
  def request(action=None,fields=None,user='admin',token='test-token'):
   body='' if action is None else 'action='+action+'\ncsrf='+token+'\n'+''.join(k+'='+v.encode().hex()+'\n' for k,v in (fields or {}).items())

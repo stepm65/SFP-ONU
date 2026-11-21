@@ -1,11 +1,12 @@
 #!/bin/sh
-# ODI Panel: authenticated, fixed-operation CGI. No eval / arbitrary commands.
+# ODI Panel: authenticated, fixed-operation CGI. No eval / arbitrary commands here;
+# operator shell commands run only through odi-terminal.sh while the terminal is enabled.
 PATH=/bin:/sbin:/usr/bin:/usr/sbin
 export PATH
 LC_ALL=C
 export LC_ALL
 umask 077
-PANEL_VERSION=1.9.22
+PANEL_VERSION=1.9.23
 STATE=/tmp/odi-panel
 FLASH=/etc/scripts/flash
 NV=/bin/nv
@@ -95,6 +96,7 @@ if [ "$REQUEST_METHOD" = GET ]; then
  for key in $LOGKEYS;do emit "$key" "$(log_get "$key")";done
  for key in $DEBUGKEYS;do emit "$key" "$(debug_get "$key")";done
  emit panel_version "$PANEL_VERSION"
+ . /etc/scripts/odi-terminal.sh; term_status
  emit uptime "$(cat /proc/uptime)"
  emit pending_keys "$(cat "$STATE/pending-keys" 2>/dev/null)"
  emit mods_status "$(cat "$STATE/mods-status" 2>/dev/null)"
@@ -129,9 +131,11 @@ case "$CONTENT_LENGTH" in ''|*[!0-9]*) fail '400 Bad Request' 'Invalid request l
 [ "${#CONTENT_LENGTH}" -le 4 ] && [ "$CONTENT_LENGTH" -le 4096 ] || fail '413 Payload Too Large' 'Request exceeds 4096 bytes'
 case "$CONTENT_TYPE" in 'text/plain'|'text/plain;charset=UTF-8'|'text/plain; charset=UTF-8') ;; *) fail '415 Unsupported Media Type' 'text/plain required';; esac
 IFS= read -r action
-case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check|action=logging|action=log_test|action=log_clear|action=debug_config|action=debug_start|action=debug_stop|action=debug_export|action=debug_guard_start|action=debug_guard_stop) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
+case "$action" in action=save|action=bank|action=reboot|action=mods|action=restore_versions|action=uplink_apply|action=uplink_check|action=logging|action=log_test|action=log_clear|action=debug_config|action=debug_start|action=debug_stop|action=debug_export|action=debug_guard_start|action=debug_guard_stop|action=terminal_enable|action=terminal_disable|action=terminal_run|action=terminal_kill) action=${action#*=};; *) fail '400 Bad Request' 'Unknown action';; esac
 IFS= read -r supplied
 [ "$supplied" = "csrf=$token" ] || fail '403 Forbidden' 'Invalid CSRF token. Reload the page.'
+# The terminal has its own one-command lock so that Abort works while a command runs.
+case "$action" in terminal_*) . /etc/scripts/odi-terminal.sh; terminal_request "$action";; esac
 mkdir "$STATE/write.lock" 2>/dev/null || fail '409 Conflict' 'Another operation is running'
 WORK=$STATE/write.lock
 trap 'rm -r "$WORK"' 0

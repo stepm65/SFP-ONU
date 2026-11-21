@@ -8,8 +8,12 @@ sync_sources(check=True)
 checks=[]
 
 def page_version(text,label):
-    footer=re.search(r'<footer\b[^>]*>(.*?)</footer>',text,re.S)[1]
-    assert re.findall(r'ODI Panel (\d+\.\d+\.\d+)',footer)==[VERSION],label
+    if 'id="sidebar-version"' in text:
+        assert re.findall(r'id="sidebar-version">v(\d+\.\d+\.\d+)<',text)==[VERSION],label
+        assert '<footer' not in text,label
+    else:
+        footer=re.search(r'<footer\b[^>]*>(.*?)</footer>',text,re.S)[1]
+        assert re.findall(r'ODI Panel (\d+\.\d+\.\d+)',footer)==[VERSION],label
     assert f'name="odi-panel-version" content="{VERSION}"' in text,label
     checks.append(label)
 

@@ -1,0 +1,44 @@
+{
+  "version": "1.9.23",
+  "firmware_sha256": "e2c7ab55a0d4187d7c89c3498144a4c09d12a8d6bab1890ff9c56ee9040297c2",
+  "physical_onu_test_this_version": false,
+  "reproducible_build": {
+    "SOURCE_DATE_EPOCH": 1795284000,
+    "identical_tar_from_two_builds": true
+  },
+  "checks": [
+    "terminal backend: 12 checks with the stick command set (off by default, timed window, LAN only, CSRF, limits, abort, history)",
+    "jsdom/Chromium JavaScript tests passed, including release and unified browser checks against pages extracted from the built SquashFS",
+    "Python backend, firmware, diagnostics, debug guard, uplink and version tests passed",
+    "refreshed RU/EN screenshots",
+    "TAR MD5, kernel CRC32, partition bounds, full SquashFS comparison and source/built byte equality"
+  ],
+  "not_passing_in_this_environment": {
+    "tests": [
+      "test_debug_lifecycle.py",
+      "test_logging.py",
+      "test_mods.py"
+    ],
+    "note": "fail identically on unmodified 1.9.19 in the same container; not affected by this change"
+  },
+  "changed_vs_1.9.22": [
+    "terminal (terminal.js, odi-terminal.sh, api.cgi terminal_* actions, state fields)",
+    "page footer removed; version only on the sidebar plaque, aligned with menu icons"
+  ],
+  "preserved": [
+    "kernel",
+    "drivers",
+    "bin/omci_app",
+    "bin/boa patch",
+    "CGI actions outside the terminal",
+    "device scripts",
+    "firmware bank writer and upload protocol",
+    "subscriber settings"
+  ],
+  "rootfs_bytes": 2414202,
+  "rootfs_limit": 2572288,
+  "limits": [
+    "no physical ONU test of this firmware",
+    "REMOTE_ADDR delivery by Boa and Boa CGI time limits are not verified on the device"
+  ]
+}

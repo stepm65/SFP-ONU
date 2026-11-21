@@ -1,5 +1,5 @@
 const fs=require('fs'),vm=require('vm'),assert=require('assert'),{JSDOM}=require('../tools/dom/node_modules/jsdom');
-const files=['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'];
+const files=['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','terminal.js','ux.js','layout.js','panel.js'];
 (async()=>{
  const p=__dirname,dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?v=1.9.11#native-password',runScripts:'outside-only'}),w=dom.window,d=w.document,c=dom.getInternalVMContext(),urls=[];
  w.fetch=async url=>{urls.push(url);if(url==='/code.asp')return {ok:true,text:async()=>'<a target="view" href="/admin/logout.asp">Logout</a><a target="view" href="/multi_lang.asp">Language</a><a target="view" href="/password.asp">Password</a>'};return {ok:false,status:403,text:async()=>''};};

@@ -3,7 +3,7 @@ const fs=require('fs'),vm=require('vm'),assert=require('assert'),{JSDOM}=require
 const p=__dirname,dom=new JSDOM(fs.readFileSync(p+'/src/index.html','utf8'),{url:'http://onu/panel/index.html?preview=1#identity',runScripts:'outside-only'}),w=dom.window,d=w.document,c=dom.getInternalVMContext();
 w.localStorage.setItem('odi-panel-layout','compact');
 w.ODINativePreview={'/saveconf.asp':'<body>Backup form</body>'};
-for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
+for(const f of ['translations.js','i18n.js','native-menu.js','mods.js','uplink.js','mackey.js','ploam.js','firmware.js','diagnostics.js','profiles.js','terminal.js','ux.js','layout.js','panel.js'])vm.runInContext(fs.readFileSync(p+'/src/'+f,'utf8').replace('const preview =','let preview ='),c);
 await new Promise(r=>setTimeout(r,30));
 assert.equal(d.body.dataset.layout,'diagnostic');assert(!d.getElementById('diagnostic-toggle'));assert(!d.getElementById('diagnostic-rail').hidden);assert(!d.querySelector('select#language'));
 const draft=d.querySelector('[name=LOID]');draft.value='keep-draft';draft.dispatchEvent(new w.Event('input',{bubbles:true}));
