@@ -1,0 +1,12 @@
+{
+  "result": "passed",
+  "checks": [
+    "three independent save forms",
+    "speed-only and version-only requests",
+    "invalid adjacent VLAN draft preserved",
+    "active VLAN validation",
+    "inactive VLAN fields omitted",
+    "disabling preserves saved filters",
+    "SDK echo and prompt omitted from optical values"
+  ]
+}
