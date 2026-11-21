@@ -1,10 +1,10 @@
-# ODI Panel 1.9.21
+# ODI Panel 1.9.22
 
 [Русский](README.md) · **English**
 
 A web interface for Realtek RTL9601D GPON SFP sticks based on **ODI SFU V1.1.8-240408 / X100SFP**. Configure connections, inspect diagnostics, manage profiles and update either firmware bank in English or Russian.
 
-[Download TAR](https://github.com/stepm65/SFP-ONU/releases/download/v1.9.21/ODI-Panel-1.9.21-RU-EN-SFU-240408.tar) · [Release and source ZIP](https://github.com/stepm65/SFP-ONU/releases/tag/v1.9.21) · [Installation guide](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md)
+[Download TAR](https://github.com/stepm65/SFP-ONU/releases/download/v1.9.22/ODI-Panel-1.9.22-RU-EN-SFU-240408.tar) · [Release and source ZIP](https://github.com/stepm65/SFP-ONU/releases/tag/v1.9.22) · [Installation guide](odi-panel/docs/03-INSTALL-AND-RECOVERY-RU.md)
 
 ![Overview](docs/screenshots/en/overview.png)
 
@@ -42,11 +42,11 @@ Requires the **SFU 240408** base, **X100SFP** hardware tag and flash layout: k0/
 1. Back up the device under System → Backup and restore, and export a profile for mod settings.
 2. Under Firmware, select the running bank for the next boot, then upload the TAR into the other bank. Wait for a verified write.
 3. Select the verified bank and reboot separately.
-4. Open `http://<stick address>/` and check version **1.9.21** and PON registration.
+4. Open `http://<stick address>/` and check version **1.9.22** and PON registration.
 
 For initial installation from factory firmware, use its Firmware Upgrade page after checking the platform and partitions. Upload TAR, not ZIP. If a write is unconfirmed, inspect its status before switching banks.
 
-See [SHA256SUMS](firmware/SHA256SUMS) and [validation reports](firmware/reports/1.9.21/). MIPS handler, shell/CGI, FIFO, local TCP syslog and Chromium checks were run; physical testing of 1.9.21 remains pending. Reboot interception is a diagnostic experiment and does not guarantee Eltex connectivity. Compatibility with a particular OLT, including Eltex, depends on its configuration and OMCI implementation.
+See [SHA256SUMS](firmware/SHA256SUMS) and [validation reports](firmware/reports/1.9.22/). MIPS handler, shell/CGI, FIFO, local TCP syslog and Chromium checks were run; physical testing of 1.9.22 remains pending. Reboot interception is a diagnostic experiment and does not guarantee Eltex connectivity. Compatibility with a particular OLT, including Eltex, depends on its configuration and OMCI implementation.
 
 ## Source and documentation
 
@@ -55,7 +55,7 @@ The Russian guides cover [installation](odi-panel/docs/03-INSTALL-AND-RECOVERY-R
 `odi-panel/src/` contains the panel and device scripts; `odi-panel/test_*` contains tests. Building requires Python 3, BeautifulSoup, Node.js and squashfs-tools with LZMA and pseudo-file support. Device scripts use only commands listed in `odi-panel/device-commands.txt`.
 
 ```sh
-python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin release-1.9.21-sfu
+python3 odi-panel/build.py firmware/original/M110_sfp_ODI_SFU_240408.tar /usr/bin release-1.9.22-sfu
 ```
 
 Releases are published automatically: when `odi-panel/VERSION` changes on `main`, `.github/workflows/release.yml` creates the `vX.Y.Z` tag itself (a manually pushed tag works too). It checks the tag against `odi-panel/VERSION` and the TAR in `firmware/` against `SHA256SUMS`, rebuilds the firmware as a cross-check, packages the ZIP and attaches TAR, ZIP and `SHA256SUMS` with notes from `firmware/RELEASE-vX.Y.Z.md`. Manually: Actions → Release → Run workflow with the tag.

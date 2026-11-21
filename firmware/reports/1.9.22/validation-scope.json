@@ -1,0 +1,44 @@
+{
+  "version": "1.9.22",
+  "firmware_sha256": "5e585d4c12a29c5efe58c7f9eac89cd60d746c1caa3d094163d6709d06de80bb",
+  "physical_onu_test_this_version": false,
+  "reproducible_build": {
+    "SOURCE_DATE_EPOCH": 1795262400,
+    "identical_tar_from_two_builds": true
+  },
+  "checks": [
+    "jsdom/Chromium JavaScript tests passed, including profile preset, Eltex preset and localization checks",
+    "Python backend, firmware, diagnostics, debug guard, uplink and version tests passed",
+    "refreshed RU/EN screenshots",
+    "TAR MD5, kernel CRC32, partition bounds, full SquashFS comparison and source/built byte equality"
+  ],
+  "not_passing_in_this_environment": {
+    "tests": [
+      "test_debug_lifecycle.py",
+      "test_logging.py",
+      "test_mods.py"
+    ],
+    "note": "fail identically on unmodified 1.9.19 in the same container; not affected by this change"
+  },
+  "changed_vs_1.9.21": [
+    "Eltex preset renamed to Eltex OLT and placed before Custom OMCI",
+    "per-preset hints about connection credentials and PLOAM check",
+    "PLOAM and OLT mode field hints",
+    "Eltex guide: PLOAM password finding"
+  ],
+  "preserved": [
+    "kernel",
+    "drivers",
+    "bin/omci_app",
+    "bin/boa patch",
+    "CGI and device scripts",
+    "firmware bank writer and upload protocol",
+    "subscriber settings"
+  ],
+  "rootfs_bytes": 2405042,
+  "rootfs_limit": 2572288,
+  "limits": [
+    "no physical ONU test of this firmware",
+    "PLOAM finding confirmed on one Eltex OLT line; service (VLAN/WAN) not confirmed"
+  ]
+}
