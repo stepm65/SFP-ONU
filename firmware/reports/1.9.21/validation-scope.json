@@ -1,0 +1,42 @@
+{
+  "version": "1.9.21",
+  "firmware_sha256": "11683f1f88dda35f1f5ec1c3b3f0e3440ed336d9fd8e89002641f4173ea3ece3",
+  "physical_onu_test_this_version": false,
+  "reproducible_build": {
+    "SOURCE_DATE_EPOCH": 1795219200,
+    "identical_tar_from_two_builds": true
+  },
+  "checks": [
+    "jsdom/Chromium JavaScript tests passed, including release and unified browser checks against pages extracted from the built SquashFS",
+    "Python backend, firmware, diagnostics, debug guard, uplink and version tests passed",
+    "refreshed RU/EN screenshots",
+    "TAR MD5, kernel CRC32, partition bounds, full SquashFS comparison and source/built byte equality"
+  ],
+  "not_passing_in_this_environment": {
+    "tests": [
+      "test_debug_lifecycle.py",
+      "test_logging.py",
+      "test_mods.py"
+    ],
+    "note": "fail identically on unmodified 1.9.19 in the same container; not affected by this change"
+  },
+  "changed_vs_1.9.20": [
+    "sidebar bottom: one plaque with device model and panel version, links to Firmware",
+    "sidebar strip continues to the end of the page",
+    "version sync rule for the sidebar tag"
+  ],
+  "preserved": [
+    "kernel",
+    "drivers",
+    "bin/omci_app",
+    "bin/boa patch",
+    "CGI and device scripts",
+    "firmware bank writer and upload protocol",
+    "subscriber settings"
+  ],
+  "rootfs_bytes": 2404657,
+  "rootfs_limit": 2572288,
+  "limits": [
+    "no physical ONU test of this firmware"
+  ]
+}

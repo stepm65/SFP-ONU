@@ -63,6 +63,7 @@ function syncRuntimeVersion(){
  if(!/^\d+\.\d+\.\d+$/.test(actual||''))return;
  const footer=document.querySelector('footer');
  if(footer?.firstChild?.nodeType===3)footer.firstChild.nodeValue='ODI Panel '+actual+' ';
+ const tag=document.getElementById('sidebar-version');if(tag)tag.textContent='v'+actual;
  let note=document.getElementById('version-mismatch');
  if(shown===actual){note?.remove();return;}
  if(!note){note=document.createElement('div');note.id='version-mismatch';note.className='banner warn';footer?.before(note);}

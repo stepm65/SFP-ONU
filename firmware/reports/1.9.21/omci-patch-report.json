@@ -1,0 +1,19 @@
+{
+  "original_sha256": "49be07183fcf11dbc2fea82ee914da5dcaead8e3049a8e770febf5c528617484",
+  "patched_sha256": "55078c02e3188afcec1a77c211172def4fbdd6844f4d787594e170bf5e6d0dae",
+  "ranges": [
+    {
+      "offset": "0x10c08",
+      "bytes": 4
+    },
+    {
+      "offset": "0x10c40",
+      "bytes": 4
+    },
+    {
+      "offset": "0x1e894",
+      "bytes": 39
+    }
+  ],
+  "scope": "normal ONU-G Reboot invokes a script; default executes the original proc reboot; feature_api 42/43 and software activation paths unchanged"
+}

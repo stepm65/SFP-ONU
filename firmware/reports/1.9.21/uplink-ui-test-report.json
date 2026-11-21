@@ -1,0 +1,12 @@
+{
+  "result": "passed",
+  "scope": "jsdom, no hardware",
+  "checks": [
+    "upload and flow controls render",
+    "RB5009 configurable egress and interface",
+    "no unrelated LAN queue edits",
+    "command injection rejected",
+    "VEIP bit preserves other bits",
+    "Russian strings are not corrupted"
+  ]
+}
